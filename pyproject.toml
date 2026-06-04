@@ -1,0 +1,30 @@
+[build-system]
+requires = ["maturin>=1.0"]
+build-backend = "maturin"
+
+[project]
+name = "harmonis-prime"
+version = "6.2.0"
+description = "The Universal Enabler -- Zero-drift sovereign infrastructure"
+readme = "README.md"
+license = {text = "Sovereign License v1.0"}
+authors = [{name = "Pilot Ayub", email = "sovereign@harmonis.prime"}]
+keywords = ["sovereign", "zero-drift", "real-time", "governance", "fluid"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Rust",
+    "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
+Homepage = "https://harmonis.prime"
+Documentation = "https://docs.harmonis.prime"
+Repository = "https://github.com/sovereign-core/harmonis-prime"
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "mypy", "sphinx"]
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+module-name = "harmonis_prime"

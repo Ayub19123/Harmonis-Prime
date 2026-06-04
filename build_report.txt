@@ -1,0 +1,96 @@
+﻿cargo : warning: unused manifest key: bin.0.hex
+At line:1 char:10
++ $build = cargo check 2>&1
++          ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: unused manifest key: bin.0.hex:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Checking sovereign_core v6.2.0 (C:\Sovereign_Alpha_Final\SovereignCore\rust_core)
+warning: field `local_shard_id` is never read
+ --> src\federation_router.rs:4:5
+  |
+3 | pub struct FederationRouter {
+  |            ---------------- field in this struct
+4 |     local_shard_id: String,
+  |     ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `WAL_MAGIC` is never used
+ --> src\pom\operational_wal.rs:7:7
+  |
+7 | const WAL_MAGIC: [u8; 4] = *b"SPOM";
+  |       ^^^^^^^^^
+
+warning: constant `WAL_VERSION` is never used
+ --> src\pom\operational_wal.rs:8:7
+  |
+8 | const WAL_VERSION: u16 = 1;
+  |       ^^^^^^^^^^^
+
+warning: struct `WalSegmentHeader` is never constructed
+  --> src\pom\operational_wal.rs:13:8
+   |
+13 | struct WalSegmentHeader {
+   |        ^^^^^^^^^^^^^^^^
+
+warning: field `last_snapshot_epoch` is never read
+ --> src\pom\snapshot_engine.rs:8:5
+  |
+6 | pub struct SnapshotEngine {
+  |            -------------- field in this struct
+7 |     snapshot_dir: PathBuf,
+8 |     last_snapshot_epoch: u64,
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: field `bindings` is never read
+ --> src\runtime\flow_runtime.rs:8:5
+  |
+7 | pub struct FlowRuntime {
+  |            ----------- field in this struct
+8 |     bindings: HardwareBindings,
+  |     ^^^^^^^^
+
+warning: fields `fingerprint`, `bindings`, and `policy` are never read
+  --> src\runtime\telemetry_loop.rs:12:5
+   |
+11 | pub struct TelemetryLoop {
+   |            ------------- fields in this struct
+12 |     fingerprint: HardwareFingerprint,
+   |     ^^^^^^^^^^^
+13 |     bindings: HardwareBindings,
+   |     ^^^^^^^^
+14 |     policy: GovernancePolicy,
+   |     ^^^^^^
+
+warning: fields `qpu` and `router` are never read
+  --> src\brick46\quantum_synapse.rs:17:5
+   |
+16 | pub struct QuantumSynapse {
+   |            -------------- fields in this struct
+17 |     qpu: QPUEngine,
+   |     ^^^
+18 |     router: TensorRouter,
+   |     ^^^^^^
+
+warning: function `now_ns` is never used
+   --> src\brick46\quantum_synapse.rs:131:4
+    |
+131 | fn now_ns() -> u128 {
+    |    ^^^^^^
+
+warning: fields `node_id` and `node_count` are never read
+  --> src\brick51\shared_memory_graph.rs:18:5
+   |
+16 | pub struct SharedMemoryGraph {
+   |            ----------------- fields in this struct
+17 |     store: HashMap<String, CausalEntry>,
+18 |     node_id: usize,
+   |     ^^^^^^^
+19 |     node_count: usize,
+   |     ^^^^^^^^^^
+   |
+   = note: `SharedMemoryGraph` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: `sovereign_core` (lib) generated 10 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 15.97s
