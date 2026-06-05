@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Harmonis Prime – Post Tracker</title>
+    <style>
+        body { font-family: monospace; background: #0a0f1a; color: #eef5ff; padding: 2rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #2a4c6e; padding: 8px; text-align: left; }
+        th { background: #0cf; color: #000; }
+        a { color: #0cf; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>📡 Harmonis Prime – Publication Timeline</h1>
+    <div id="csv-container">Loading...</div>
+    <script>
+        fetch('HarmonisPrime_Posts.csv')
+            .then(response => response.text())
+            .then(csv => {
+                const lines = csv.trim().split('\n');
+                const headers = lines[0].split(',');
+                const rows = lines.slice(1).map(line => line.split(','));
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                headers.forEach(h => { const th = document.createElement('th'); th.textContent = h; headerRow.appendChild(th); });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+                const tbody = document.createElement('tbody');
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    row.forEach((cell, i) => {
+                        const td = document.createElement('td');
+                        if (i === 3) {
+                            const a = document.createElement('a');
+                            a.href = cell;
+                            a.textContent = 'Link';
+                            a.target = '_blank';
+                            td.appendChild(a);
+                        } else {
+                            td.textContent = cell;
+                        }
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                document.getElementById('csv-container').innerHTML = '';
+                document.getElementById('csv-container').appendChild(table);
+            });
+    </script>
+</body>
+</html>

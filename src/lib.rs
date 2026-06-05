@@ -142,3 +142,5 @@ pub mod brick49;
 pub mod brick50;
 
 pub mod brick51;
+
+pub mod benchmark;

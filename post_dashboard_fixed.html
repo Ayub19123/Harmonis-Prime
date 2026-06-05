@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Harmonis Prime – Post Tracker with Metrics</title>
+    <style>
+        body { font-family: monospace; background: #0a0f1a; color: #eef5ff; padding: 2rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #2a4c6e; padding: 8px; text-align: left; }
+        th { background: #0cf; color: #000; }
+        a { color: #0cf; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>📡 Harmonis Prime – Publication Timeline with Metrics</h1>
+    <div id="table-container"></div>
+    <script>
+        const data = [{"Date":"2026-06-05 11:25:29","Channel":"Reddit","Title":"Reproduction Request","URL":"https://www.reddit.com/r/rust/comments/...","Status":"active","Views":"False","Upvotes":"False","Comments":"False","Retweets":"False","Impressions":"False"},{"Date":"2026-06-05 11:26:02","Channel":"Zenodo","Title":"HBS-1.0 Specification","URL":"https://doi.org/10.5281/zenodo.20541821","Status":"active","Views":"42","Upvotes":"0","Comments":"0","Retweets":"0","Impressions":"120"},{"Date":"2026-06-05 11:27:09","Channel":"Figshare","Title":"HBS-1.0 Specification","URL":"https://doi.org/10.6084/m9.figshare.32578833","Status":"active","Views":"False","Upvotes":"False","Comments":"False","Retweets":"False","Impressions":"False"},{"Date":"2026-06-05 11:27:41","Channel":"GitHub","Title":"Harmonis Prime v7.1.0-BRICK51.3","URL":"https://github.com/Ayub19123/Harmonis-Prime/releases/tag/v7.1.0-BRICK51.3","Status":"active","Views":"0","Upvotes":"0","Comments":"0","Retweets":"0","Impressions":"0"},{"Date":"2026-06-05 11:27:53","Channel":"Reddit","Title":"Announcement","URL":"https://www.reddit.com/r/rust/comments/...","Status":"active","Views":"2700","Upvotes":"0","Comments":"0","Retweets":"0","Impressions":"0"},{"Date":"2026-06-05 11:28:03","Channel":"LinkedIn","Title":"Announcement","URL":"https://www.linkedin.com/feed/update/...","Status":"active","Views":"0","Upvotes":"3","Comments":"0","Retweets":"0","Impressions":"112"},{"Date":"2026-06-05 11:28:15","Channel":"Twitter","Title":"Thread","URL":"https://twitter.com/...","Status":"active","Views":"890","Upvotes":"12","Comments":"0","Retweets":"2","Impressions":"0"},{"Date":"2026-06-05 11:28:27","Channel":"HuggingFace","Title":"Dataset Card","URL":"https://huggingface.co/datasets/ayub227/harmonis-prime","Status":"active","Views":"15","Upvotes":"0","Comments":"0","Retweets":"0","Impressions":"0"},{"Date":"2026-06-05 11:28:41","Channel":"OpenHub","Title":"Project Page","URL":"https://openhub.net/p/harmonis-prime","Status":"active","Views":"False","Upvotes":"False","Comments":"False","Retweets":"False","Impressions":"False"}];
+        if (!data.length) { document.getElementById('table-container').innerHTML = '<p>No data yet.</p>'; }
+        else {
+            const headers = Object.keys(data[0]);
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            const tbody = document.createElement('tbody');
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(key => {
+                    const td = document.createElement('td');
+                    if (key === 'URL') {
+                        const a = document.createElement('a');
+                        a.href = row[key];
+                        a.textContent = 'Link';
+                        a.target = '_blank';
+                        td.appendChild(a);
+                    } else {
+                        td.textContent = row[key];
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            document.getElementById('table-container').appendChild(table);
+        }
+    </script>
+</body>
+</html>
