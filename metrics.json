@@ -1,0 +1,1001 @@
+[
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 0,
+    "latency_ns": 40900,
+    "throughput_ops_sec": 24449.877751,
+    "energy_joules": null,
+    "seed": 89898499835411
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 1,
+    "latency_ns": 25200,
+    "throughput_ops_sec": 39682.539683,
+    "energy_joules": null,
+    "seed": 89898499835412
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 2,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835413
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 3,
+    "latency_ns": 26300,
+    "throughput_ops_sec": 38022.813688,
+    "energy_joules": null,
+    "seed": 89898499835414
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 4,
+    "latency_ns": 26400,
+    "throughput_ops_sec": 37878.787879,
+    "energy_joules": null,
+    "seed": 89898499835415
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 5,
+    "latency_ns": 25600,
+    "throughput_ops_sec": 39062.500000,
+    "energy_joules": null,
+    "seed": 89898499835416
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 6,
+    "latency_ns": 25200,
+    "throughput_ops_sec": 39682.539683,
+    "energy_joules": null,
+    "seed": 89898499835417
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 7,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835418
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 8,
+    "latency_ns": 25700,
+    "throughput_ops_sec": 38910.505837,
+    "energy_joules": null,
+    "seed": 89898499835419
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 9,
+    "latency_ns": 29900,
+    "throughput_ops_sec": 33444.816054,
+    "energy_joules": null,
+    "seed": 89898499835420
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 10,
+    "latency_ns": 26300,
+    "throughput_ops_sec": 38022.813688,
+    "energy_joules": null,
+    "seed": 89898499835421
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 11,
+    "latency_ns": 61500,
+    "throughput_ops_sec": 16260.162602,
+    "energy_joules": null,
+    "seed": 89898499835422
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 12,
+    "latency_ns": 38200,
+    "throughput_ops_sec": 26178.010471,
+    "energy_joules": null,
+    "seed": 89898499835423
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 13,
+    "latency_ns": 58100,
+    "throughput_ops_sec": 17211.703959,
+    "energy_joules": null,
+    "seed": 89898499835424
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 14,
+    "latency_ns": 28400,
+    "throughput_ops_sec": 35211.267606,
+    "energy_joules": null,
+    "seed": 89898499835425
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 15,
+    "latency_ns": 27100,
+    "throughput_ops_sec": 36900.369004,
+    "energy_joules": null,
+    "seed": 89898499835426
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 16,
+    "latency_ns": 26800,
+    "throughput_ops_sec": 37313.432836,
+    "energy_joules": null,
+    "seed": 89898499835427
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 17,
+    "latency_ns": 65700,
+    "throughput_ops_sec": 15220.700152,
+    "energy_joules": null,
+    "seed": 89898499835428
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 18,
+    "latency_ns": 25900,
+    "throughput_ops_sec": 38610.038610,
+    "energy_joules": null,
+    "seed": 89898499835429
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 19,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835430
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 20,
+    "latency_ns": 39800,
+    "throughput_ops_sec": 25125.628141,
+    "energy_joules": null,
+    "seed": 89898499835431
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 21,
+    "latency_ns": 25800,
+    "throughput_ops_sec": 38759.689922,
+    "energy_joules": null,
+    "seed": 89898499835432
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 22,
+    "latency_ns": 26500,
+    "throughput_ops_sec": 37735.849057,
+    "energy_joules": null,
+    "seed": 89898499835433
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 23,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835434
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 24,
+    "latency_ns": 28100,
+    "throughput_ops_sec": 35587.188612,
+    "energy_joules": null,
+    "seed": 89898499835435
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 25,
+    "latency_ns": 28300,
+    "throughput_ops_sec": 35335.689046,
+    "energy_joules": null,
+    "seed": 89898499835436
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 26,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835437
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 27,
+    "latency_ns": 53700,
+    "throughput_ops_sec": 18621.973929,
+    "energy_joules": null,
+    "seed": 89898499835438
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 28,
+    "latency_ns": 25300,
+    "throughput_ops_sec": 39525.691700,
+    "energy_joules": null,
+    "seed": 89898499835439
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 29,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835440
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 30,
+    "latency_ns": 26200,
+    "throughput_ops_sec": 38167.938931,
+    "energy_joules": null,
+    "seed": 89898499835441
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 31,
+    "latency_ns": 25900,
+    "throughput_ops_sec": 38610.038610,
+    "energy_joules": null,
+    "seed": 89898499835442
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 32,
+    "latency_ns": 26500,
+    "throughput_ops_sec": 37735.849057,
+    "energy_joules": null,
+    "seed": 89898499835443
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 33,
+    "latency_ns": 25500,
+    "throughput_ops_sec": 39215.686275,
+    "energy_joules": null,
+    "seed": 89898499835444
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 34,
+    "latency_ns": 26100,
+    "throughput_ops_sec": 38314.176245,
+    "energy_joules": null,
+    "seed": 89898499835445
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 35,
+    "latency_ns": 26000,
+    "throughput_ops_sec": 38461.538462,
+    "energy_joules": null,
+    "seed": 89898499835446
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 36,
+    "latency_ns": 27000,
+    "throughput_ops_sec": 37037.037037,
+    "energy_joules": null,
+    "seed": 89898499835447
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 37,
+    "latency_ns": 27000,
+    "throughput_ops_sec": 37037.037037,
+    "energy_joules": null,
+    "seed": 89898499835448
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 38,
+    "latency_ns": 25900,
+    "throughput_ops_sec": 38610.038610,
+    "energy_joules": null,
+    "seed": 89898499835449
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 39,
+    "latency_ns": 41800,
+    "throughput_ops_sec": 23923.444976,
+    "energy_joules": null,
+    "seed": 89898499835450
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 40,
+    "latency_ns": 25400,
+    "throughput_ops_sec": 39370.078740,
+    "energy_joules": null,
+    "seed": 89898499835451
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 41,
+    "latency_ns": 27400,
+    "throughput_ops_sec": 36496.350365,
+    "energy_joules": null,
+    "seed": 89898499835452
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 42,
+    "latency_ns": 41700,
+    "throughput_ops_sec": 23980.815348,
+    "energy_joules": null,
+    "seed": 89898499835453
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 43,
+    "latency_ns": 27500,
+    "throughput_ops_sec": 36363.636364,
+    "energy_joules": null,
+    "seed": 89898499835454
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 44,
+    "latency_ns": 26800,
+    "throughput_ops_sec": 37313.432836,
+    "energy_joules": null,
+    "seed": 89898499835455
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 45,
+    "latency_ns": 26800,
+    "throughput_ops_sec": 37313.432836,
+    "energy_joules": null,
+    "seed": 89898499835456
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 46,
+    "latency_ns": 27400,
+    "throughput_ops_sec": 36496.350365,
+    "energy_joules": null,
+    "seed": 89898499835457
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 47,
+    "latency_ns": 26400,
+    "throughput_ops_sec": 37878.787879,
+    "energy_joules": null,
+    "seed": 89898499835458
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 48,
+    "latency_ns": 27700,
+    "throughput_ops_sec": 36101.083032,
+    "energy_joules": null,
+    "seed": 89898499835459
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 49,
+    "latency_ns": 24700,
+    "throughput_ops_sec": 40485.829960,
+    "energy_joules": null,
+    "seed": 89898499835460
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 50,
+    "latency_ns": 24700,
+    "throughput_ops_sec": 40485.829960,
+    "energy_joules": null,
+    "seed": 89898499835461
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 51,
+    "latency_ns": 25100,
+    "throughput_ops_sec": 39840.637450,
+    "energy_joules": null,
+    "seed": 89898499835462
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 52,
+    "latency_ns": 26400,
+    "throughput_ops_sec": 37878.787879,
+    "energy_joules": null,
+    "seed": 89898499835463
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 53,
+    "latency_ns": 26000,
+    "throughput_ops_sec": 38461.538462,
+    "energy_joules": null,
+    "seed": 89898499835464
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 54,
+    "latency_ns": 25100,
+    "throughput_ops_sec": 39840.637450,
+    "energy_joules": null,
+    "seed": 89898499835465
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 55,
+    "latency_ns": 25200,
+    "throughput_ops_sec": 39682.539683,
+    "energy_joules": null,
+    "seed": 89898499835466
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 56,
+    "latency_ns": 25100,
+    "throughput_ops_sec": 39840.637450,
+    "energy_joules": null,
+    "seed": 89898499835467
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 57,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835468
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 58,
+    "latency_ns": 27800,
+    "throughput_ops_sec": 35971.223022,
+    "energy_joules": null,
+    "seed": 89898499835469
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 59,
+    "latency_ns": 59600,
+    "throughput_ops_sec": 16778.523490,
+    "energy_joules": null,
+    "seed": 89898499835470
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 60,
+    "latency_ns": 25800,
+    "throughput_ops_sec": 38759.689922,
+    "energy_joules": null,
+    "seed": 89898499835471
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 61,
+    "latency_ns": 27000,
+    "throughput_ops_sec": 37037.037037,
+    "energy_joules": null,
+    "seed": 89898499835472
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 62,
+    "latency_ns": 26200,
+    "throughput_ops_sec": 38167.938931,
+    "energy_joules": null,
+    "seed": 89898499835473
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 63,
+    "latency_ns": 58700,
+    "throughput_ops_sec": 17035.775128,
+    "energy_joules": null,
+    "seed": 89898499835474
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 64,
+    "latency_ns": 26300,
+    "throughput_ops_sec": 38022.813688,
+    "energy_joules": null,
+    "seed": 89898499835475
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 65,
+    "latency_ns": 26100,
+    "throughput_ops_sec": 38314.176245,
+    "energy_joules": null,
+    "seed": 89898499835476
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 66,
+    "latency_ns": 26400,
+    "throughput_ops_sec": 37878.787879,
+    "energy_joules": null,
+    "seed": 89898499835477
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 67,
+    "latency_ns": 26900,
+    "throughput_ops_sec": 37174.721190,
+    "energy_joules": null,
+    "seed": 89898499835478
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 68,
+    "latency_ns": 26400,
+    "throughput_ops_sec": 37878.787879,
+    "energy_joules": null,
+    "seed": 89898499835479
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 69,
+    "latency_ns": 25600,
+    "throughput_ops_sec": 39062.500000,
+    "energy_joules": null,
+    "seed": 89898499835480
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 70,
+    "latency_ns": 24800,
+    "throughput_ops_sec": 40322.580645,
+    "energy_joules": null,
+    "seed": 89898499835481
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 71,
+    "latency_ns": 25000,
+    "throughput_ops_sec": 40000.000000,
+    "energy_joules": null,
+    "seed": 89898499835482
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 72,
+    "latency_ns": 25000,
+    "throughput_ops_sec": 40000.000000,
+    "energy_joules": null,
+    "seed": 89898499835483
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 73,
+    "latency_ns": 24500,
+    "throughput_ops_sec": 40816.326531,
+    "energy_joules": null,
+    "seed": 89898499835484
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 74,
+    "latency_ns": 28300,
+    "throughput_ops_sec": 35335.689046,
+    "energy_joules": null,
+    "seed": 89898499835485
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 75,
+    "latency_ns": 29300,
+    "throughput_ops_sec": 34129.692833,
+    "energy_joules": null,
+    "seed": 89898499835486
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 76,
+    "latency_ns": 27700,
+    "throughput_ops_sec": 36101.083032,
+    "energy_joules": null,
+    "seed": 89898499835487
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 77,
+    "latency_ns": 72700,
+    "throughput_ops_sec": 13755.158184,
+    "energy_joules": null,
+    "seed": 89898499835488
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 78,
+    "latency_ns": 28800,
+    "throughput_ops_sec": 34722.222222,
+    "energy_joules": null,
+    "seed": 89898499835489
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 79,
+    "latency_ns": 143600,
+    "throughput_ops_sec": 6963.788301,
+    "energy_joules": null,
+    "seed": 89898499835490
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 80,
+    "latency_ns": 25500,
+    "throughput_ops_sec": 39215.686275,
+    "energy_joules": null,
+    "seed": 89898499835491
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 81,
+    "latency_ns": 26300,
+    "throughput_ops_sec": 38022.813688,
+    "energy_joules": null,
+    "seed": 89898499835492
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 82,
+    "latency_ns": 64000,
+    "throughput_ops_sec": 15625.000000,
+    "energy_joules": null,
+    "seed": 89898499835493
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 83,
+    "latency_ns": 28600,
+    "throughput_ops_sec": 34965.034965,
+    "energy_joules": null,
+    "seed": 89898499835494
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 84,
+    "latency_ns": 27900,
+    "throughput_ops_sec": 35842.293907,
+    "energy_joules": null,
+    "seed": 89898499835495
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 85,
+    "latency_ns": 27500,
+    "throughput_ops_sec": 36363.636364,
+    "energy_joules": null,
+    "seed": 89898499835496
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 86,
+    "latency_ns": 27700,
+    "throughput_ops_sec": 36101.083032,
+    "energy_joules": null,
+    "seed": 89898499835497
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 87,
+    "latency_ns": 26300,
+    "throughput_ops_sec": 38022.813688,
+    "energy_joules": null,
+    "seed": 89898499835498
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 88,
+    "latency_ns": 25400,
+    "throughput_ops_sec": 39370.078740,
+    "energy_joules": null,
+    "seed": 89898499835499
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 89,
+    "latency_ns": 26200,
+    "throughput_ops_sec": 38167.938931,
+    "energy_joules": null,
+    "seed": 89898499835500
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 90,
+    "latency_ns": 65600,
+    "throughput_ops_sec": 15243.902439,
+    "energy_joules": null,
+    "seed": 89898499835501
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 91,
+    "latency_ns": 26700,
+    "throughput_ops_sec": 37453.183521,
+    "energy_joules": null,
+    "seed": 89898499835502
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 92,
+    "latency_ns": 26300,
+    "throughput_ops_sec": 38022.813688,
+    "energy_joules": null,
+    "seed": 89898499835503
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 93,
+    "latency_ns": 25300,
+    "throughput_ops_sec": 39525.691700,
+    "energy_joules": null,
+    "seed": 89898499835504
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 94,
+    "latency_ns": 24900,
+    "throughput_ops_sec": 40160.642570,
+    "energy_joules": null,
+    "seed": 89898499835505
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 95,
+    "latency_ns": 39500,
+    "throughput_ops_sec": 25316.455696,
+    "energy_joules": null,
+    "seed": 89898499835506
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 96,
+    "latency_ns": 25000,
+    "throughput_ops_sec": 40000.000000,
+    "energy_joules": null,
+    "seed": 89898499835507
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 97,
+    "latency_ns": 24700,
+    "throughput_ops_sec": 40485.829960,
+    "energy_joules": null,
+    "seed": 89898499835508
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 98,
+    "latency_ns": 26000,
+    "throughput_ops_sec": 38461.538462,
+    "energy_joules": null,
+    "seed": 89898499835509
+  }
+  ,
+  {
+    "benchmark_name": "harmonis_chaos_consensus",
+    "version": "6.2.0",
+    "iteration": 99,
+    "latency_ns": 27000,
+    "throughput_ops_sec": 37037.037037,
+    "energy_joules": null,
+    "seed": 89898499835510
+  }
+]
