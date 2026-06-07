@@ -21,3 +21,19 @@
 ## Sovereign Principle
 **Claims = Measurements. Nothing more. Nothing less.**
 
+
+## Timing Methodology & Variance (Added 2026-06-07)
+
+**Measurement:** std::time::Instant::now() — OS-scheduled wall-clock time
+**Hardware:** Consumer laptop, stock configuration (no core pinning, no turbo lock)
+**Expected variance:** ±30% between runs due to:
+- CPU frequency scaling (Turbo Boost)
+- OS scheduler jitter
+- Thermal throttling
+- Memory allocation variance
+
+**This is NOT a bug.** This is honest measurement of real-world conditions.
+For <5% variance, core pinning and turbo locking are required.
+
+**Reproducibility guarantee:** The workload path (seed → operations) IS deterministic.
+The latency measurement IS NOT deterministic on uncontrolled hardware.

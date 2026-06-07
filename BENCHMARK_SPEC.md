@@ -66,3 +66,17 @@ git clone https://github.com/Ayub19123/Harmonis-Prime.git
 cd Harmonis-Prime
 git checkout v7.1.0-BRICK51.3-FINAL-BENCH
 ./run_benchmark.ps1
+
+### Timing Methodology & Statistical Reporting
+
+| Attribute | Value |
+|-----------|-------|
+| Timer | std::time::Instant::now() (OS wall-clock) |
+| Variance source | Turbo Boost, OS scheduling, thermal throttling |
+| Expected run-to-run variance | ±30% on consumer hardware |
+| Statistical method | Single-run reporting (median-of-N planned for v1.1) |
+| Workload determinism | ✅ Fixed seed guarantees identical operations |
+| Measurement determinism | ❌ Wall-clock timing varies with system state |
+
+**Honest framing:** This benchmark measures real-world latency under real-world conditions.
+It does NOT claim cycle-accurate reproducibility. For that, core pinning + dtsc required.
