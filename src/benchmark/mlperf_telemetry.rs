@@ -19,7 +19,7 @@ pub struct MLPerfResult {
     pub seed: u64,
 }
 
-pub fn run_mlperf_benchmark<F>(iterations: u64, seed: u64, mut workload: F) -> Vec<MLPerfResult>
+pub fn run_mlperf_benchmark<F>(iterations: u64, seed: u64, benchmark_name: &str, mut workload: F) -> Vec<MLPerfResult>
 where
     F: FnMut(u64),
 {
@@ -39,7 +39,7 @@ where
         };
 
         results.push(MLPerfResult {
-            benchmark_name: "harmonis_consensus_simulation".to_string(),
+            benchmark_name: benchmark_name.to_string(),
             version: env!("CARGO_PKG_VERSION").to_string(),
             iteration: i,
             latency_ns,
@@ -102,3 +102,4 @@ pub fn write_limitations_md(path: &str) {
 **Claims = Measurements. Nothing more. Nothing less.**
 "#).unwrap();
 }
+

@@ -68,7 +68,10 @@ fn main() {
 
     let start_total = std::time::Instant::now();
     let results = mlperf_telemetry::run_mlperf_benchmark(
-        iterations, seed, run_consensus_chaos_iteration,
+        iterations,
+        seed,
+        "harmonis_consensus_simulation",
+        run_consensus_chaos_iteration,
     );
     let total_elapsed = start_total.elapsed();
 
@@ -92,3 +95,5 @@ fn main() {
     println!();
     println!("🧱 SOVEREIGN PRINCIPLE: Claims = Measurements. Nothing more.");
 }
+
+

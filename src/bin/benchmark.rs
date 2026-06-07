@@ -33,7 +33,10 @@ fn main() {
 
     let start_total = std::time::Instant::now();
     let results = mlperf_telemetry::run_mlperf_benchmark(
-        iterations, seed, run_graph_iteration,
+        iterations,
+        seed,
+        "harmonis_shared_memory_graph",
+        run_graph_iteration,
     );
     let total_elapsed = start_total.elapsed();
 
@@ -57,3 +60,5 @@ fn main() {
     println!();
     println!("🧱 SOVEREIGN PRINCIPLE: Claims = Measurements. Nothing more.");
 }
+
+
