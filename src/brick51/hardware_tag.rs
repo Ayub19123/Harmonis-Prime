@@ -1,11 +1,11 @@
-//! BRICK-51.1: Hardware Classification Tag
+﻿//! BRICK-51.1: Hardware Classification Tag
 //! Every latency/performance claim must carry its measurement domain
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum HardwareDomain {
     Simulated,        // Software-only timing, no physical hardware
     Emulated,         // Hardware model in simulation (FPGA, QEMU)
-    PhysicalMeasured, // Real instrumented measurement
+    PhysicalMeasured, // FUTURE CAPABILITY — not active on consumer hardware. Benchmark binaries use Simulated exclusively.
 }
 
 impl HardwareDomain {
@@ -49,7 +49,7 @@ impl TaggedMetric {
 
     pub fn report(&self) -> String {
         format!(
-            "[{}] {:.2} {} ± {:.2} (n={}, seed={})",
+            "[{}] {:.2} {} Â± {:.2} (n={}, seed={})",
             self.domain.label(),
             self.value,
             self.unit,
@@ -59,3 +59,4 @@ impl TaggedMetric {
         )
     }
 }
+
