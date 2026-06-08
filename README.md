@@ -1,8 +1,9 @@
-# Harmonis Prime
+﻿# Harmonis Prime
 
 A unified experimental distributed systems stack in Rust, integrating transport, consensus (Raft), storage abstraction, and deterministic execution under a single reproducible benchmark harness.
 
 **Current State:** HBS-1.1 Specification  
+![CI](https://github.com/Ayub19123/Harmonis-Prime/actions/workflows/rust.yml/badge.svg)  
 **Latest Tag:** `v7.1.1-SPEC-HBS1.1`  
 **Specification:** [SPEC.md](https://github.com/Ayub19123/Harmonis-Prime/blob/main/SPEC.md)  
 **Peer Review:** [GitHub Discussion #6](https://github.com/Ayub19123/Harmonis-Prime/discussions/6)
@@ -13,12 +14,12 @@ A unified experimental distributed systems stack in Rust, integrating transport,
 
 | Layer | Location | Status |
 |-------|----------|--------|
-| Quantum-classical simulation | `src/brick42/quantum/` | ✅ Implemented (simulated backend) |
-| Formal verification engine | `src/fv/` | ✅ Implemented (invariant checker, model checker, proof generator) |
-| Policy-driven autonomy | `src/autonomy/` | ✅ Implemented (predicate calculus runtime) |
-| Causal state transitions | `src/brick49/` | ✅ Implemented (transition → CausalityProof) |
-| Raft consensus | `src/raft/` | ✅ Implemented (leader election, log replication, chaos injection) |
-| Shared-memory graph | `src/brick51/` | ✅ Implemented (single-node HashMap) |
+| Quantum-classical simulation | `src/brick42/quantum/` | âœ… Implemented (simulated backend) |
+| Formal verification engine | `src/fv/` | âœ… Implemented (invariant checker, model checker, proof generator) |
+| Policy-driven autonomy | `src/autonomy/` | âœ… Implemented (predicate calculus runtime) |
+| Causal state transitions | `src/brick49/` | âœ… Implemented (transition â†’ CausalityProof) |
+| Raft consensus | `src/raft/` | âœ… Implemented (leader election, log replication, chaos injection) |
+| Shared-memory graph | `src/brick51/` | âœ… Implemented (single-node HashMap) |
 
 ---
 
@@ -30,7 +31,7 @@ A unified experimental distributed systems stack in Rust, integrating transport,
   - `cmf511_shared_memory_consistency`
   - `cmf516_knowledge_integrity`
   - `cmf519_state_consistency_index`
-- **8 cosmetic warnings** (unused imports/variables in test files only — no production code warnings)
+- **8 cosmetic warnings** (unused imports/variables in test files only â€” no production code warnings)
 - **0 audit vulnerabilities**
 - **Verified on:** Windows 11 + Rust 1.96.0
 
@@ -40,12 +41,12 @@ A unified experimental distributed systems stack in Rust, integrating transport,
 
 | Claim | Reality |
 |-------|---------|
-| Quantum substrate | Simulated backend only — no physical QPU integration |
-| Density matrix evolution | Amplitude estimation with normalization — not full von Neumann equation |
-| Mesh topology | Graph abstraction exists — DAG enforcement is future work |
+| Quantum substrate | Simulated backend only â€” no physical QPU integration |
+| Density matrix evolution | Amplitude estimation with normalization â€” not full von Neumann equation |
+| Mesh topology | Graph abstraction exists â€” DAG enforcement is future work |
 | Hardware | SIMULATED on consumer laptop, stock config |
-| Energy | NOT MEASURED — no power profiling |
-| Multi-node | Single-threaded simulation — no physical cluster |
+| Energy | NOT MEASURED â€” no power profiling |
+| Multi-node | Single-threaded simulation â€” no physical cluster |
 
 ---
 
@@ -72,7 +73,7 @@ A unified experimental distributed systems stack in Rust, integrating transport,
 | Determinism | Fixed seed: `0x51C3_2026_0613` |
 | Iterations | 10,000 |
 | Metric | Per-iteration wall-clock latency (ns) |
-| **Honest Label** | SIMULATION — production APIs not yet exposed |
+| **Honest Label** | SIMULATION â€” production APIs not yet exposed |
 
 ### Build Specification
 
@@ -103,10 +104,10 @@ A unified experimental distributed systems stack in Rust, integrating transport,
 |-----------|-------|
 | Timer | `std::time::Instant::now()` (OS wall-clock) |
 | Variance source | Turbo Boost, OS scheduling, thermal throttling |
-| Expected run-to-run variance | ±30% on consumer hardware |
+| Expected run-to-run variance | Â±30% on consumer hardware |
 | Statistical method | Single-run reporting (median-of-N planned for v1.2) |
-| Workload determinism | ✅ Fixed seed guarantees identical operations |
-| Measurement determinism | ❌ Wall-clock timing varies with system state |
+| Workload determinism | âœ… Fixed seed guarantees identical operations |
+| Measurement determinism | âŒ Wall-clock timing varies with system state |
 
 **Honest framing:** This benchmark measures real-world latency under real-world conditions. It does NOT claim cycle-accurate reproducibility. For that, core pinning + `rdtsc` required.
 
@@ -119,3 +120,4 @@ git clone https://github.com/Ayub19123/Harmonis-Prime.git
 cd Harmonis-Prime
 git checkout v7.1.1-SPEC-HBS1.1
 cargo test  # ~10 minutes, 50 tests
+
