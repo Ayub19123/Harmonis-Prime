@@ -2,7 +2,9 @@
 
 A unified experimental distributed systems stack in Rust, integrating transport, consensus (Raft), storage abstraction, and deterministic execution under a single reproducible benchmark harness.
 
-**Current State:** HBS-1.1 Specification  
+**Current State:** HBS-1.1 Specification
+
+[![Reproduced](https://img.shields.io/badge/reproduced-1%20witness-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/discussions/1)  
 ![CI](https://github.com/Ayub19123/Harmonis-Prime/actions/workflows/rust.yml/badge.svg)  
 **Latest Tag:** `v7.1.1-SPEC-HBS1.1`  
 **Specification:** [SPEC.md](https://github.com/Ayub19123/Harmonis-Prime/blob/main/SPEC.md)  
@@ -120,4 +122,5 @@ git clone https://github.com/Ayub19123/Harmonis-Prime.git
 cd Harmonis-Prime
 git checkout v7.1.1-SPEC-HBS1.1
 cargo test  # ~10 minutes, 50 tests
+
 
