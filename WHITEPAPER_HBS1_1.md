@@ -424,7 +424,7 @@ Ongaro, D., \& Ousterhout, J. (2014). In Search of an Understandable Consensus A
 
 MLPerf. (2024). MLPerf Training Benchmark. https://mlcommons.org/
 
-Zenodo Archive: \[DOI placeholder — to be added after v7.1.1-WHITEPAPER-1 tag is archived]
+Zenodo Archive: https://doi.org/10.5281/zenodo.20628080
 
 Document Version: 1.1 (Reviewer-corrected)
 
