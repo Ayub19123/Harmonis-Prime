@@ -1,3 +1,6 @@
+pub mod thermo;
+pub mod energy;
+pub mod quantum;
 use crate::engine::SovereignOrchestrator;
 use pyo3::prelude::*;
 use std::sync::{Arc, Mutex};
