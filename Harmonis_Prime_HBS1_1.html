@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc 3.10" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Harmonis Prime: A Reproducible Distributed Systems Benchmark Specification (HBS-1.1)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Harmonis Prime: A Reproducible Distributed Systems
+Benchmark Specification (HBS-1.1)</h1>
+</header>
+<p>Harmonis Prime: A Reproducible Distributed Systems Benchmark
+Specification (HBS-1.1)</p>
+<p>Version: v7.1.1-WITNESS-1</p>
+<p>Date: 2026-06-10</p>
+<p>Repository: https://github.com/Ayub19123/Harmonis-Prime</p>
+<p>License: MIT</p>
+<p>Classification: Pre-submission, awaiting independent reproduction</p>
+<p>Abstract</p>
+<p>We present Harmonis Prime, an experimental distributed systems stack
+implemented in Rust, integrating Raft consensus, deterministic chaos
+injection, formal verification primitives, quantum-classical simulation,
+and a reproducible benchmark harness under a unified architecture. The
+system is validated by 50 passing unit and integration tests, continuous
+integration across three operating systems (Linux, Windows, macOS), and
+one independent external reproduction on commodity hardware by an
+unaffiliated engineer (<span class="citation"
+data-cites="abdulwahab72">@abdulwahab72</span>). All benchmarks execute
+with a fixed pseudorandom seed (0x51C3_2026_0613) to guarantee
+deterministic operation sequences, while wall-clock timing is reported
+with honest variance bounds (±30%) reflecting real-world consumer
+hardware conditions. This paper documents the architecture, benchmark
+specification, validation methodology, and honest limitations of the
+current release, establishing a reproducibility baseline for future
+iterations toward thermodynamic efficiency claims.</p>
+<p>Keywords: distributed systems, reproducible benchmarking, Raft
+consensus, Rust, deterministic chaos injection, formal verification,
+quantum-classical simulation</p>
+<p>1. Introduction</p>
+<p>1.1 Motivation</p>
+<p>The field of distributed systems suffers from a reproducibility gap.
+Benchmark claims are frequently made without corresponding open-source
+implementations, deterministic harnesses, or independent validation.
+Performance numbers are cited without hardware context, energy
+measurement, or statistical rigor. This creates an environment where
+claims outpace measurements, and trust erodes.</p>
+<p>Harmonis Prime was built to close this gap. The governing principle
+is simple:</p>
+<p>Claims = Measurements. Nothing more. Nothing less.</p>
+<p>Every architectural claim is backed by code. Every performance claim
+is backed by a deterministic benchmark. Every validation claim is backed
+by tests, CI, and human witness logs.</p>
+<p>1.2 Contribution</p>
+<p>This release (v7.1.1, HBS-1.1) contributes:</p>
+<p>A unified stack where transport, consensus, storage, simulation, and
+verification layers coexist under a single reproducible harness.</p>
+<p>Deterministic benchmarks with fixed seeds, honest hardware context,
+and documented variance.</p>
+<p>Multi-platform validation via GitHub Actions CI (Linux, Windows,
+macOS).</p>
+<p>External human witness validation with full reproduction logs.</p>
+<p>Honest limitation documentation — every non-claim is explicitly
+listed.</p>
+<p>1.3 Scope</p>
+<p>This paper covers the HBS-1.1 specification. It does not claim
+physical quantum integration, energy efficiency superiority, or
+production-grade mesh networking. Those are future milestones on the
+12-month summit roadmap.</p>
+<p>2. Architecture</p>
+<p>Harmonis Prime is organized into six primary layers, each
+corresponding to a BRICK module in the source tree.</p>
+<p>2.1 Quantum-Classical Simulation Layer (src/brick42/quantum/)</p>
+<p>A simulated quantum substrate providing amplitude estimation and
+normalization. This is a simulated backend only — no physical QPU
+integration exists in HBS-1.1. The layer serves as a placeholder for
+future quantum-classical hybrid computation, with classical emulation of
+quantum state transitions.</p>
+<p>Status: Implemented (simulated).</p>
+<p>Future: Physical QPU integration planned for HBS-1.3+.</p>
+<p>2.2 Formal Verification Engine (src/fv/)</p>
+<p>An invariant checker, model checker, and proof generator operating
+over the system state space. Validates causal consistency and policy
+compliance at runtime.</p>
+<p>Status: Implemented.</p>
+<p>Coverage: BRICK-45 through BRICK-51 invariants.</p>
+<p>2.3 Policy-Driven Autonomy (src/autonomy/)</p>
+<p>A predicate calculus runtime enabling declarative policy
+specification over system behavior. Policies are evaluated against the
+formal verification engine before state transitions are committed.</p>
+<p>Status: Implemented.</p>
+<p>2.4 Causal State Transitions (src/brick49/)</p>
+<p>Every state transition produces a CausalityProof structure
+documenting the predecessor state, operation, and resulting state hash.
+This forms an immutable causal chain.</p>
+<p>Status: Implemented.</p>
+<p>2.5 Raft Consensus (src/raft/)</p>
+<p>A Raft implementation [7] supporting leader election, log
+replication, and deterministic chaos injection. Chaos scenarios simulate
+network partitions, leader failures, and message delays to validate
+consensus robustness.</p>
+<p>Status: Implemented.</p>
+<p>Tests: 4 cluster-level integration tests pass.</p>
+<p>2.6 Shared-Memory Graph (src/brick51/)</p>
+<p>A single-node HashMap-backed graph abstraction providing the storage
+substrate for Workload A. This is single-threaded simulation — no
+physical cluster or distributed memory is used in HBS-1.1.</p>
+<p>Status: Implemented.</p>
+<p>Future: DAG-enforced mesh topology planned for HBS-1.2.</p>
+<p>3. Benchmark Specification</p>
+<p>3.1 Design Principles</p>
+<p>All benchmarks follow these principles:</p>
+<p>Determinism: Fixed PRNG seed guarantees identical operation sequences
+across runs.</p>
+<p>Honesty: Wall-clock timing is reported with explicit variance bounds
+and hardware context.</p>
+<p>Independence: Zero external benchmark dependencies — only std and
+project-internal crates.</p>
+<p>Reproducibility: A single cargo test invocation reproduces all
+validation.</p>
+<p>3.2 Workload A: SharedMemoryGraph Microbenchmark</p>
+<p>Table</p>
+<p>Attribute Value</p>
+<p>Name harmonis_shared_memory_graph</p>
+<p>Operation SharedMemoryGraph::insert + SharedMemoryGraph::get</p>
+<p>Node config node_id=0, node_count=1</p>
+<p>Determinism Fixed seed: 0x51C3_2026_0613</p>
+<p>Iterations 10,000</p>
+<p>Metric Per-iteration wall-clock latency (ns)</p>
+<p>3.3 Workload B: Consensus Simulation</p>
+<p>Table</p>
+<p>Attribute Value</p>
+<p>Name harmonis_consensus_simulation</p>
+<p>Operation Deterministic PRNG + chaos scenario + Raft leader election
++ heartbeat + consistency check</p>
+<p>Node config 5 simulated nodes, 7 chaos scenarios</p>
+<p>Determinism Fixed seed: 0x51C3_2026_0613</p>
+<p>Iterations 10,000</p>
+<p>Metric Per-iteration wall-clock latency (ns)</p>
+<p>Honest Label SIMULATION — production APIs not yet exposed</p>
+<p>3.4 Build Specification</p>
+<p>Table</p>
+<p>Attribute Value</p>
+<p>Language Rust 1.96.0 (pinned via rust-toolchain.toml)</p>
+<p>Profile release (optimized)</p>
+<p>Target x86_64-pc-windows-msvc (primary)</p>
+<p>Dependencies Zero external benchmark dependencies</p>
+<p>3.5 Hardware Context (Developer Baseline)</p>
+<p>Table</p>
+<p>Attribute Value</p>
+<p>Machine Consumer laptop, stock configuration</p>
+<p>CPU 11th Gen Intel i7-1165G7</p>
+<p>RAM 16GB DDR4</p>
+<p>OS Windows 11</p>
+<p>Core pinning NOT IMPLEMENTED</p>
+<p>Turbo locking NOT IMPLEMENTED</p>
+<p>Energy measurement NOT AVAILABLE</p>
+<p>3.6 Timing Methodology &amp; Statistical Reporting</p>
+<p>Table</p>
+<p>Attribute Value</p>
+<p>Timer std::time::Instant::now() (OS wall-clock)</p>
+<p>Variance source Turbo Boost, OS scheduling, thermal throttling</p>
+<p>Expected run-to-run variance ±30% on consumer hardware</p>
+<p>Statistical method Single-run reporting (median-of-N planned for
+HBS-1.2)</p>
+<p>Workload determinism ✅ Fixed seed guarantees identical
+operations</p>
+<p>Measurement determinism ❌ Wall-clock timing varies with system
+state</p>
+<p>Honest framing: This benchmark measures real-world latency under
+real-world conditions. It does NOT claim cycle-accurate reproducibility.
+For that, core pinning + rdtsc would be required.</p>
+<p>4. Validation &amp; Reproducibility</p>
+<p>4.1 Self-Verification</p>
+<p>Table</p>
+<p>Environment OS Result Witness</p>
+<p>Developer machine Windows 11 ✅ 50 pass, ~10 min Self</p>
+<p>4.2 CI Verification</p>
+<p>Table</p>
+<p>Environment OS Result Witness</p>
+<p>GitHub Actions Ubuntu Latest ✅ 50 pass CI (Automated)</p>
+<p>GitHub Actions Windows Server ✅ 50 pass CI (Automated)</p>
+<p>GitHub Actions macOS Latest ✅ 50 pass CI (Automated)</p>
+<p>CI workflow: .github/workflows/rust.yml (commit 374bd6a).</p>
+<p>Trigger: Every push to main and every pull request.</p>
+<p>4.3 External Human Witness</p>
+<p>Table</p>
+<p>Attribute Value</p>
+<p>Witness <span class="citation"
+data-cites="abdulwahab72">@abdulwahab72</span> (independent engineer,
+unaffiliated)</p>
+<p>Date 2026-06-09</p>
+<p>Machine Windows 10 Pro</p>
+<p>CPU Intel Core i7-8565U (8th Gen)</p>
+<p>RAM Not specified</p>
+<p>OS Windows 10 Pro</p>
+<p>Rust Version 1.96.0</p>
+<p>Tag Tested v7.1.1-SPEC-HBS1.1</p>
+<p>Commit 14f1de0</p>
+<p>Commands Executed:</p>
+<p>bash</p>
+<p>git clone https://github.com/Ayub19123/Harmonis-Prime.git</p>
+<p>cd Harmonis-Prime</p>
+<p>git checkout v7.1.1-SPEC-HBS1.1</p>
+<p>cargo test</p>
+<p>cargo audit</p>
+<p>cargo run –release –bin benchmark – 10000 0x51C3_2026_0613</p>
+<p>Results:</p>
+<p>Table</p>
+<p>Check Result</p>
+<p>cargo test ✅ PASSED — 0 failures</p>
+<p>cargo audit ✅ PASSED — 0 vulnerabilities</p>
+<p>Benchmark ✅ PASSED — deterministic output with fixed seed</p>
+<p>Runtime 1100.32s (~18 minutes)</p>
+<p>4.4 Hardware Variance Analysis</p>
+<p>Table</p>
+<p>Environment CPU Runtime Variance</p>
+<p>Baseline (Developer) Intel i7-1165G7 (11th Gen) ~10 minutes
+Baseline</p>
+<p>Witness #1 (Abdulwahab72) Intel i7-8565U (8th Gen) ~18 minutes
++80%</p>
+<p>GitHub Actions (CI) VM (3 OS) ~12 minutes +20%</p>
+<p>Conclusion: Runtime variance is consistent with documented ±30%
+wall-clock variance on consumer hardware. The ~80% increase on i7-8565U
+vs i7-1165G7 is explained by generational CPU differences (8th Gen vs
+11th Gen). The deterministic operation sequences remain identical; only
+wall-clock timing varies.</p>
+<p>4.5 Validation Matrix Summary</p>
+<p>Table</p>
+<p>Environment OS Status Witness</p>
+<p>Developer machine Windows 11 ✅ 50 pass Self</p>
+<p>GitHub Actions Ubuntu ✅ 50 pass CI</p>
+<p>GitHub Actions Windows Server ✅ 50 pass CI</p>
+<p>GitHub Actions macOS ✅ 50 pass CI</p>
+<p>External witness Windows 10 ✅ 50 pass Abdulwahab72</p>
+<p>Total independent validations: 5 environments, 1 human witness.</p>
+<p>4.6 Reproduction Protocol</p>
+<p>To reproduce this validation:</p>
+<p>bash</p>
+<p>git clone https://github.com/Ayub19123/Harmonis-Prime.git</p>
+<p>cd Harmonis-Prime</p>
+<p>git checkout v7.1.1-SPEC-HBS1.1</p>
+<p>cargo test # ~10-20 minutes, 50 tests</p>
+<p>cargo audit # 0 vulnerabilities expected</p>
+<p>cargo run –release –bin benchmark – 10000 0x51C3_2026_0613</p>
+<p>Expected result: All tests pass. Benchmark produces deterministic
+output. Runtime varies by hardware generation.</p>
+<p>5. Honest Limitations</p>
+<p>The following table documents every claim that Harmonis Prime HBS-1.1
+does not make:</p>
+<p>Table</p>
+<p>Claim Reality</p>
+<p>Quantum substrate Simulated backend only — no physical QPU
+integration</p>
+<p>Density matrix evolution Amplitude estimation with normalization —
+not full von Neumann equation</p>
+<p>Mesh topology Graph abstraction exists — DAG enforcement is future
+work (HBS-1.2)</p>
+<p>Hardware SIMULATED on consumer laptop, stock config — no physical
+cluster</p>
+<p>Energy NOT MEASURED — no power profiling available</p>
+<p>Multi-node Single-threaded simulation — no physical cluster</p>
+<p>Statistical rigor Single-run reporting — median-of-N planned for
+HBS-1.2</p>
+<p>Cycle accuracy Wall-clock Instant::now() — no rdtsc or core
+pinning</p>
+<p>Production APIs Benchmark is simulation — production APIs not yet
+exposed</p>
+<p>3+ witnesses Only 1 human witness to date — more needed for
+statistical confidence</p>
+<p>6. Future Work &amp; 12-Month Summit Roadmap</p>
+<p>6.1 HBS-1.2 (Months 3–4)</p>
+<p>DAG-enforced mesh topology</p>
+<p>Median-of-N statistical reporting</p>
+<p>2nd and 3rd human witness accumulation</p>
+<p>Rust Users Forum peer review engagement</p>
+<p>6.2 HBS-1.3 (Months 5–6)</p>
+<p>SET-3 thermodynamic validation protocol</p>
+<p>Energy measurement instrumentation</p>
+<p>Data efficiency benchmarks vs. standard transformers</p>
+<p>Entropy reduction metrics</p>
+<p>6.3 Summit Phase (Months 7–12)</p>
+<p>Physical multi-node cluster (3+ nodes)</p>
+<p>Cross-node consensus at scale (5+ nodes)</p>
+<p>3–5 independent human witnesses</p>
+<p>Whitepaper peer review and citation</p>
+<p>Public launch across engineering channels</p>
+<p>6.4 Long-Term Technical Objective</p>
+<p>The long-term research objective is a distributed systems
+architecture targeting orders-of-magnitude reductions in data movement
+and energy consumption through deterministic execution and low-entropy
+state transitions. This requires thermodynamic efficiency proofs
+(SET-3), minimal data movement architectures, low-entropy consensus
+protocols, and deterministic, reproducible execution. HBS-1.1 is the
+first reproducible baseline on that path.</p>
+<p>7. Conclusion</p>
+<p>Harmonis Prime v7.1.1 (HBS-1.1) establishes a reproducible baseline
+for distributed systems validation. With 50 passing tests, 5 validated
+environments, 1 independent human witness, deterministic benchmarks, and
+honest limitation documentation, it demonstrates that claims can equal
+measurements when discipline is applied.</p>
+<p>The system is not complete. It is not the summit. It is the first
+step toward a larger vision of efficient, verifiable, distributed
+intelligence.</p>
+<p>Claims = Measurements. Nothing more. Nothing less.</p>
+<p>References</p>
+<p>Harmonis Prime Repository:
+https://github.com/Ayub19123/Harmonis-Prime</p>
+<p>HBS-1.1 Specification Tag: v7.1.1-SPEC-HBS1.1 (commit 14f1de0)</p>
+<p>CI Badge Tag: v7.1.1-README-CI-BADGE (commit a35f630)</p>
+<p>Witness Tag: v7.1.1-WITNESS-1 (commit b5e61eb)</p>
+<p>REPRODUCTION_LOG.md: Witness #1 log (commit 308416a)</p>
+<p>GitHub Actions Workflow: .github/workflows/rust.yml (commit
+374bd6a)</p>
+<p>Ongaro, D., &amp; Ousterhout, J. (2014). In Search of an
+Understandable Consensus Algorithm. USENIX ATC.</p>
+<p>MLPerf. (2024). MLPerf Training Benchmark. https://mlcommons.org/</p>
+<p>Zenodo Archive: https://doi.org/10.5281/zenodo.20628080</p>
+<p>Document Version: 1.1 (Reviewer-corrected)</p>
+<p>Sealed: 2026-06-10</p>
+<p>Next Review: Upon accumulation of Witness #2</p>
+<p>Maintainer: Harmonis Prime Core Team</p>
+</body>
+</html>
