@@ -1,3 +1,4 @@
+pub mod sovereign;
 pub mod thermo;
 pub mod energy;
 pub mod quantum;
