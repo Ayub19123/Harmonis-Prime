@@ -4,7 +4,7 @@
 
 use std::time::Instant;
 use sovereign_core::mesh::dag::{CognitiveMesh, Message, MessageId, NodeId};
-use sovereign_core::energy::monitor::{EnergyMonitor, RaplMonitor, SoftwareEnergyMonitor, JloReport};
+use sovereign_core::energy::monitor::{EnergyMonitor, SoftwareEnergyMonitor, JloReport};
 use sovereign_core::thermo::entropy::{EntropyTracker, ThermodynamicState};
 
 fn main() {

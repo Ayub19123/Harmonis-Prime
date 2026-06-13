@@ -97,6 +97,7 @@ pub enum ThermoError {
 }
 
 /// Entropy tracker for consensus state transitions
+#[derive(Debug, Clone)]
 pub struct EntropyTracker {
     states: Vec<ThermodynamicState>,
     temperature_k: f64,

@@ -1,3 +1,4 @@
+pub mod simulation;
 pub mod sovereign;
 pub mod thermo;
 pub mod energy;

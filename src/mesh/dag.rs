@@ -55,7 +55,7 @@ pub enum DagError {
     DuplicateMessage(MessageId),
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct MeshMetrics {
     pub total_messages: u64,
     pub total_rejections: u64,
@@ -64,6 +64,7 @@ pub struct MeshMetrics {
 }
 
 /// The cognitive mesh — DAG-enforced peer-to-peer topology
+#[derive(Debug, Clone)]
 pub struct CognitiveMesh {
     graph: DiGraph<MessageId, CausalLink>,
     node_indices: HashMap<MessageId, NodeIndex>,
@@ -189,7 +190,5 @@ impl CognitiveMesh {
         &self.metrics
     }
 }
-
-
 
 

@@ -2,7 +2,6 @@
 //! Non-binary probabilistic state distributions for cognitive decision-making
 //! |ψ⟩ = α|0⟩ + β|1⟩ where |α|² + |β|² = 1
 
-use std::f64::consts::PI;
 
 /// Quantum amplitude: complex probability amplitude
 #[derive(Debug, Clone, Copy, PartialEq)]
