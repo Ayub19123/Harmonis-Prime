@@ -9,7 +9,7 @@ use sovereign_core::energy::rapl_bindings::{RaplHardwareMonitor, RaplDomain};
 use sovereign_core::thermo::entropy::{EntropyTracker, ThermodynamicState};
 
 fn main() {
-    println!("=== HARMONIS PRIME â€” SET-3 ENERGY BENCHMARK ===");
+    println!("=== HARMONIS PRIME - SET-3 ENERGY BENCHMARK ===");
     println!("Measuring Joules-per-Logical-Operation (JLO) under DAG mesh load");
     println!();
 
@@ -104,7 +104,7 @@ fn main() {
     println!("Total messages: {}", metrics.total_messages);
     println!("Total rejections: {}", metrics.total_rejections);
     println!("Max depth: {}", metrics.max_depth_observed);
-    println!("Avg latency: {:.2} Âµs", metrics.avg_insertion_latency_micros);
+    println!("Avg latency: {:.2} us", metrics.avg_insertion_latency_micros);
 
     println!();
     println!("=== ENERGY REPORT (JLO) ===");
@@ -125,7 +125,7 @@ fn main() {
 
     println!();
     println!("=== LANDAUER LIMIT COMPARISON ===");
-    println!("Theoretical minimum ({} bits Ã— {:.2e} J/bit): {:.6e} J/op", 
+    println!("Theoretical minimum ({} bits x {:.2e} J/bit): {:.6e} J/op", 
              bits_per_op, landauer_per_bit, theoretical_min);
     println!("Actual JLO: {:.6e} J/op", energy_report.joules_per_op);
     
