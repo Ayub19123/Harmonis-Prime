@@ -1,3 +1,4 @@
+pub mod endurance;
 pub mod simulation;
 pub mod sovereign;
 pub mod thermo;
