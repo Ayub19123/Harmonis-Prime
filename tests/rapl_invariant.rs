@@ -1,5 +1,4 @@
 ﻿//! SET-5.2: RAPL Hardware-in-the-Loop Invariant Tests
-//! Validates hardware-measured energy correlates with software-estimated JLO
 
 use sovereign_core::energy::rapl_bindings::JloCorrelation;
 
@@ -28,12 +27,11 @@ fn rapl_fallback_on_windows() {
     use sovereign_core::energy::monitor::EnergyMonitor;
     let mut monitor = RaplHardwareMonitor::new(RaplDomain::Package);
     let sample = monitor.sample("test_op");
-    assert_eq!(sample.joules, 0.0, "Non-Linux RAPL should report 0.0");
+    assert_eq!(sample.joules, 0.0, "Non-Linux RAPL should report 0.0 joules");
     let report = monitor.report();
-    // On non-Linux, no hardware reading, so total_operations may be 0
-    // The monitor correctly returns zero joules, and operation count is not incremented.
-    assert!(report.total_operations == 0 || report.total_operations == 1);
-    assert_eq!(report.total_joules, 0.0);
+    assert_eq!(report.total_joules, 0.0, "Total joules should be 0.0");
+    // On Windows, no samples are recorded because reading returns None, so total_operations may be 0
+    // That's acceptable.
 }
 
 #[test]

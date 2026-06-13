@@ -1,4 +1,4 @@
-//! SET-3: Thermodynamic invariant tests
+﻿//! SET-3: Thermodynamic invariant tests
 //! Shannon entropy monotonicity + Landauer limit adherence
 
 use proptest::prelude::*;
@@ -9,7 +9,7 @@ proptest! {
     /// INVARIANT: Entropy monotonically decreases under optimization
     #[test]
     fn entropy_monotonicity_invariant(
-        initial_entropy in 1.0_f64..10.0,
+        _initial_entropy in 1.0_f64..10.0,
         steps in 2usize..20,
     ) {
         let mut tracker = EntropyTracker::new(300.0).unwrap();
@@ -49,7 +49,7 @@ proptest! {
     /// INVARIANT: Landauer energy scales correctly with temperature
     #[test]
     fn landauer_temperature_scaling(
-        temp in 273.0_f64..373.0, // 0°C to 100°C
+        temp in 273.0_f64..373.0, // 0Â°C to 100Â°C
         bits in 1.0_f64..64.0,
     ) {
         let expected = K_BOLTZMANN * temp * std::f64::consts::LN_2 * bits;

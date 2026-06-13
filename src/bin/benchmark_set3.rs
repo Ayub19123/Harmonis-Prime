@@ -1,22 +1,36 @@
-//! SET-3 Energy Benchmark: Joules-per-Logical-Operation (JLO)
+﻿//! SET-3 Energy Benchmark: Joules-per-Logical-Operation (JLO)
 //! Measures physical energy cost of DAG mesh operations + entropy tracking
 //! Blueprint requirement: Entropy & Energy Dissipation Profiling
 
 use std::time::Instant;
 use sovereign_core::mesh::dag::{CognitiveMesh, Message, MessageId, NodeId};
 use sovereign_core::energy::monitor::{EnergyMonitor, SoftwareEnergyMonitor, JloReport};
+use sovereign_core::energy::rapl_bindings::{RaplHardwareMonitor, RaplDomain};
 use sovereign_core::thermo::entropy::{EntropyTracker, ThermodynamicState};
 
 fn main() {
-    println!("=== HARMONIS PRIME — SET-3 ENERGY BENCHMARK ===");
+    println!("=== HARMONIS PRIME â€” SET-3 ENERGY BENCHMARK ===");
     println!("Measuring Joules-per-Logical-Operation (JLO) under DAG mesh load");
     println!();
 
-    // Initialize energy monitor (RAPL on Linux, software fallback on Windows)
+    // Initialize energy monitor (RAPL hardware on Linux, software fallback on Windows)
     #[cfg(target_os = "linux")]
-    let mut energy_monitor = RaplMonitor::new("intel-rapl:0");
+    let mut energy_monitor: Box<dyn EnergyMonitor> = {
+        let mut rapl = RaplHardwareMonitor::new(RaplDomain::Package);
+        if rapl.is_available() {
+            println!("Platform: Linux (RAPL hardware)");
+            Box::new(rapl)
+        } else {
+            println!("Platform: Linux (RAPL unavailable, using software estimate)");
+            Box::new(SoftwareEnergyMonitor::new(1.0e-6))
+        }
+    };
+    
     #[cfg(not(target_os = "linux"))]
-    let mut energy_monitor = SoftwareEnergyMonitor::new(1e-6); // 1 µJ per op estimate
+    let mut energy_monitor: Box<dyn EnergyMonitor> = {
+        println!("Platform: Windows (Software estimate)");
+        Box::new(SoftwareEnergyMonitor::new(1.0e-6))
+    };
 
     energy_monitor.reset();
 
@@ -38,7 +52,6 @@ fn main() {
     let mut next_id = 1u64;
 
     println!("Workload: {} DAG append operations", iterations);
-    println!("Platform: {}", if cfg!(target_os = "linux") { "Linux (RAPL)" } else { "Windows (Software estimate)" });
     println!();
 
     // MAIN BENCHMARK LOOP
@@ -91,7 +104,7 @@ fn main() {
     println!("Total messages: {}", metrics.total_messages);
     println!("Total rejections: {}", metrics.total_rejections);
     println!("Max depth: {}", metrics.max_depth_observed);
-    println!("Avg latency: {:.2} µs", metrics.avg_insertion_latency_micros);
+    println!("Avg latency: {:.2} Âµs", metrics.avg_insertion_latency_micros);
 
     println!();
     println!("=== ENERGY REPORT (JLO) ===");
@@ -112,7 +125,7 @@ fn main() {
 
     println!();
     println!("=== LANDAUER LIMIT COMPARISON ===");
-    println!("Theoretical minimum ({} bits × {:.2e} J/bit): {:.6e} J/op", 
+    println!("Theoretical minimum ({} bits Ã— {:.2e} J/bit): {:.6e} J/op", 
              bits_per_op, landauer_per_bit, theoretical_min);
     println!("Actual JLO: {:.6e} J/op", energy_report.joules_per_op);
     
