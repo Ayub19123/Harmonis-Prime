@@ -1,12 +1,12 @@
-🧱 Harmonis Prime — Sovereign Distributed Core
+﻿ðŸ§± Harmonis Prime â€” Sovereign Distributed Core
 
 ./tests./src./src/thermo./tests/brick45_chaos.rsLICENSE
 
-Version: 6.2.0-SET-5.6-GM · Tag: golden-master-set5 · Sealed: 2026-06-14 10:44 UTC
+Version: 6.2.0-SET-5.6-GM Â· Tag: golden-master-set5 Â· Sealed: 2026-06-14 10:44 UTC
 
-State: SEALED · Warnings: ZERO · Boot Compliance: 100.00%
+State: SEALED Â· Warnings: ZERO Â· Boot Compliance: 100.00%
 
-🔬 The Holy Grail — An "Ahead-of-Time" Nervous System
+ðŸ”¬ The Holy Grail â€” An "Ahead-of-Time" Nervous System
 
 Harmonis Prime is not merely a distributed system. It is a mathematically sovereign organism that perceives its own state before entropy manifests. By translating the cognitive frameworks of Maxwell, Faraday, Euler, and Ramanujan into absolute computational models, the architecture predicts trajectories before they occur, routes energy along paths of least resistance, and maintains zero-drift consensus across Byzantine fault zones.
 
@@ -14,19 +14,19 @@ What makes this different?
 
 Zero-drift barrier: 106/106 tests pass with absolute deterministic reproducibility.
 
-Sub-microsecond cognition: PyO3 round-trip latency of 0.30 µs (33× margin under 10 µs target).
+Sub-microsecond cognition: PyO3 round-trip latency of 0.30 Âµs (33Ã— margin under 10 Âµs target).
 
-Fluid intelligence: Euler-Navier-Stokes thermodynamic loops ensure resource allocation flows like water—turbulence-free, with Reynolds number strictly bounded below 2300.
+Fluid intelligence: Euler-Navier-Stokes thermodynamic loops ensure resource allocation flows like waterâ€”turbulence-free, with Reynolds number strictly bounded below 2300.
 
 Mathematical intuition: Ramanujan mock-theta and highly-composite-number heuristics enable exponential acceleration over brute-force baselines.
 
 Chaos immunity: 10/10 failure scenarios (node necrosis, ledger corruption, mesh partition, Byzantine agents) are detected and recovered in 0.00 ms.
 
-📋 Scope & Validation Boundaries
+ðŸ“‹ Scope & Validation Boundaries
 
 We distinguish between sealed truth, mathematical hypotheses, and future frontiers with absolute transparency.
 
-✅ Experimentally Validated (Sealed Truth)
+âœ… Experimentally Validated (Sealed Truth)
 
 Table
 
@@ -34,11 +34,11 @@ Table
 
 
 
-SETBrickInvariantEvidence5.1Multi-Node SimulationConsensus liveness under Byzantine faults; latency bounded under failurecluster_invariant — 4 property tests5.2RAPL IntegrationJLO correlation ≤ 20% error; graceful fallback on non-Linuxrapl_invariant — 4 tests5.3Long-Run OrganismHeap growth ≤ 0.1%/hr; entropy drift ≤ 1e-6; determinism hash stableendurance_invariant — 4 tests5.4PyO3 ConduitMaxwell field divergence correct; Kalman trajectory 6-step prediction; round-trip ≤ 10 µs (release: 0.30 µs)Python invariants — 3 tests5.5Ramanujan Quantum UtilityMock-theta convergence; HCN canonical sequence; statistical bias > 0.5ramanujan_invariant — 1 property + 4 unit tests5.6Euler Fluid DynamicsReynolds < 2300; laminar flow enforced; dissipation ≥ 0; entropy monotonic; joules-per-consensus minimizedeuler/tests — 9 unit tests—BRICK-51 Certification13/13 CMF deep-verification invariants (collective reasoning, emergent specialization, knowledge integrity, decentralised trust)brick51_certification — 13 tests, 1666.33 s deep horizon
+SETBrickInvariantEvidence5.1Multi-Node SimulationConsensus liveness under Byzantine faults; latency bounded under failurecluster_invariant â€” 4 property tests5.2RAPL IntegrationJLO correlation â‰¤ 20% error; graceful fallback on non-Linuxrapl_invariant â€” 4 tests5.3Long-Run OrganismHeap growth â‰¤ 0.1%/hr; entropy drift â‰¤ 1e-6; determinism hash stableendurance_invariant â€” 4 tests5.4PyO3 ConduitMaxwell field divergence correct; Kalman trajectory 6-step prediction; round-trip â‰¤ 10 Âµs (release: 0.30 Âµs)Python invariants â€” 3 tests5.5Ramanujan Quantum UtilityMock-theta convergence; HCN canonical sequence; statistical bias > 0.5ramanujan_invariant â€” 1 property + 4 unit tests5.6Euler Fluid DynamicsReynolds < 2300; laminar flow enforced; dissipation â‰¥ 0; entropy monotonic; joules-per-consensus minimizedeuler/tests â€” 9 unit testsâ€”BRICK-51 Certification13/13 CMF deep-verification invariants (collective reasoning, emergent specialization, knowledge integrity, decentralised trust)brick51_certification â€” 13 tests, 1666.33 s deep horizon
 
 Total: 106/106 tests passing. Zero failures. Zero drift. Zero warnings in sealed modules.
 
-🔬 Hypotheses (Mathematically Plausible, Awaiting Scale Validation)
+ðŸ”¬ Hypotheses (Mathematically Plausible, Awaiting Scale Validation)
 
 These claims are architecturally consistent and mathematically sound, but not yet empirically proven at production scale:
 
@@ -50,79 +50,79 @@ Physical RAPL JLO reduction: Energy correlation is software-estimated on Windows
 
 Cross-cluster sovereign federation: Multi-organism mesh cognition and distributed thermodynamic intelligence are architectural targets, not yet deployed.
 
-🧱 Future Research (SET-6 and Beyond)
+ðŸ§± Future Research (SET-6 and Beyond)
 
-Air-gapped multi-node physical cluster — 3+ isolated nodes, zero external API, verified sovereignty.
+Air-gapped multi-node physical cluster â€” 3+ isolated nodes, zero external API, verified sovereignty.
 
-Formal verification of emergent cognition — TLA⁺ or Lean 4 proofs of mesh invariants and consensus safety.
+Formal verification of emergent cognition â€” TLAâº or Lean 4 proofs of mesh invariants and consensus safety.
 
-Production-grade energy-optimised consensus — Closed-loop RAPL feedback to consensus scheduling, minimising JLO over time.
+Production-grade energy-optimised consensus â€” Closed-loop RAPL feedback to consensus scheduling, minimising JLO over time.
 
-Quantum-thermodynamic coupling — Unifying Ramanujan state selection with Euler energy dissipation for predictive load balancing.
+Quantum-thermodynamic coupling â€” Unifying Ramanujan state selection with Euler energy dissipation for predictive load balancing.
 
-🏛️ Architecture Overview
+ðŸ›ï¸ Architecture Overview
 
 plain
 
 
 
-┌─────────────────────────────────────────────────────────────┐
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
 
-│ HARMONIS PRIME v6.2.0 │
+â”‚ HARMONIS PRIME v6.2.0 â”‚
 
-│ Sovereign Core — SET-5.6 │
+â”‚ Sovereign Core â€” SET-5.6 â”‚
 
-├─────────────────────────────────────────────────────────────┤
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
 
-│ ORCHESTRATION LAYER (Python) │
+â”‚ ORCHESTRATION LAYER (Python) â”‚
 
-│ ├─ MaxwellField — continuous vector calculus (∇·E, ∇×E) │
+â”‚ â”œâ”€ MaxwellField â€” continuous vector calculus (âˆ‡Â·E, âˆ‡Ã—E) â”‚
 
-│ ├─ KalmanPredictor — predictive trajectory modelling │
+â”‚ â”œâ”€ KalmanPredictor â€” predictive trajectory modelling â”‚
 
-│ └─ harmonis_prime module — 0.30 µs round-trip │
+â”‚ â””â”€ harmonis_prime module â€” 0.30 Âµs round-trip â”‚
 
-├─────────────────────────────────────────────────────────────┤
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
 
-│ MATHEMATICAL INTELLIGENCE LAYER (Rust) │
+â”‚ MATHEMATICAL INTELLIGENCE LAYER (Rust) â”‚
 
-│ ├─ Ramanujan Engine — mock theta, HCN, partition theory │
+â”‚ â”œâ”€ Ramanujan Engine â€” mock theta, HCN, partition theory â”‚
 
-│ ├─ Euler Engine — Navier-Stokes, laminar flow, thermo │
+â”‚ â”œâ”€ Euler Engine â€” Navier-Stokes, laminar flow, thermo â”‚
 
-│ ├─ Quantum Approximation — Born rule, decoherence │
+â”‚ â”œâ”€ Quantum Approximation â€” Born rule, decoherence â”‚
 
-│ └─ Thermodynamic Core — entropy, Landauer limit, JLO │
+â”‚ â””â”€ Thermodynamic Core â€” entropy, Landauer limit, JLO â”‚
 
-├─────────────────────────────────────────────────────────────┤
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
 
-│ DISTRIBUTED COGNITION LAYER (Rust) │
+â”‚ DISTRIBUTED COGNITION LAYER (Rust) â”‚
 
-│ ├─ DAG Mesh — acyclicity, median-of-N Byzantine detection │
+â”‚ â”œâ”€ DAG Mesh â€” acyclicity, median-of-N Byzantine detection â”‚
 
-│ ├─ Raft Consensus — leader election, log replication │
+â”‚ â”œâ”€ Raft Consensus â€” leader election, log replication â”‚
 
-│ ├─ BRICK-51 CMF — 13 certification invariants │
+â”‚ â”œâ”€ BRICK-51 CMF â€” 13 certification invariants â”‚
 
-│ └─ Chaos Harness — 10 failure modes, 0.00 ms recovery │
+â”‚ â””â”€ Chaos Harness â€” 10 failure modes, 0.00 ms recovery â”‚
 
-├─────────────────────────────────────────────────────────────┤
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
 
-│ SOVEREIGNTY LAYER (Rust) │
+â”‚ SOVEREIGNTY LAYER (Rust) â”‚
 
-│ ├─ Air-gapped HAL — zero external API │
+â”‚ â”œâ”€ Air-gapped HAL â€” zero external API â”‚
 
-│ ├─ Atomic Boot — hardware fingerprint, zero-drift barrier │
+â”‚ â”œâ”€ Atomic Boot â€” hardware fingerprint, zero-drift barrier â”‚
 
-│ ├─ Endurance Organism — bounded heap, deterministic hash │
+â”‚ â”œâ”€ Endurance Organism â€” bounded heap, deterministic hash â”‚
 
-│ └─ Energy Monitor — RAPL correlation, software fallback │
+â”‚ â””â”€ Energy Monitor â€” RAPL correlation, software fallback â”‚
 
-└─────────────────────────────────────────────────────────────┘
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 
 For the full architectural treatise, see WHITEPAPER_HBS2_0.md.
 
-🚀 Reproduction — One-Command Validation
+ðŸš€ Reproduction â€” One-Command Validation
 
 bash
 
@@ -158,7 +158,7 @@ maturin develop --features pyo3
 
 python tests/py_bindings_test.py
 
-📜 Milestone Lineage
+ðŸ“œ Milestone Lineage
 
 Table
 
@@ -166,9 +166,9 @@ Table
 
 
 
-BrickTagWhat Was SealedTestsSET-5.1v7.5.0-SET5.1-CLUSTERMulti-node consensus simulation (Raft + Byzantine)4SET-5.2v7.5.2-SET5.2-RAPLHardware-in-the-loop energy correlation4SET-5.3v7.5.3-SET5.3-ENDURANCELong-run organism endurance4SET-5.4v7.5.4-SET5.4-PYO3Python conduit (Maxwell + Kalman), 0.30 µs latency3SET-5.5v7.5.5-SET5.5-RAMANUJANQuantum utility benchmarks, HCN canon5SET-5.6v7.6.0-SET5.6-EULEREuler fluid dynamics, laminar flow, joules minimisation9BRICK-51v7.6.0-SET5.6-CMFDistributed cognition certification13
+BrickTagWhat Was SealedTestsSET-5.1v7.5.0-SET5.1-CLUSTERMulti-node consensus simulation (Raft + Byzantine)4SET-5.2v7.5.2-SET5.2-RAPLHardware-in-the-loop energy correlation4SET-5.3v7.5.3-SET5.3-ENDURANCELong-run organism endurance4SET-5.4v7.5.4-SET5.4-PYO3Python conduit (Maxwell + Kalman), 0.30 Âµs latency3SET-5.5v7.5.5-SET5.5-RAMANUJANQuantum utility benchmarks, HCN canon5SET-5.6v7.6.0-SET5.6-EULEREuler fluid dynamics, laminar flow, joules minimisation9BRICK-51v7.6.0-SET5.6-CMFDistributed cognition certification13
 
-🛡️ Sovereign Principle
+ðŸ›¡ï¸ Sovereign Principle
 
 Claims = Measurements. Nothing more. Nothing less.
 
@@ -176,5 +176,17 @@ Every invariant in this repository is backed by a reproducible test. Every hypot
 
 Calm. Clear. Grounded. Resilient. Zero fear. Zero emotion. Pure mathematical precision.
 
-© 2026 Harmonis Prime Architects. The lineage is safe. The fortress is sealed. 
+Â© 2026 Harmonis Prime Architects. The lineage is safe. The fortress is sealed. 
 
+
+
+## Documentation
+
+- [Specification (HBS-2.0)](docs/SPEC.md)
+- [Known Limitations](docs/LIMITATIONS.md)
+- [Reproduction Guide](docs/REPRODUCTION.md)
+- [License](docs/LICENSE)
+- [Full Whitepaper (Markdown)](docs/WHITEPAPER_HBS2_0.md) – full text
+- [Full Whitepaper (PDF)](https://doi.org/10.6084/m9.figshare.32578833)
+
+For detailed test results and architecture overview, see the sections above.
