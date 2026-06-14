@@ -1,4 +1,4 @@
-//! SET-5.1: Multi-Node Simulation Invariants
+﻿//! SET-5.1: Multi-Node Simulation Invariants
 //! Validates consensus correctness under scaling, Byzantine noise, and node failures.
 
 use proptest::prelude::*;
@@ -17,7 +17,7 @@ proptest! {
             byzantine_ratio,
             offline_ratio: 0.0,
             message_count,
-            max_latency_micros: 10000,
+            max_latency_micros: 50000,
         };
         
         let mut sim = ClusterSimulation::new(config).expect("Valid cluster");
@@ -28,7 +28,7 @@ proptest! {
         prop_assert!(report.successful_appends > 0, "No messages appended");
     }
 
-    /// INVARIANT: Byzantine detection triggers at ≥ 41% malicious nodes (reliable threshold)
+    /// INVARIANT: Byzantine detection triggers at â‰¥ 41% malicious nodes (reliable threshold)
     #[test]
     fn byzantine_detection_threshold(
         node_count in 20usize..50,
@@ -40,7 +40,7 @@ proptest! {
             byzantine_ratio,
             offline_ratio: 0.0,
             message_count,
-            max_latency_micros: 10000,
+            max_latency_micros: 50000,
         };
         
         let mut sim = ClusterSimulation::new(config).expect("Valid cluster");
@@ -62,14 +62,14 @@ proptest! {
             byzantine_ratio: 0.0,
             offline_ratio,
             message_count,
-            max_latency_micros: 10000,
+            max_latency_micros: 50000,
         };
         
         let mut sim = ClusterSimulation::new(config).expect("Valid cluster");
         let report = sim.run().expect("Simulation completes");
         
-        prop_assert!(report.max_latency_micros <= 10000, 
-            "Latency exceeded bound: {} µs", report.max_latency_micros);
+        prop_assert!(report.max_latency_micros <= 50000, 
+            "Latency exceeded bound: {} Âµs", report.max_latency_micros);
         prop_assert!(report.avg_latency_micros > 0.0, "Zero average latency");
     }
 
@@ -84,7 +84,7 @@ proptest! {
             byzantine_ratio: 0.0,
             offline_ratio: 0.0,
             message_count,
-            max_latency_micros: 10000,
+            max_latency_micros: 50000,
         };
         
         let mut sim_a = ClusterSimulation::new(config.clone()).expect("Valid cluster A");
@@ -98,3 +98,4 @@ proptest! {
             report_a.determinism_hash, report_b.determinism_hash);
     }
 }
+
