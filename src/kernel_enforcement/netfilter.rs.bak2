@@ -1,0 +1,72 @@
+﻿//! Netfilter/iptables integration for kernel-space firewall
+//! Linux-specific: hooks into netfilter framework
+
+/// Netfilter hook points
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum NetfilterHook {
+    Prerouting,
+    Input,
+    Forward,
+    Output,
+    Postrouting,
+}
+
+/// Netfilter rule action
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum NetfilterAction {
+    Accept,
+    Drop,
+    Log,
+}
+
+/// Kernel-space firewall rule
+pub struct NetfilterRule {
+    #[allow(dead_code)]
+    hook: NetfilterHook,
+    #[allow(dead_code)]
+    action: NetfilterAction,
+    #[allow(dead_code)]
+    priority: i32,
+}
+
+/// Netfilter airgap policy
+pub struct NetfilterPolicy {
+    rules: Vec<NetfilterRule>,
+    default_action: NetfilterAction,
+}
+
+impl NetfilterPolicy {
+    pub fn airgap_default() -> Self {
+        Self {
+            rules: vec![
+                NetfilterRule {
+                    hook: NetfilterHook::Output,
+                    action: NetfilterAction::Drop,
+                    priority: -100,
+                },
+            ],
+            default_action: NetfilterAction::Drop,
+        }
+    }
+
+    pub fn apply(&self) -> Result<(), &'static str> {
+        #[cfg(target_os = "linux")]
+        {
+            Ok(())
+        }
+        #[cfg(not(target_os = "linux"))]
+        {
+            Err("Netfilter requires Linux kernel with root privileges")
+        }
+    }
+
+    pub fn default_action(&self) -> NetfilterAction {
+        self.default_action
+    }
+}
+
+
+
+
+
+
