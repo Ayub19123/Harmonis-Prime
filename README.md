@@ -1,4 +1,4 @@
-[![Rust CI](https://github.com/Ayub19123/Harmonis-Prime/actions/workflows/sovereign-ci.yml/badge.svg)](https://github.com/Ayub19123/Harmonis-Prime/actions)
+)[![Rust CI](https://github.com/Ayub19123/Harmonis-Prime/actions/workflows/rust.yml/badge.svg)](https://github.com/Ayub19123/Harmonis-Prime/actions)
 [![Tests](https://img.shields.io/badge/tests-106%2F106-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
 [![Version](https://img.shields.io/badge/version-6.2.0--SET--5.6--GM-blue)](https://github.com/Ayub19123/Harmonis-Prime/releases)
 [![DOI](https://img.shields.io/badge/DOI-10.6084%2Fm9.figshare.32578833-blue)](https://doi.org/10.6084/m9.figshare.32578833)
