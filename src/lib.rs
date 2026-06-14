@@ -153,3 +153,6 @@ pub mod benchmark;
 
 pub mod mesh;
 pub mod stats;
+
+pub mod ramanujan;
+pub mod euler;
