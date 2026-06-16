@@ -160,3 +160,7 @@ pub mod euler;
 pub mod airgap;
 
 pub mod kernel_enforcement;
+
+pub mod identity;
+
+pub mod network_calculus;
