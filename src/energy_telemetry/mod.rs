@@ -1,4 +1,4 @@
-﻿//! SET-6E: CoreSight Energy Telemetry - Cycle-Accurate Power Measurement
+//! SET-6E: CoreSight Energy Telemetry - Cycle-Accurate Power Measurement
 //! 
 //! Holy Grail Principle:
 //!   Less data. Less energy. More precision. The unresolved becomes mere task
@@ -18,13 +18,12 @@
 pub mod telemetry;
 
 pub use telemetry::{
-    PmuSimulator, DvfsProfile, EmaFilter, 
+    PmuSimulator, DvfsProfile, EmaFilter,
     EnergyTelemetry, TelemetryDrift,
     compute_dynamic_power, apply_ema_filter,
+    Workload, PowerModel, PmuEstimator, PhysicalMeter,
 };
-
 
 #[cfg(test)]
 mod tests;
-
 
