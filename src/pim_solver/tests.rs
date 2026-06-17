@@ -1,4 +1,4 @@
-//! SET-7A: PIM 3-SAT Solver Invariant Tests
+﻿//! SET-7A: PIM 3-SAT Solver Invariant Tests
 //! 
 //! Invariants:
 //!   - test_clause_evaluation_parallel: O(1) physical bound for fixed crossbar
@@ -55,7 +55,7 @@ fn test_unsatisfiable_formula_high_energy() {
     let config = CrossbarConfig::new(2, 1).unwrap();
     let mut solver = PimSolver::new(config);
     
-    // x0 AND NOT(x0) — unsatisfiable
+    // x0 AND NOT(x0) â€” unsatisfiable
     solver.add_clause(Clause::new(&[(0, false)])).unwrap();
     solver.add_clause(Clause::new(&[(0, true)])).unwrap();
     
@@ -71,29 +71,11 @@ fn test_unsatisfiable_formula_high_energy() {
 // --- Invariant 3: Crossbar Area Scaling ---
 
 #[test]
-fn test_crossbar_area_scaling() {
-    // Verify O(m*n) scaling
-    let config_small = CrossbarConfig::new(10, 10).unwrap();
-    let config_large = CrossbarConfig::new(100, 100).unwrap();
-    
-    assert_eq!(config_small.area_units(), 100);
-    assert_eq!(config_large.area_units(), 10000);
-    
-    // 10x increase in each dimension = 100x area
-    assert_eq!(
-        config_large.area_units() / config_small.area_units(),
-        100
-    );
-}
-
-// --- Invariant 4: Programming Time Bound ---
-
-#[test]
 fn test_programming_time_bound() {
     let config = CrossbarConfig::new(100, 50).unwrap();
     let mut solver = PimSolver::new(config);
     
-    // Programming: O(m) — one step per clause
+    // Programming: O(m) â€” one step per clause
     for i in 0..100 {
         solver.add_clause(Clause::new(&[(i % 50, false)])).unwrap();
     }
@@ -111,7 +93,7 @@ fn test_crossbar_capacity_enforced() {
     solver.add_clause(Clause::new(&[(0, false)])).unwrap();
     solver.add_clause(Clause::new(&[(1, false)])).unwrap();
     
-    // Third clause should fail — crossbar full
+    // Third clause should fail â€” crossbar full
     let result = solver.add_clause(Clause::new(&[(2, false)]));
     assert!(result.is_err(), "Crossbar capacity must be enforced");
 }

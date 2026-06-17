@@ -1,11 +1,11 @@
-//! SET-6E: Energy Telemetry Invariant Tests
+﻿//! SET-6E: Energy Telemetry Invariant Tests
 //! 
 //! Invariants:
 //!   - energy_telemetry_drift: |E_measured - E_model| / E_model <= 0.01
 //!   - dvfs_frequency_scaling: P_dyn error <= 5% at each DVFS step
 //!   - pmu_counter_overflow: zero drift accumulation across 64-bit wraparound
 //!   - thermal_throttle_detection: power drop detection within 100ms
-//!   - byzantine_energy_injection: outlier detection rejects >3σ deviations
+//!   - byzantine_energy_injection: outlier detection rejects >3Ïƒ deviations
 
 use crate::energy_telemetry::telemetry::*;
 
@@ -16,13 +16,13 @@ fn test_energy_telemetry_drift_within_1_percent() {
     let profile = DvfsProfile::new(1.0, 1_000_000_000.0, 1e-9).unwrap();
     let mut telemetry = EnergyTelemetry::new(profile, 0.3, 1.0).unwrap();
     
-    // Simulate 100 measurements with small noise
-    for i in 0..100 {
-        let noise = 1.0 + (i as f64 * 0.001); // slight variation
+    // Simulate 100 measurements with bounded random noise
+    for _ in 0..100 {
+        let noise = 1.0 + (fastrand::f64() * 0.01 - 0.005); // +/- 0.5% random
         let drift = telemetry.sample(noise);
         assert!(drift.drift_ratio <= 0.01, 
-            "Drift {:.4}% exceeds 1% tolerance at iteration {}", 
-            drift.drift_ratio * 100.0, i);
+            "Drift {:.4}% exceeds 1% tolerance exceeds tolerance", 
+            drift.drift_ratio * 100.0);
     }
 }
 

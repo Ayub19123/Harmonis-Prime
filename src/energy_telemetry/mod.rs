@@ -23,3 +23,8 @@ pub use telemetry::{
     compute_dynamic_power, apply_ema_filter,
 };
 
+
+#[cfg(test)]
+mod tests;
+
+
