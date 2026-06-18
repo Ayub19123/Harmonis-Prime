@@ -57,17 +57,22 @@ impl RaplHardwareMonitor {
         }
     }
 
+    /// Return the RAPL domain being monitored
+    pub fn domain(&self) -> RaplDomain {
+        self.domain
+    }
+
     /// Read RAPL energy counter from sysfs (Linux only)
     #[cfg(target_os = "linux")]
     fn read_raw(&self) -> Option<RaplReading> {
         let base_path = format!("/sys/class/powercap/{}/", self.domain.sysfs_path());
-        
+
         let energy_uj = std::fs::read_to_string(format!("{}energy_uj", base_path))
             .ok()?
             .trim()
             .parse::<u64>()
             .ok()?;
-        
+
         let max_range = std::fs::read_to_string(format!("{}max_energy_range_uj", base_path))
             .ok()?
             .trim()
@@ -112,7 +117,7 @@ impl EnergyMonitor for RaplHardwareMonitor {
                 let joules = if let Some(ref baseline) = self.baseline {
                     if self.detect_wraparound(&reading, baseline) {
                         // Handle wraparound: add max range to delta
-                        let wrapped_delta = reading.energy_uj + 
+                        let wrapped_delta = reading.energy_uj +
                             (reading.max_energy_range_uj - baseline.energy_uj);
                         wrapped_delta as f64 / 1_000_000.0
                     } else {
@@ -230,8 +235,19 @@ impl JloCorrelation {
         })
     }
 
-    /// Verify invariant: |r| ≥ 0.95 and error ≤ 20%
+    /// Verify invariant: |r| >= 0.95 and error <= 20%
     pub fn verify_invariant(&self) -> bool {
         self.correlation_coefficient.abs() >= 0.95 && self.error_bound <= 0.20
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rapl_hardware_monitor_domain_active() {
+        let monitor = RaplHardwareMonitor::new(RaplDomain::Package);
+        assert_eq!(monitor.domain(), RaplDomain::Package);
     }
 }

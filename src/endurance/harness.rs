@@ -1,7 +1,7 @@
 ﻿//! SET-5.3: Endurance Harness — N-hour sustained operation validator (accelerated)
 //! Invariant: Zero state divergence or memory leakage over N-hour cycles
 
-use std::time::Instant;
+use std::time::{Instant, Duration};
 use crate::endurance::memory::MemoryProfiler;
 use crate::endurance::checkpoint::CheckpointEngine;
 use crate::endurance::telemetry::TelemetryStream;
@@ -53,15 +53,20 @@ impl EnduranceHarness {
         }
     }
 
+    /// Return elapsed time since harness creation
+    pub fn elapsed(&self) -> Duration {
+        self.start.elapsed()
+    }
+
     /// Run the endurance simulation (accelerated — no real-time sleep)
     pub fn run_simulated(&mut self) -> EnduranceReport {
         let target_duration_secs = self.config.duration_hours * 3600.0;
         let checkpoint_interval_secs = self.config.checkpoint_interval_secs as f64;
-        
+
         // Simulated elapsed time (accelerated)
         let mut simulated_elapsed_secs: f64 = 0.0;
         let mut next_checkpoint_secs: f64 = checkpoint_interval_secs;
-        
+
         // Simulate heap growth: normal growth + small noise
         let mut current_heap: usize = 1_000_000; // 1MB baseline
 
@@ -70,7 +75,7 @@ impl EnduranceHarness {
             self.operation_counter += 1;
             let latency = 100 + (self.operation_counter % 50); // 100-150 µs
             let energy = 1.0e-6; // 1 µJ per op
-            
+
             // Advance simulated time by operation latency
             simulated_elapsed_secs += latency as f64 / 1_000_000.0;
 
@@ -89,10 +94,10 @@ impl EnduranceHarness {
             // Checkpoint at interval
             if simulated_elapsed_secs >= next_checkpoint_secs {
                 self.memory.snapshot(current_heap);
-                
+
                 let entropy = 0.5 + (self.operation_counter as f64).sin() * 0.001; // stable entropy
                 self.checkpoints.seal(entropy, self.operation_counter, current_heap);
-                
+
                 next_checkpoint_secs += checkpoint_interval_secs;
             }
         }
@@ -119,5 +124,24 @@ impl EnduranceHarness {
             success_rate: self.telemetry.success_rate(),
             invariant_passed,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_endurance_harness_elapsed_active() {
+        let config = EnduranceConfig {
+            duration_hours: 0.001,
+            checkpoint_interval_secs: 1,
+            max_heap_growth_percent_per_hour: 10.0,
+            max_entropy_variance: 1.0,
+            operations_per_checkpoint: 100,
+        };
+        let harness = EnduranceHarness::new(config);
+        let elapsed = harness.elapsed();
+        assert!(elapsed >= Duration::ZERO, "Elapsed must be non-negative");
     }
 }

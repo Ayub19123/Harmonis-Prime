@@ -1,6 +1,6 @@
 ﻿//! SET-5.3: Memory Profiler — Heap growth tracking
 
-use std::time::Instant;
+use std::time::{Instant, Duration};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct MemorySnapshot {
@@ -24,6 +24,11 @@ impl MemoryProfiler {
         }
     }
 
+    /// Return elapsed time since profiler creation
+    pub fn elapsed(&self) -> Duration {
+        self.start.elapsed()
+    }
+
     pub fn snapshot(&mut self, heap_bytes: usize) -> MemorySnapshot {
         let snap = MemorySnapshot { heap_bytes, timestamp: Instant::now() };
         if self.baseline.is_none() {
@@ -45,5 +50,17 @@ impl MemoryProfiler {
 
     pub fn verify_invariant(&self, max_percent_per_hour: f64) -> bool {
         self.growth_rate_per_hour() <= max_percent_per_hour
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_memory_profiler_elapsed_active() {
+        let profiler = MemoryProfiler::new();
+        let elapsed = profiler.elapsed();
+        assert!(elapsed >= Duration::ZERO, "Elapsed must be non-negative");
     }
 }

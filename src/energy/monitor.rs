@@ -50,6 +50,11 @@ impl RaplMonitor {
         }
     }
 
+    /// Return the RAPL domain identifier
+    pub fn domain(&self) -> &str {
+        &self.domain
+    }
+
     /// Read RAPL energy counter (Linux-specific, stub for other platforms)
     fn read_rapl_counter(&self) -> f64 {
         #[cfg(target_os = "linux")]
@@ -175,5 +180,16 @@ impl EnergyMonitor for SoftwareEnergyMonitor {
     fn reset(&mut self) {
         self.samples.clear();
         self.start = Instant::now();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rapl_monitor_domain_active() {
+        let monitor = RaplMonitor::new("intel-rapl:0");
+        assert_eq!(monitor.domain(), "intel-rapl:0");
     }
 }
