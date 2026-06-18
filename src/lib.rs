@@ -165,3 +165,5 @@ pub mod energy_telemetry;
 pub mod pim_solver;
 
 pub mod zeta_resonance;
+
+pub mod thermodynamic_balance;
