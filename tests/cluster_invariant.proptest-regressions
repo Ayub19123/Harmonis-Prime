@@ -5,3 +5,5 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc af16d7b1e8aff70886075b8ec24217135c11d3304e9e98f4777553096c604bf9 # shrinks to node_count = 10, byzantine_ratio = 0.31, message_count = 100
+cc a604ec17883418f65b7640f62f5ce667c5faca04e2bd5b9b3825ba314a79d0ea # shrinks to node_count = 17, offline_ratio = 0.2083315964316537, message_count = 472
+cc bdd992bdad045fa29ee68d2b3f420f87e3c6343d57ff6d39f22a561c97c65a1a # shrinks to node_count = 29, offline_ratio = 0.2468418749082265, message_count = 431
