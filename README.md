@@ -3,7 +3,7 @@
 [![Warnings](https://img.shields.io/badge/warnings-0-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
 [![Version](https://img.shields.io/badge/version-6.2.0--SET--8--GM-blue)](https://github.com/Ayub19123/Harmonis-Prime/releases)
 [![DOI (Figshare)](https://img.shields.io/badge/Figshare-10.6084%2Fm9.figshare.32732766-blue)](https://doi.org/10.6084/m9.figshare.32732766)
-[![DOI (Zenodo)](https://zenodo.org/badge/DOI/10.5281/zenodo.20750406.svg)](https://doi.org/10.5281/zenodo.20750406)
+[![DOI (Zenodo)](https://zenodo.org/badge/DOI/10.5281/zenodo.20764215.svg)](https://doi.org/10.5281/zenodo.20764215)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-1.78%2B-orange)](https://www.rust-lang.org)
 
@@ -39,7 +39,7 @@ Harmonis Prime is a Rust-based distributed systems validation stack where every 
 | Thermodynamic entropy | Exact | Shannon S = −Σpᵢln(pᵢ), KL divergence D_KL(P‖Q) |
 | GitHub commit | `bca5154` | `main` branch |
 | Figshare DOI | `10.6084/m9.figshare.32732766` | Permanent, citable |
-| Zenodo DOI | `10.5281/zenodo.20750406` | Permanent, citable |
+| Zenodo DOI | `10.5281/zenodo.20764215` | Permanent, citable (v2, LaTeX PDF) |
 | License | MIT | Open source |
 
 ---
@@ -73,7 +73,10 @@ git clone https://github.com/Ayub19123/Harmonis-Prime.git
 cd Harmonis-Prime
 git checkout bca5154
 cargo test --lib -- --nocapture
-Expected: test result: ok. 103 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in ~0.36s
+Expected output:
+plain
+test result: ok. 103 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in ~0.36s
+Verified on: Windows 11 (developer), Ubuntu Latest (CI), Windows Server (CI), macOS Latest (CI)
 Documentation Suite
 Table
 Document	Purpose	Commit
@@ -85,7 +88,20 @@ KNOWN_LIMITATIONS.md	14 documented gaps, Phase 2 roadmap	Pre-existing
 WHITEPAPER_HBS1_1.md	Full academic specification with executable proofs	bca5154
 Whitepaper DOIs:
 Figshare: 10.6084/m9.figshare.32732766
-Zenodo: 10.5281/zenodo.20750406
+Zenodo v2 (LaTeX PDF): 10.5281/zenodo.20764215
+Additional Presence:
+Hugging Face Space: ayub227/harmonis-prime
+How to Cite
+If you use Harmonis Prime in your research or engineering work, please cite:
+bibtex
+@software{harmonis_prime_v620,
+  author = {Pandith, Ayub and Harmonis Prime Core Team},
+  title = {Harmonis Prime v6.2.0-SET-8-GM: A Reproducible Distributed Systems Benchmark},
+  year = {2026},
+  month = {jun},
+  doi = {10.5281/zenodo.20764215},
+  url = {https://github.com/Ayub19123/Harmonis-Prime}
+}
 Honest Limitations
 Table
 Limitation	Current State	Resolution
