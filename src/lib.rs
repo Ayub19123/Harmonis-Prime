@@ -171,3 +171,7 @@ pub mod thermodynamic_balance;
 pub mod set9_telemetry;
 
 pub mod set10_fusion;
+
+pub mod mpfr_oracle;
+pub mod reference_data;
+pub mod truncation_budget;
