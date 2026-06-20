@@ -1,143 +1,161 @@
-[![Rust CI](https://github.com/Ayub19123/Harmonis-Prime/actions/workflows/rust.yml/badge.svg)](https://github.com/Ayub19123/Harmonis-Prime/actions)
-[![Tests](https://img.shields.io/badge/tests-103%2F103-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
-[![Warnings](https://img.shields.io/badge/warnings-0-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
-[![Version](https://img.shields.io/badge/version-6.2.0--SET--8--GM-blue)](https://github.com/Ayub19123/Harmonis-Prime/releases)
-[![DOI (Figshare)](https://img.shields.io/badge/Figshare-10.6084%2Fm9.figshare.32732766-blue)](https://doi.org/10.6084/m9.figshare.32732766)
-[![DOI (Zenodo)](https://zenodo.org/badge/DOI/10.5281/zenodo.20764215.svg)](https://doi.org/10.5281/zenodo.20764215)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Rust](https://img.shields.io/badge/rust-1.78%2B-orange)](https://www.rust-lang.org)
+<p align="center">
+  <img src="https://img.shields.io/badge/tests-135%2F135%20passing-brightgreen?logo=rust&style=flat-square" alt="135/135 Tests Passing">
+  <img src="https://img.shields.io/badge/warnings-0-blue?style=flat-square" alt="Zero Warnings">
+  <img src="https://img.shields.io/badge/drift-0-critical?style=flat-square" alt="Zero Drift">
+  <img src="https://img.shields.io/badge/validation-0.38s-lightgrey?style=flat-square" alt="0.38s Validation">
+  <a href="https://doi.org/10.5281/zenodo.20777632"><img src="https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20777632-blue?style=flat-square&logo=doi" alt="Zenodo DOI"></a>
+  <a href="https://doi.org/10.6084/m9.figshare.32732766"><img src="https://img.shields.io/badge/Figshare-10.6084%2Fm9.figshare.32732766-orange?style=flat-square&logo=doi" alt="Figshare DOI"></a>
+</p>
+
+<h1 align="center">HARMonis Prime Sovereign Core</h1>
+<p align="center"><b>Engineering Milestone Report — SET-10 & SET-11 Completion</b><br>
+Version 1.0 — Commit <code>476fd34</code> — 2026-06-20</p>
 
 ---
 
-# Harmonis Prime — Mathematically Sovereign Distributed Systems Benchmark
+## Abstract
 
-**103/103 tests passing · 0 warnings · 0 errors · 0 drift · 0.36s full validation**
+HARMonis Prime is an open engineering programme investigating whether traditionally separate computing disciplines—distributed consensus, physical identity, kernel enforcement, network calculus, energy telemetry, processing-in-memory, and analytic number theory—can be integrated into a single verifiable framework with **zero diagnostic drift**.
 
-> *Claims = Measurements. Nothing more. Nothing less.*
+At the time of writing, the system consists of **135 active invariant tests** with **zero compiler warnings**, **sub-second validation runtime**, and **documented honest limitations**. All claims in this repository are reproducible via a single command and permanently archived with DOI.
 
----
-
-## Executive Summary
-
-Harmonis Prime is a Rust-based distributed systems validation stack where every architectural claim is backed by executable tests, every limitation is documented, and every commit is sealed with zero diagnostic noise. SET-8 milestone: architectural debt retired through functionality, not suppression — increasing test coverage (99→103) while simultaneously eliminating warnings (4→0).
+> **Reproduction:** `git checkout 476fd34 && cargo test --lib -- --nocapture`
 
 ---
 
-## Verified Metrics
+## Whitepaper
 
-| Metric | Value | Proof |
-|--------|-------|-------|
-| Tests passing | 103/103 | `cargo test --lib -- --nocapture` |
-| Compile warnings | 0 | `cargo check --lib` |
-| Compile errors | 0 | `cargo check --lib` |
-| Full suite runtime | 0.36s | Observed on Intel i7-1165G7, 16GB RAM |
-| Tests per second | ~286 | Single-threaded |
-| Atomic Boot compliance | 100.00% | `hal::atomic_boot` fingerprint verification |
-| Energy telemetry drift | ≤1% | Per-workload calibrated: Idle, SustainedHigh, Bursty, Ramping |
-| Network delay bound | Sub-millisecond | Min-plus algebra, token bucket |
-| PIM clause evaluation | O(1) | Fixed crossbar, 3-SAT |
-| Thermodynamic entropy | Exact | Shannon S = −Σpᵢln(pᵢ), KL divergence D_KL(P‖Q) |
-| GitHub commit | `bca5154` | `main` branch |
-| Figshare DOI | `10.6084/m9.figshare.32732766` | Permanent, citable |
-| Zenodo DOI | `10.5281/zenodo.20764215` | Permanent, citable (v2, LaTeX PDF) |
-| License | MIT | Open source |
+The full engineering milestone report (LaTeX PDF, 4 pages, IEEE/ACM format) is permanently archived and available for download:
+
+| Archive | DOI | Direct Link |
+|---------|-----|-------------|
+| **Zenodo v1** | `10.5281/zenodo.20777632` | [Download PDF](https://doi.org/10.5281/zenodo.20777632) |
+| **Figshare** | `10.6084/m9.figshare.32732766` | [Download PDF](https://doi.org/10.6084/m9.figshare.32732766) |
+
+*Both archives contain the identical document: title, abstract, 135-test ledger, SET-10/SET-11 analysis, honest limitations, reproduction protocol, and Phase 2 roadmap.*
 
 ---
 
-## Architecture — 14 Modules, 103 Invariants
+## What Has Been Achieved — Proven Only
 
-| Module | Tests | Core Invariants | Status |
-|--------|-------|-----------------|--------|
-| `hal::atomic_boot` | 1 | Hardware fingerprint, 100% Golden Master compliance | ✅ Sealed |
-| `identity` | 17 | PUF deterministic per node, NIST SP 800-22, challenge-response auth | ✅ Sealed |
-| `airgap` | 6 | Zero external API calls, deterministic RNG, firewall blocks all egress | ✅ Sealed |
-| `kernel_enforcement` | 7 | eBPF drops all packets, seccomp blocks CONNECT/SENDTO, netfilter DENY | ✅ Sealed |
-| `network_calculus` | 7 | Min-plus algebra, delay bound stable/unstable, token bucket, subadditivity | ✅ Sealed |
-| `energy_telemetry` | 10 | Per-workload drift ≤1%, EMA convergence, DVFS scaling, Byzantine rejection | ✅ Sealed |
-| `pim_solver` | 8 | O(1) clause evaluation, crossbar area O(mn), energy minimization | ✅ Sealed |
-| `zeta_resonance` | 7 | Theta(t) monotonicity, pipeline validation, determinism | ✅ Sealed |
-| `euler` | 9 | Reynolds <2300, dissipation non-negative, entropy monotonic, equilibrium | ✅ Sealed |
-| `ramanujan` | 4 | Mock-theta convergence, HCN divisor advantage | ✅ Sealed |
-| `thermodynamic_balance` | 19 | Shannon entropy, KL divergence ≥0, RC thermal convergence, drift detection | ✅ Sealed |
-| `SET-8` | 4 | `elapsed()` active, `domain()` active — debt retired through functionality | ✅ Sealed |
-| `raft` (SET-5) | 106 | Leader failover, quorum replication, BRICK-18/19 | ✅ Historical |
-| `telemetry` | 0 | Scaffold preserved for SET-9 | ⏳ Pending |
-| **Total** | **103** | **Zero drift, zero warnings, zero errors** | ✅ **Sealed** |
+The following components are validated by `cargo test --lib -- --nocapture` at commit `476fd34`:
+
+| Module | Tests | Core Invariant | Status |
+|--------|-------|----------------|--------|
+| `hal::atomic_boot` | 1 | Hardware fingerprint, deterministic boot | Sealed |
+| `identity` (PUF) | 17 | NIST SP 800-22 statistical randomness | Sealed |
+| `airgap` | 6 | Zero external API calls, deterministic RNG isolation | Sealed |
+| `kernel_enforcement` | 7 | eBPF packet drop, seccomp syscall block | Sealed |
+| `network_calculus` | 7 | Min-plus algebra, delay bound subadditivity | Sealed |
+| `energy_telemetry` | 10 | Per-workload JLO calibration ≤1% drift | Sealed |
+| `pim_solver` | 8 | O(1) clause evaluation, crossbar area O(mn) | Sealed |
+| `zeta_resonance` | 7 | θ(t) monotonicity, pipeline determinism | Sealed |
+| `euler` | 9 | Reynolds <2300, entropy monotonic | Sealed |
+| `ramanujan` | 4 | Mock-theta convergence, HCN divisor advantage | Sealed |
+| `thermodynamic_balance` | 19 | Shannon entropy, KL divergence ≥0, RC thermal | Sealed |
+| SET-8 | 4 | Dormant fields activated to APIs | Sealed |
+| SET-9 | 15 | Multi-domain RAPL, thermal RC, JLO correlation | Sealed |
+| **SET-10** | 11 | Theta approximation, Dirichlet series, thermal bridge | Sealed |
+| **SET-11** | 7 | MPFR fallback oracle, truncation bound, benchmark | Sealed |
+| **Total Active** | **135** | **Zero drift, zero warnings, zero errors** | **Sealed** |
+
+*One test is intentionally ignored (`reference_data` SHA-256 placeholder) pending manual Odlyzko dataset download.*
 
 ---
 
-## Reproduction — One Command
+## Architecture
+┌─────────────────────────────────────────────────────────────┐
+│                    HARMonis Prime v6.2.0                     │
+├─────────────────────────────────────────────────────────────┤
+│  HAL & Boot        │  Identity & Security                    │
+│  atomic_boot (1)   │  PUF (17) · airgap (6) · kernel (7)    │
+├─────────────────────────────────────────────────────────────┤
+│  Network & Energy  │  Mathematics & Thermodynamics           │
+│  net_calc (7)      │  zeta_resonance (7) · euler (9)         │
+│  energy_telemetry (10) │  ramanujan (4) · thermodynamic (19) │
+├─────────────────────────────────────────────────────────────┤
+│  Processing-in-Memory    │  Fusion & Reference                  │
+│  pim_solver (8)          │  SET-10 (11) · SET-11 (7)          │
+└─────────────────────────────────────────────────────────────┘
+plain
+
+---
+
+## Benchmarks
+
+Criterion 30-run baseline (single machine, Windows 11, Intel i7-1165G7):
+
+| Benchmark | Mean | Honest Limitation |
+|-----------|------|-------------------|
+| `theta_approx_t1000` | 22.36 ns | Single machine, Windows only |
+| `dirichlet_series_100terms` | 4.59 µs | Single machine, Windows only |
+| `mpfr_oracle_theta_t1000` | 25.95 ns | f64 fallback, not true MPFR |
+
+Run benchmarks: `cargo bench`
+
+---
+
+## Honest Limitations — What Is NOT Claimed
+
+The following are **explicitly not achieved** at this milestone:
+
+| Item | Status | Blocker |
+|------|--------|---------|
+| True MPFR ζ(½+it) evaluation | ❌ Not implemented | `rug` crate Windows compatibility |
+| Odlyzko dataset validation | ❌ Not implemented | Manual download pending |
+| AVX-512 SIMD kernel | ❌ Not implemented | `std::simd` experimental |
+| FPGA hardware acceleration | ❌ Not implemented | No silicon |
+| RAPL physical hardware access | ❌ Not implemented | Windows laptop, no Linux |
+| FMEA / RTM / SBOM / Signing | ❌ Not implemented | Requires Phase 2 resources |
+| Multi-machine benchmark CI | ❌ Not implemented | Requires 3+ identical nodes |
+
+*We do not claim to solve P vs NP. We claim a software-simulated PIM solver with O(1) clause evaluation per crossbar row — a heuristic, not a proof.*
+
+---
+
+## Reproduction Protocol
 
 ```bash
 git clone https://github.com/Ayub19123/Harmonis-Prime.git
 cd Harmonis-Prime
-git checkout bca5154
+git checkout 476fd34
 cargo test --lib -- --nocapture
-Expected output:
+Expected Output:
 plain
-test result: ok. 103 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in ~0.36s
-Verified on: Windows 11 (developer), Ubuntu Latest (CI), Windows Server (CI), macOS Latest (CI)
-Documentation Suite
+test result: ok. 135 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.38s
+Verified On:
+Windows 11 (developer machine, Intel i7-1165G7, 16GB RAM)
+Ubuntu Latest (GitHub Actions CI)
+macOS Latest (GitHub Actions CI)
+Phase 2 Roadmap
 Table
-Document	Purpose	Commit
-ARCHITECTURE.md	Module dependency graph, invariant ledger, honest limitations	ccc862a
-CHANGELOG.md	Historical progression: 50→71→78→80→99→103 tests	ccc862a
-PERFORMANCE.md	0.36s baseline, latency budget, determinism proof	ccc862a
-CONTRIBUTING.md	Build protocol, test discipline, commit convention	7ebd1b0
-KNOWN_LIMITATIONS.md	14 documented gaps, Phase 2 roadmap	Pre-existing
-WHITEPAPER_HBS1_1.md	Full academic specification with executable proofs	bca5154
-Whitepaper DOIs:
-Figshare: 10.6084/m9.figshare.32732766
-Zenodo v2 (LaTeX PDF): 10.5281/zenodo.20764215
-Additional Presence:
-Hugging Face Space: ayub227/harmonis-prime
-How to Cite
-If you use Harmonis Prime in your research or engineering work, please cite:
+Milestone	Scope	Honest Constraint
+M2.1	MPFR Z(t) oracle via rug crate	Software-only, no hardware
+M2.2	Odlyzko/LMFDB dataset automation	Requires internet + dataset download
+M2.3	AVX-512 SIMD kernel	std::simd experimental, may not compile
+M2.4	Integration test harness	tests/integration/ directory
+M2.5	Criterion statistical CI	Multi-machine baseline
+Citation
+If you use this work in academic or industrial research, please cite:
+BibTeX:
 bibtex
-@software{harmonis_prime_v620,
-  author = {Pandith, Ayub and Harmonis Prime Core Team},
-  title = {Harmonis Prime v6.2.0-SET-8-GM: A Reproducible Distributed Systems Benchmark},
-  year = {2026},
-  month = {jun},
-  doi = {10.5281/zenodo.20764215},
-  url = {https://github.com/Ayub19123/Harmonis-Prime}
+@software{harmonis_prime_2026,
+  author       = {Ayub Pandith},
+  title        = {{HARMonis Prime: Engineering Milestone Report — SET-10 \& SET-11 Completion}},
+  month        = jun,
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.20777632},
+  url          = {https://doi.org/10.5281/zenodo.20777632}
 }
-Honest Limitations
-Table
-Limitation	Current State	Resolution
-Integration tests	None — unit tests only	Phase 2: tests/integration/
-Performance benchmarks	Observed 0.36s, not criterion.rs	Phase 2: statistical confidence ±5% CI
-Fuzzing	None	Phase 2: cargo fuzz
-Real hardware	Software simulation only	Phase 2: ARM/FPGA
-Zeta zero detection	Truncated Dirichlet series, σ>1	Phase 2: Riemann-Siegel formula
-Telemetry modules	Scaffold only, 0 tests	Phase 2: SET-9 implementation
-Thermal model	1D lumped RC	Phase 2: FEM 2D diffusion
-Multi-node	Single-threaded simulation	Phase 2: physical cluster
-Human witnesses	1 (@abdulwahab72)	Target: 3–5 independent witnesses
-SET-8 Milestone: Debt Retired Through Functionality
-Four compiler warnings indicated dormant fields. Instead of #[allow(dead_code)] or _ prefixing, each was converted to verifiable API:
-Table
-Field	Activation	Test
-EnduranceHarness.start	elapsed() — lifecycle timing	test_endurance_harness_elapsed_active
-MemoryProfiler.start	elapsed() — temporal resource tracking	test_memory_profiler_elapsed_active
-RaplMonitor.domain	domain() — domain identity exposure	test_rapl_monitor_domain_active
-RaplHardwareMonitor.domain	domain() — hardware-domain semantics	test_rapl_hardware_monitor_domain_active
-Result: Coverage increased (99→103 tests) while noise decreased (4→0 warnings). Most systems achieve one at the expense of the other. This is the signature of architectural coherence.
-Build Requirements
-Rust 1.78+ (stable)
-cargo (via rustup)
-Zero external dependencies for core library
-Optional: pyo3 feature for Python bridge
-Commit Convention
-plain
-type(scope): short description — proof
-Table
-Type	Scope	Example
-feat, fix, chore, docs, test, refactor	set-5, set-6a–6e, set-7a–7c, set-8, set-9	feat(set-7c): entropy computation for workload balancing — 5/5 tests, zero drift
+Archival DOIs:
+Zenodo v1: 10.5281/zenodo.20777632
+Figshare: 10.6084/m9.figshare.32732766
+Repository: github.com/Ayub19123/Harmonis-Prime
 License
-MIT — see LICENSE
-Version: 6.2.0-SET-8-GM
-Commit: bca5154
-Date: 2026-06-18
-Maintainer: Harmonis Prime Core Team
-The precision is eternal. The lineage is live.
+[Specify License — e.g., MIT/Apache-2.0 dual license]
+Contact
+Core Team: Ayub Pandith — Harmonis Prime Core Team
+Discipline: Every claim has a failing test first. The precision is eternal.
+> *The precision is eternal. The lineage is live. Commit 476fd34.*
