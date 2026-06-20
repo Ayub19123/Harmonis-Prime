@@ -1,4 +1,4 @@
-﻿//! Reference Data -- Odlyzko zeros dataset with SHA-256 integrity verification.
+//! Reference Data -- Odlyzko zeros dataset with SHA-256 integrity verification.
 //!
 //! HONEST SCOPE (M1.3):
 //! - Manual download of Odlyzko zeros1 file (automated fetch is Phase 2)
