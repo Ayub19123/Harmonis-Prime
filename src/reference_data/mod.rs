@@ -90,21 +90,25 @@ mod tests {
 
     /// Parse test: verify parser handles valid format correctly.
     /// Uses a temporary file to avoid requiring the real dataset.
+    /// Self-contained: creates directory if missing (fixes CI failure).
     #[test]
     fn test_odlyzko_parse_format() {
         use std::io::Write;
         
-        // Create temporary test file
-        let test_path = "data/odlyzko/test_zeros.txt";
+        // Create directory if missing -- fixes CI where data/odlyzko/ doesn't exist
+        let test_dir = "data/odlyzko";
+        let _ = std::fs::create_dir_all(test_dir);
+        
+        let test_path = format!("{}/test_zeros.txt", test_dir);
         let test_data = "# Comment line\n14.134725\n21.022040\n25.010858\n\n";
         
         // Write test file
-        let mut file = std::fs::File::create(test_path).unwrap();
+        let mut file = std::fs::File::create(&test_path).unwrap();
         file.write_all(test_data.as_bytes()).unwrap();
         drop(file);
         
         // Temporarily override path (we test parsing logic, not the constant)
-        let content = std::fs::read_to_string(test_path).unwrap();
+        let content = std::fs::read_to_string(&test_path).unwrap();
         let mut values = Vec::new();
         for line in content.lines() {
             let trimmed = line.trim();
@@ -119,6 +123,6 @@ mod tests {
         assert!((values[2] - 25.010858).abs() < 1e-6);
         
         // Cleanup
-        let _ = std::fs::remove_file(test_path);
+        let _ = std::fs::remove_file(&test_path);
     }
 }
