@@ -1,4 +1,4 @@
-﻿pub mod endurance;
+pub mod endurance;
 pub mod simulation;
 pub mod sovereign;
 pub mod thermo;
@@ -159,9 +159,6 @@ pub mod network_calculus;
 // ========== SET-6E: Energy Telemetry ==========
 pub mod energy_telemetry;
 
-
-
-
 pub mod pim_solver;
 
 pub mod zeta_resonance;
@@ -175,3 +172,8 @@ pub mod set10_fusion;
 pub mod mpfr_oracle;
 pub mod reference_data;
 pub mod truncation_budget;
+
+// SET-12: MPFR Z(t) Oracle — 400-bit ζ(½+it) with honest fallback
+// LIMITATION: Software-only, no hardware acceleration until Phase 3
+// LIMITATION: Windows compilation may fail — f64 fallback activated automatically
+pub mod mpfr_zeta;

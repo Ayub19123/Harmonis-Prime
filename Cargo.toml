@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "sovereign_core"
 version = "6.2.0"
 edition = "2021"
@@ -23,6 +23,13 @@ crate-type = ["cdylib", "rlib"]
 # name = "harmonis"
 # path = "src/bin/harmonis.rs"
 
+# SET-12: Feature flags for MPFR Z(t) oracle
+# mpfr = true → 400-bit rug::Float path (requires GMP/MPFR C libraries)
+# mpfr = false → f64 fallback path (works on Windows, no external deps)
+[features]
+default = []
+mpfr = ["rug"]
+
 [dependencies]
 hex = "0.4"
 sha2 = "0.10"
@@ -38,22 +45,24 @@ rand_core = "0.6"
 hmac = "0.12"
 fastrand = "2.4.1"
 
+# SET-12: MPFR high-precision arithmetic (optional, Linux/macOS only)
+# LIMITATION: Windows compilation may fail due to GMP/MPFR C library dependencies.
+# When unavailable, the f64 fallback path is automatically activated.
+# Feature flag 'mpfr' controls inclusion. Default: disabled.
+rug = { version = "1.24", optional = true }
+
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
 proptest = "1.4"
 
-
-
-
-
-
-
-
-
-
-
-
-
+# SET-12: Criterion benchmark for MPFR oracle vs f64 fallback
 [[bench]]
 name = "zeta_scalar_baseline"
+harness = false
+
+# SET-12: Additional benchmark target for MPFR Z(t) oracle
+# LIMITATION: Only runs when mpfr feature is enabled
+[[bench]]
+name = "mpfr_zeta"
+path = "src/mpfr_zeta/benchmark.rs"
 harness = false
