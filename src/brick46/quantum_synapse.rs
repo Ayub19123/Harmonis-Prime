@@ -1,5 +1,5 @@
 //! BRICK-46 Phase 3: Quantum Synapse
-//! Quantum-classical fusion â€” superpositional state mapping with bounded cache
+//! Quantum-classical fusion — superpositional state mapping with bounded cache
 
 use crate::brick42::fluid::tensor_router::TensorRouter;
 use crate::brick42::quantum::qpu_engine::QPUEngine;
@@ -15,9 +15,7 @@ pub enum EvictionPolicy {
 
 pub struct QuantumSynapse {
     #[allow(dead_code)]
-    #[allow(dead_code)]
     qpu: QPUEngine,
-    #[allow(dead_code)]
     #[allow(dead_code)]
     router: TensorRouter,
 
@@ -134,13 +132,10 @@ impl QuantumSynapse {
 }
 
 #[allow(dead_code)]
-
 fn now_ns() -> u128 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_nanos()
 }
-
-
 
