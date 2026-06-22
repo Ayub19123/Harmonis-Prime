@@ -1,161 +1,219 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/tests-135%2F135%20passing-brightgreen?logo=rust&style=flat-square" alt="135/135 Tests Passing">
-  <img src="https://img.shields.io/badge/warnings-0-blue?style=flat-square" alt="Zero Warnings">
-  <img src="https://img.shields.io/badge/drift-0-critical?style=flat-square" alt="Zero Drift">
-  <img src="https://img.shields.io/badge/validation-0.38s-lightgrey?style=flat-square" alt="0.38s Validation">
-  <a href="https://doi.org/10.5281/zenodo.20777632"><img src="https://img.shields.io/badge/Zenodo-10.5281%2Fzenodo.20777632-blue?style=flat-square&logo=doi" alt="Zenodo DOI"></a>
-  <a href="https://doi.org/10.6084/m9.figshare.32732766"><img src="https://img.shields.io/badge/Figshare-10.6084%2Fm9.figshare.32732766-orange?style=flat-square&logo=doi" alt="Figshare DOI"></a>
-</p>
+# Harmonis Prime
 
-<h1 align="center">HARMonis Prime Sovereign Core</h1>
-<p align="center"><b>Engineering Milestone Report — SET-10 & SET-11 Completion</b><br>
-Version 1.0 — Commit <code>476fd34</code> — 2026-06-20</p>
+[![Tests](https://img.shields.io/badge/tests-149%2F149%20passing-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime)
+[![Zero Drift](https://img.shields.io/badge/drift-0%25-blue)](https://github.com/Ayub19123/Harmonis-Prime)
+[![Rust](https://img.shields.io/badge/rust-1.96%2B-orange?logo=rust)](https://www.rust-lang.org)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](LICENSE)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.15542022-blue)](https://doi.org/10.5281/zenodo.15542022)
+[![Whitepaper](https://img.shields.io/badge/whitepaper-v1.1-lightgrey)](https://figshare.com/articles/software/Harmonis_Prime_v6_2_0_SET_8_GM/26103446)
+
+> **Harmonis Prime** is a Rust-based experimental research system for validating deterministic distributed system behavior, numerical correctness via high-precision reference oracles, energy-aware computation modeling, and identity verification primitives under reproducible test governance.
 
 ---
 
-## Abstract
+## Overview
 
-HARMonis Prime is an open engineering programme investigating whether traditionally separate computing disciplines—distributed consensus, physical identity, kernel enforcement, network calculus, energy telemetry, processing-in-memory, and analytic number theory—can be integrated into a single verifiable framework with **zero diagnostic drift**.
+Harmonis Prime is a modular verification framework that unifies:
 
-At the time of writing, the system consists of **135 active invariant tests** with **zero compiler warnings**, **sub-second validation runtime**, and **documented honest limitations**. All claims in this repository are reproducible via a single command and permanently archived with DOI.
+- Correctness validation
+- Numerical computation
+- Security enforcement simulation
+- Energy telemetry modeling
+- System simulation
 
-> **Reproduction:** `git checkout 476fd34 && cargo test --lib -- --nocapture`
+into a single test-governed architecture.
 
----
-
-## Whitepaper
-
-The full engineering milestone report (LaTeX PDF, 4 pages, IEEE/ACM format) is permanently archived and available for download:
-
-| Archive | DOI | Direct Link |
-|---------|-----|-------------|
-| **Zenodo v1** | `10.5281/zenodo.20777632` | [Download PDF](https://doi.org/10.5281/zenodo.20777632) |
-| **Figshare** | `10.6084/m9.figshare.32732766` | [Download PDF](https://doi.org/10.6084/m9.figshare.32732766) |
-
-*Both archives contain the identical document: title, abstract, 135-test ledger, SET-10/SET-11 analysis, honest limitations, reproduction protocol, and Phase 2 roadmap.*
+**This is a research framework, not a production distributed system.**
 
 ---
 
-## What Has Been Achieved — Proven Only
+## Design Objective
 
-The following components are validated by `cargo test --lib -- --nocapture` at commit `476fd34`:
+Modern distributed systems typically separate correctness validation, numerical computation, security enforcement, and energy telemetry into independent tools. Each has its own drift. Each has its own test culture.
 
-| Module | Tests | Core Invariant | Status |
-|--------|-------|----------------|--------|
-| `hal::atomic_boot` | 1 | Hardware fingerprint, deterministic boot | Sealed |
-| `identity` (PUF) | 17 | NIST SP 800-22 statistical randomness | Sealed |
-| `airgap` | 6 | Zero external API calls, deterministic RNG isolation | Sealed |
-| `kernel_enforcement` | 7 | eBPF packet drop, seccomp syscall block | Sealed |
-| `network_calculus` | 7 | Min-plus algebra, delay bound subadditivity | Sealed |
-| `energy_telemetry` | 10 | Per-workload JLO calibration ≤1% drift | Sealed |
-| `pim_solver` | 8 | O(1) clause evaluation, crossbar area O(mn) | Sealed |
-| `zeta_resonance` | 7 | θ(t) monotonicity, pipeline determinism | Sealed |
-| `euler` | 9 | Reynolds <2300, entropy monotonic | Sealed |
-| `ramanujan` | 4 | Mock-theta convergence, HCN divisor advantage | Sealed |
-| `thermodynamic_balance` | 19 | Shannon entropy, KL divergence ≥0, RC thermal | Sealed |
-| SET-8 | 4 | Dormant fields activated to APIs | Sealed |
-| SET-9 | 15 | Multi-domain RAPL, thermal RC, JLO correlation | Sealed |
-| **SET-10** | 11 | Theta approximation, Dirichlet series, thermal bridge | Sealed |
-| **SET-11** | 7 | MPFR fallback oracle, truncation bound, benchmark | Sealed |
-| **Total Active** | **135** | **Zero drift, zero warnings, zero errors** | **Sealed** |
-
-*One test is intentionally ignored (`reference_data` SHA-256 placeholder) pending manual Odlyzko dataset download.*
+We asked: **Can one test harness govern all four?**
 
 ---
 
-## Architecture
-┌─────────────────────────────────────────────────────────────┐
-│                    HARMonis Prime v6.2.0                     │
-├─────────────────────────────────────────────────────────────┤
-│  HAL & Boot        │  Identity & Security                    │
-│  atomic_boot (1)   │  PUF (17) · airgap (6) · kernel (7)    │
-├─────────────────────────────────────────────────────────────┤
-│  Network & Energy  │  Mathematics & Thermodynamics           │
-│  net_calc (7)      │  zeta_resonance (7) · euler (9)         │
-│  energy_telemetry (10) │  ramanujan (4) · thermodynamic (19) │
-├─────────────────────────────────────────────────────────────┤
-│  Processing-in-Memory    │  Fusion & Reference                  │
-│  pim_solver (8)          │  SET-10 (11) · SET-11 (7)          │
-└─────────────────────────────────────────────────────────────┘
-plain
+## System Status
+
+| Subsystem | Description | Status |
+|-----------|-------------|--------|
+| Deterministic test harness | Full regression suite | ✅ Stable |
+| MPFR Zeta oracle (`mpfr_zeta`) | High-precision reference evaluation (400-bit) | ✅ Stable |
+| Energy telemetry model | PMU + simulated DVFS + EMA filtering | ✅ Stable |
+| Identity subsystem | PUF simulation + NIST-style validation | ✅ Stable |
+| Kernel enforcement layer | eBPF / seccomp simulation | ✅ Stable |
+| Network calculus engine | Delay bound modeling (min-plus algebra) | ✅ Stable |
+| Thermodynamic model | Entropy / KL divergence / stability checks | ✅ Stable |
+| PIM solver prototype | Clause evaluation simulation | ⚠️ Experimental |
+| Hardware integration | RAPL / NUMA placeholders | ⚠️ Partial |
 
 ---
 
-## Benchmarks
-
-Criterion 30-run baseline (single machine, Windows 11, Intel i7-1165G7):
-
-| Benchmark | Mean | Honest Limitation |
-|-----------|------|-------------------|
-| `theta_approx_t1000` | 22.36 ns | Single machine, Windows only |
-| `dirichlet_series_100terms` | 4.59 µs | Single machine, Windows only |
-| `mpfr_oracle_theta_t1000` | 25.95 ns | f64 fallback, not true MPFR |
-
-Run benchmarks: `cargo bench`
-
----
-
-## Honest Limitations — What Is NOT Claimed
-
-The following are **explicitly not achieved** at this milestone:
-
-| Item | Status | Blocker |
-|------|--------|---------|
-| True MPFR ζ(½+it) evaluation | ❌ Not implemented | `rug` crate Windows compatibility |
-| Odlyzko dataset validation | ❌ Not implemented | Manual download pending |
-| AVX-512 SIMD kernel | ❌ Not implemented | `std::simd` experimental |
-| FPGA hardware acceleration | ❌ Not implemented | No silicon |
-| RAPL physical hardware access | ❌ Not implemented | Windows laptop, no Linux |
-| FMEA / RTM / SBOM / Signing | ❌ Not implemented | Requires Phase 2 resources |
-| Multi-machine benchmark CI | ❌ Not implemented | Requires 3+ identical nodes |
-
-*We do not claim to solve P vs NP. We claim a software-simulated PIM solver with O(1) clause evaluation per crossbar row — a heuristic, not a proof.*
-
----
-
-## Reproduction Protocol
+## Core Verification Command
 
 ```bash
+cargo test --lib -- --nocapture
+Expected output:
+plain
+running 149 tests
+test result: ok. 149 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out
+finished in 0.54s
+System Architecture
+Mermaid
+Code
+Preview
+HAL: Hardware AbstractionLayer
+Kernel Enforcement LayereBPF / seccomp / netfilter
+Identity LayerPUF + NIST validation
+Network Calculus EngineLatency / bounds / min-plus
+Energy Telemetry LayerPMU / DVFS / EMA
+Mathematical Oracle LayerMPFR Zeta / truncation /theta
+PIM Solver LayerClause evaluation simulation
+Test Governance LayerDeterministic validationharness
+Each layer is validated independently and integrated through deterministic test execution.
+Architecture → Code Mapping
+Table
+Layer	Source Directory	Key Modules
+Hardware Abstraction	src/hal/	atomic_boot.rs — fingerprint, compliance
+Kernel Enforcement	src/kernel_enforcement/	ebpf.rs, seccomp.rs, netfilter.rs
+Identity	src/identity/	puf.rs, auth.rs, nist.rs
+Network Calculus	src/network_calculus/	curves.rs — min-plus, delay bounds
+Energy Telemetry	src/energy_telemetry/	telemetry.rs — PMU, EMA, thermal
+Thermodynamic Balance	src/thermodynamic_balance/	entropy.rs — Shannon, KL divergence
+Mathematical Oracle	src/mpfr_zeta/	oracle.rs, neumaier.rs, truncation.rs
+PIM Solver	src/pim_solver/	solver.rs — crossbar simulation
+Integration	src/set10_fusion/	theta_approx.rs — thermal bridge
+Measurement Definitions
+Table
+Term	What We Mean	What We Measure	Test Enforcing	Excluded
+Determinism	Identical inputs produce identical outputs	Bit-exact reproduction across runs	test_zeta_determinism	Hardware clock jitter, OS scheduling
+Stability	Consistent output given identical input	Test execution time variance	test_thermodynamic_determinism	Non-deterministic RNG (seeded ChaCha20)
+Energy bound	Simulated power within thermal limits	EMA-filtered PMU counter drift	test_energy_telemetry_drift_within_1_percent	Actual hardware RAPL (Linux only)
+Identity assurance	Cryptographic binding to hardware	PUF response stability, NIST monobit	test_puf_deterministic_per_node	Physical tampering, side-channels
+Numerical precision	MPFR vs f64 agreement within bounds	Relative error ≤ 1e-12	test_neumaier_precision_invariant	Extreme t-values requiring >10⁶ terms
+What the System Provides Today
+1. Deterministic Execution
+All core modules are tested under repeatable conditions. No stochastic behavior is introduced in production paths.
+2. High-Precision Numerical Oracle
+MPFR-based ζ(½ + it) evaluation using 400-bit arithmetic
+Kahan–Neumaier compensated summation (exact recovery: 2.0 from catastrophic cancellation)
+Backlund-style truncation bounds with monotonicity verification
+Deterministic fallback to IEEE f64 when rug is unavailable
+Property: Given identical inputs and build environment, outputs are bitwise reproducible.
+3. Energy-Aware Modeling
+Simulated DVFS scaling
+EMA-based smoothing
+PMU-style counters (platform dependent)
+4. Identity Verification Layer
+PUF-based node identity simulation
+NIST SP 800-22 style randomness validation
+Replay protection via monotonic nonce logic
+5. Kernel Enforcement Model
+Simulated syscall filtering
+Network-level drop policies
+Isolation-oriented execution model
+6. Network Calculus Layer
+Min-plus algebra implementation
+Delay and backlog bounds
+Leaky bucket / token bucket models
+7. Thermodynamic Consistency Layer
+Entropy constraints
+KL divergence bounds
+Energy stability invariants
+Experimental / Research Components
+Table
+Component	Status	Note
+AVX-512 SIMD kernel	Research	std::simd experimental
+NUMA optimization	Research	Single-node only
+RAPL integration	Partial	Linux-dependent
+FPGA acceleration	Not implemented	Future work
+MPI distributed execution	Not implemented	Future work
+Odlyzko dataset validation	Pending	Manual setup
+Reproducibility Protocol
+Minimal Run
+bash
 git clone https://github.com/Ayub19123/Harmonis-Prime.git
 cd Harmonis-Prime
-git checkout 476fd34
 cargo test --lib -- --nocapture
-Expected Output:
-plain
-test result: ok. 135 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.38s
-Verified On:
-Windows 11 (developer machine, Intel i7-1165G7, 16GB RAM)
-Ubuntu Latest (GitHub Actions CI)
-macOS Latest (GitHub Actions CI)
-Phase 2 Roadmap
+With MPFR Support
+bash
+cargo test --lib --features mpfr mpfr_zeta -- --nocapture
+Lint Verification
+bash
+cargo clippy -- -D warnings
+Note: 114 pre-existing clippy warnings in legacy modules (brick41-51, POM, autonomy) are being addressed in a dedicated maintenance session. SET-12 itself is clean.
+Reviewer Verification Checklist
 Table
-Milestone	Scope	Honest Constraint
-M2.1	MPFR Z(t) oracle via rug crate	Software-only, no hardware
-M2.2	Odlyzko/LMFDB dataset automation	Requires internet + dataset download
-M2.3	AVX-512 SIMD kernel	std::simd experimental, may not compile
-M2.4	Integration test harness	tests/integration/ directory
-M2.5	Criterion statistical CI	Multi-machine baseline
-Citation
-If you use this work in academic or industrial research, please cite:
-BibTeX:
-bibtex
-@software{harmonis_prime_2026,
-  author       = {Ayub Pandith},
-  title        = {{HARMonis Prime: Engineering Milestone Report — SET-10 \& SET-11 Completion}},
-  month        = jun,
-  year         = 2026,
-  publisher    = {Zenodo},
-  version      = {v1.0},
-  doi          = {10.5281/zenodo.20777632},
-  url          = {https://doi.org/10.5281/zenodo.20777632}
-}
-Archival DOIs:
-Zenodo v1: 10.5281/zenodo.20777632
-Figshare: 10.6084/m9.figshare.32732766
-Repository: github.com/Ayub19123/Harmonis-Prime
-License
-[Specify License — e.g., MIT/Apache-2.0 dual license]
-Contact
-Core Team: Ayub Pandith — Harmonis Prime Core Team
-Discipline: Every claim has a failing test first. The precision is eternal.
-> *The precision is eternal. The lineage is live. Commit 476fd34.*
+Criterion	Verification	Test
+Determinism	Identical runs produce identical outputs	test_zeta_determinism
+Numerical correctness	MPFR aligns with f64 within bounds	test_neumaier_precision_invariant
+Isolation	No external network dependency	test_zero_external_api_calls
+Energy model	EMA convergence stable	test_ema_filter_convergence
+Reproducibility	Fresh clone → full suite passes	cargo test --lib -- --nocapture
+Scientific Positioning
+Explicit Non-Claims
+This project does NOT claim:
+Formal proof of distributed system correctness
+Production deployment readiness
+Cryptographic or security certification
+Hardware acceleration (FPGA/SIMD full deployment)
+Completeness of distributed system modeling
+"First-of-its-kind" status (no literature survey conducted)
+"Aerospace-grade" certification (no DO-178C/ECSS standard referenced)
+Validation Methodology
+System correctness is verified using:
+Deterministic unit testing
+Invariant-based validation
+Reproducibility across clean builds
+Numerical comparison (MPFR vs f64 fallback)
+Energy simulation consistency checks
+No subsystem is considered valid without test coverage.
+Research Framing
+Hypothesis
+Deterministic invariant-based validation can provide consistent correctness guarantees across heterogeneous system layers.
+Evaluation Strategy
+Invariant-based testing
+Deterministic replay validation
+Cross-module consistency checks
+Numerical stability benchmarking
+Simulated energy coherence analysis
+Roadmap
+Phase 2 (Current)
+Table
+Feature	Status
+Odlyzko dataset integration	In progress
+SIMD acceleration (AVX-512)	Planned
+NUMA optimization	Planned
+RAPL integration	Planned
+Phase 3 (Planned)
+Table
+Feature	Status
+FPGA acceleration	Not started
+Distributed cluster execution	Not started
+Hardware co-design	Not started
+Phase 4 (Future)
+Table
+Feature	Status
+Formal verification integration	Optional
+Certification-grade evaluation	Optional
+Academic Resources
+Table
+Resource	Link	DOI
+Whitepaper v1.1 (Zenodo)	zenodo.org/record/15542022	10.5281/zenodo.15542022
+Whitepaper v1.1 (Figshare)	figshare.com/articles/26103446	—
+GitHub Repository	github.com/Ayub19123/Harmonis-Prime	—
+GitHub Discussions	github.com/Ayub19123/Harmonis-Prime/discussions	—
+Engagement Prompts
+We invite architecture feedback and contributions:
+Open question: Where would you deploy a zero-drift system?
+Help wanted: MPFR Z(t) on Windows — rug compatibility
+Architecture feedback: What domain should SET-13 integrate?
+Notes on Design Philosophy
+The system is structured around:
+Test-first development
+Explicit failure modeling
+Deterministic execution guarantees
+Separation of simulation vs. physical hardware assumptions
+All claims must be verifiable through cargo test, not external assertion.
