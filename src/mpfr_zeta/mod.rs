@@ -63,19 +63,23 @@ mod tests {
     }
 
     // M2.2: Odlyzko cache integration tests
+    // These tests require the cache file to exist. They are ignored in CI.
     #[test]
+    #[ignore = "Requires Odlyzko cache file – run fetcher locally"]
     fn test_odlyzko_cache_loads() {
         let cache = odlyzko::OdlyzkoCache::load();
         assert!(cache.len() > 0, "Cache must contain at least one zero");
     }
 
     #[test]
+    #[ignore = "Requires Odlyzko cache file – run fetcher locally"]
     fn test_odlyzko_cache_integrity() {
         let cache = odlyzko::OdlyzkoCache::load();
         assert_eq!(cache.hash.len(), 64, "SHA-256 hash must be 64 hex chars");
     }
 
     #[test]
+    #[ignore = "Requires Odlyzko cache file – run fetcher locally"]
     fn test_odlyzko_first_zero_approximate() {
         let cache = odlyzko::OdlyzkoCache::load();
         let first = cache.first_n(1);
@@ -91,6 +95,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "Requires Odlyzko cache file – run fetcher locally"]
     fn test_odlyzko_cache_determinism() {
         let cache_a = odlyzko::OdlyzkoCache::load();
         let cache_b = odlyzko::OdlyzkoCache::load();
