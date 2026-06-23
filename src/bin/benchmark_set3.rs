@@ -1,10 +1,11 @@
-﻿//! SET-3 Energy Benchmark: Joules-per-Logical-Operation (JLO)
+//! SET-3 Energy Benchmark: Joules-per-Logical-Operation (JLO)
 //! Measures physical energy cost of DAG mesh operations + entropy tracking
 //! Blueprint requirement: Entropy & Energy Dissipation Profiling
 
 use std::time::Instant;
 use sovereign_core::mesh::dag::{CognitiveMesh, Message, MessageId, NodeId};
 use sovereign_core::energy::monitor::{EnergyMonitor, SoftwareEnergyMonitor, JloReport};
+use sovereign_core::energy::rapl_bindings::{RaplHardwareMonitor, RaplDomain}; // <-- ADDED
 use sovereign_core::thermo::entropy::{EntropyTracker, ThermodynamicState};
 
 fn main() {
