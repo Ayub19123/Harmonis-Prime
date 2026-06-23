@@ -27,8 +27,10 @@
 
 #![cfg_attr(not(feature = "mpfr"), allow(dead_code))]
 
-pub mod oracle;
+pub mod benchmark;
 pub mod neumaier;
+pub mod odlyzko;        // M2.2: Odlyzko zero cache reader
+pub mod oracle;
 pub mod truncation;
 
 #[cfg(feature = "mpfr")]
@@ -58,5 +60,41 @@ mod tests {
     fn test_fallback_produces_finite_output() {
         let z = zeta_half_plus_it_fallback(100.0);
         assert!(z.is_finite(), "Fallback must produce finite f64 output");
+    }
+
+    // M2.2: Odlyzko cache integration tests
+    #[test]
+    fn test_odlyzko_cache_loads() {
+        let cache = odlyzko::OdlyzkoCache::load();
+        assert!(cache.len() > 0, "Cache must contain at least one zero");
+    }
+
+    #[test]
+    fn test_odlyzko_cache_integrity() {
+        let cache = odlyzko::OdlyzkoCache::load();
+        assert_eq!(cache.hash.len(), 64, "SHA-256 hash must be 64 hex chars");
+    }
+
+    #[test]
+    fn test_odlyzko_first_zero_approximate() {
+        let cache = odlyzko::OdlyzkoCache::load();
+        let first = cache.first_n(1);
+        assert!(!first.is_empty(), "Must have at least one zero");
+        
+        // First non-trivial zero is approximately 14.1347...
+        let z1 = first[0];
+        assert!(
+            z1 > 14.0 && z1 < 15.0,
+            "First zero {} should be near 14.1347",
+            z1
+        );
+    }
+
+    #[test]
+    fn test_odlyzko_cache_determinism() {
+        let cache_a = odlyzko::OdlyzkoCache::load();
+        let cache_b = odlyzko::OdlyzkoCache::load();
+        assert_eq!(cache_a.zeros, cache_b.zeros, "Same cache must produce same zeros");
+        assert_eq!(cache_a.hash, cache_b.hash, "Same cache must produce same hash");
     }
 }
