@@ -1,15 +1,15 @@
-//! M2.3: MPFR Z(t) vs Odlyzko Validation Engine
+﻿//! M2.3: MPFR Z(t) vs Odlyzko Validation Engine
 //! LIMITATION: Requires Odlyzko cache pre-populated (M2.2).
 //! LIMITATION: Single-threaded until M2.4 NUMA scaling.
-//! LIMITATION: No formal proof — only numerical convergence verification.
+//! LIMITATION: No formal proof â€” only numerical convergence verification.
 //! 
 //! HONEST CONSTRAINT: Tolerance depends on mpfr feature:
 //! - mpfr enabled: 1e-10 (400-bit precision)
 //! - mpfr disabled: 1.0 (f64 fallback, Dirichlet series truncated at 100k terms)
 //! 
 //! VALIDATION CONTRACT:
-//! - For each Odlyzko zero t_n, compute |ζ(t_n)| via oracle
-//! - Target: |ζ(t_n)| < TOLERANCE for all tested zeros
+//! - For each Odlyzko zero t_n, compute |Î¶(t_n)| via oracle
+//! - Target: |Î¶(t_n)| < TOLERANCE for all tested zeros
 //! - Sign-change detection: Count zeros in [t_a, t_b], match Odlyzko count
 
 use crate::mpfr_zeta::odlyzko::OdlyzkoCache;
@@ -35,7 +35,7 @@ pub struct ValidationReport {
     pub validations: Vec<ZeroValidation>,
 }
 
-/// Honest error type — no panics in production path.
+/// Honest error type â€” no panics in production path.
 #[derive(Debug)]
 pub enum ValidationError {
     CacheError(String),
@@ -47,7 +47,7 @@ pub enum ValidationError {
 const TOLERANCE: f64 = 1e-10;  // 400-bit MPFR precision
 
 #[cfg(not(feature = "mpfr"))]
-const TOLERANCE: f64 = 1.0;     // f64 fallback — honest constraint, calibrated by measurement
+const TOLERANCE: f64 = 1.0;     // f64 fallback â€” honest constraint, calibrated by measurement
 
 /// Validate oracle against Odlyzko ground truth.
 /// 
@@ -69,7 +69,7 @@ pub fn validate_oracle(max_zeros: usize) -> Result<ValidationReport, ValidationE
     for i in 0..zeros_to_check {
         let t = cache.first_n(i + 1)[i];
         
-        // Compute ζ(½+it) via oracle — returns (real, imag)
+        // Compute Î¶(Â½+it) via oracle â€” returns (real, imag)
         let (real, imag) = zeta_half_plus_it(t);
         let z_abs = (real * real + imag * imag).sqrt();
         
@@ -101,12 +101,12 @@ pub fn validate_oracle(max_zeros: usize) -> Result<ValidationReport, ValidationE
     })
 }
 
-/// Quick sanity check — first 10 zeros only.
+/// Quick sanity check â€” first 10 zeros only.
 pub fn validate_first_10() -> Result<ValidationReport, ValidationError> {
     validate_oracle(10)
 }
 
-/// Full validation — all cached zeros.
+/// Full validation â€” all cached zeros.
 pub fn validate_all() -> Result<ValidationReport, ValidationError> {
     let cache = OdlyzkoCache::load();
     validate_oracle(cache.len())
