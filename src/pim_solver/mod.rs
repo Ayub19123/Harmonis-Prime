@@ -1,4 +1,4 @@
-//! SET-7A: PIM 3-SAT Solver - Physical Parallelism for k-SAT
+﻿//! SET-7A: PIM 3-SAT Solver - Physical Parallelism for k-SAT
 //! 
 //! Holy Grail Principle:
 //!   Less data. Less energy. More precision. The unresolved becomes mere task
@@ -27,6 +27,7 @@
 //!   - Fearless. Calm. Clear. Resilient. Zero emotion.
 
 pub mod solver;
+pub mod dimacs; // M2.5: DIMACS CNF adapter for SAT Competition 2027
 
 pub use solver::{PimSolver, CrossbarConfig, EnergyState, Clause, VariableAssignment};
 #[cfg(test)]
