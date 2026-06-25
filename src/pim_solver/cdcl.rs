@@ -170,9 +170,9 @@ impl CdclSolver {
 
                 // Step 2: Determine which watch became false (no mutable borrow)
                 let mut to_update = None;
-                if w_a_lit == -(var as i32) && self.eval(w_a_lit) == Some(false) {
+                if w_a_lit.abs() as usize == var && self.eval(w_a_lit) == Some(false) {
                     to_update = Some(0usize);
-                } else if w_b_lit == -(var as i32) && self.eval(w_b_lit) == Some(false) {
+                } else if w_b_lit.abs() as usize == var && self.eval(w_b_lit) == Some(false) {
                     to_update = Some(1usize);
                 }
                 if to_update.is_none() {
@@ -501,8 +501,6 @@ mod tests {
             SolveResult::Unsat => panic!("Expected SAT"),
         }
     }
-
-    #[ignore = "M2.5.2 limitation: XOR-pattern UNSAT requires advanced clause learning. Fix in M2.5.3."]
     #[test]
     fn test_cdcl_unsat_3var() {
         // (aâˆ¨b) âˆ§ (aâˆ¨-b) âˆ§ (-aâˆ¨b) âˆ§ (-aâˆ¨-b) â€” unsat

@@ -18,8 +18,8 @@ mod tests {
             (1, vec![vec![1], vec![-1]], false),
             // SAT: choice required
             (2, vec![vec![1, 2], vec![-1, 2]], true),
-            // UNSAT: XOR pattern — SKIPPED (hangs in M2.5.2, fix in M2.5.4)
-            // (2, vec![vec![1, 2], vec![1, -2], vec![-1, 2], vec![-1, -2]], false),
+            // UNSAT: XOR pattern
+            (2, vec![vec![1, 2], vec![1, -2], vec![-1, 2], vec![-1, -2]], false),
             // SAT: single unit clause
             (3, vec![vec![-2]], true),
             // SAT: empty instance
