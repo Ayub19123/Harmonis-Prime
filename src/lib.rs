@@ -177,3 +177,4 @@ pub mod truncation_budget;
 // LIMITATION: Software-only, no hardware acceleration until Phase 3
 // LIMITATION: Windows compilation may fail — f64 fallback activated automatically
 pub mod mpfr_zeta;
+pub mod audit;

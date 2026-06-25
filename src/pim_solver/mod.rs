@@ -28,6 +28,7 @@
 
 pub mod solver;
 pub mod dimacs; // M2.5: DIMACS CNF adapter for SAT Competition 2027
+pub mod cdcl;   // M2.5.1: Minimal CDCL engine for SAT Competition 2027
 
 pub use solver::{PimSolver, CrossbarConfig, EnergyState, Clause, VariableAssignment};
 #[cfg(test)]
