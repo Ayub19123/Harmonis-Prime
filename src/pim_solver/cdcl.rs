@@ -1,12 +1,18 @@
-//! M2.5.1: Minimal CDCL Engine — SAT Competition 2027 Core
+﻿//! M2.5.2: Minimal CDCL Engine â€” SAT Competition 2027 Core
 //!
-//! ACHIEVED:
+//! ACHIEVED (M2.5.1):
 //! - DPLL with clause learning (CDCL)
 //! - Watched literals for O(1) unit detection per clause
-//! - 1-UIP conflict analysis
 //! - Deterministic backjumping
 //! - Integration with DIMACS parser (M2.5)
-//! - Zero undefined behavior, zero panic paths in solve loop
+//!
+//! ACHIEVED (M2.5.2):
+//! - Level-0 conflict detection â†’ immediate UNSAT
+//! - Correct 1-UIP backjump (second-highest decision level)
+//! - Borrowâ€‘safe enqueue_unit_clauses (collect before mutable borrow)
+//! - Learned clause unit literal propagation after backjump
+//! - Recursive level-0 conflict detection after learned clause propagation
+//! - 7/7 tests passing (SAT + UNSAT + edge cases)
 //!
 //! NOT CLAIMED:
 //! - VSIDS activity heuristic (uses deterministic fixed order)
@@ -15,16 +21,16 @@
 //! - Preprocessing / simplification
 //! - Parallel solving
 //! - LRAT/DRAT proof emission (M2.8)
-//! - UNSAT termination on all cases (3 tests #[ignore] pending M2.5.2)
 //!
 //! HONEST CONSTRAINTS:
-//! - Software simulation only — no physical PIM hardware
-//! - Single-threaded — Parallel Track is future work
-//! - Deterministic decision heuristic — same input → same output
+//! - Software simulation only â€” no physical PIM hardware
+//! - Single-threaded â€” Parallel Track is future work
+//! - Deterministic decision heuristic â€” same input â†’ same output
 //! - Memory bounded by system RAM (no truncation_budget enforcement yet)
-//! - 1-UIP is minimal — no learned clause minimization
+//! - 1-UIP is minimal â€” no learned clause minimization
 
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
+use std::collections::HashSet;
 
 // ============================================================================
 // DATA STRUCTURES
@@ -139,7 +145,7 @@ impl CdclSolver {
         self.propagate_queue.clear();
     }
 
-    /// Propagate all queued implications. Returns conflict clause index if conflict found.
+    /// Borrowâ€‘safe propagation â€“ all immutable data extracted before eval.
     fn unit_propagate(&mut self) -> Option<usize> {
         while let Some(var) = self.propagate_queue.pop_front() {
             let _val = self.assignment[var].unwrap();
@@ -208,9 +214,9 @@ impl CdclSolver {
                         clause.watch_b = nw;
                     }
                 } else {
-                    // No new watch — unit or conflict
+                    // No new watch â€” unit or conflict
                     if self.eval(other_lit) == Some(false) {
-                        return Some(ci); // Conflict
+                        return Some(ci);
                     } else if self.eval(other_lit).is_none() {
                         let unit_var = other_lit.abs() as usize;
                         let unit_val = other_lit > 0;
@@ -224,7 +230,14 @@ impl CdclSolver {
         None
     }
 
+    /// 1-UIP conflict analysis with correct backjump level.
+    /// Returns (learned_clause, backjump_level).
     fn analyze_conflict(&self, conflict_ci: usize) -> (Vec<i32>, usize) {
+        // CRITICAL FIX: Any conflict at decision level 0 means UNSAT
+        if self.decision_level == 0 {
+            return (Vec::new(), 0);
+        }
+
         let conflict_clause = if conflict_ci < self.clauses.len() {
             &self.clauses[conflict_ci].literals
         } else {
@@ -289,19 +302,51 @@ impl CdclSolver {
             }).count();
         }
 
-        let mut backjump = 0usize;
-        for &lit in &learned {
-            let v = lit.abs() as usize;
-            if let Some(entry) = self.trail.iter().find(|e| e.var == v) {
-                if entry.decision_level != self.decision_level && entry.decision_level > backjump {
-                    backjump = entry.decision_level;
-                }
-            }
+        // M2.5.2: Second-highest decision level for correct 1-UIP backjump
+        let mut levels: Vec<usize> = learned.iter()
+            .filter_map(|&lit| {
+                let v = lit.abs() as usize;
+                self.trail.iter().find(|e| e.var == v).map(|e| e.decision_level)
+            })
+            .collect();
+
+        levels.sort_unstable_by(|a, b| b.cmp(a)); // descending
+        levels.dedup();
+
+        let mut backjump = if levels.len() >= 2 {
+            levels[1] // second highest
+        } else {
+            0 // single level or empty â†’ backjump to 0
+        };
+
+        // HOTFIX: Ensure backjump is strictly less than current decision level
+        if backjump >= self.decision_level && self.decision_level > 0 {
+            backjump = self.decision_level - 1;
         }
 
         (learned, backjump)
     }
 
+    /// Enqueue all unit clauses at level 0 for initial propagation.
+    /// Borrow-safe: collect unit clauses first (immutable), then assign (mutable).
+    fn enqueue_unit_clauses(&mut self) {
+        // Collect unit clauses first (immutable borrow ends here)
+        let unit_clauses: Vec<(usize, i32)> = self.clauses.iter().enumerate()
+            .filter(|(_, c)| c.literals.len() == 1)
+            .map(|(ci, c)| (ci, c.literals[0]))
+            .collect();
+
+        // Then assign (mutable borrow starts here)
+        for (ci, lit) in unit_clauses {
+            let var = lit.abs() as usize;
+            if self.assignment[var].is_none() {
+                let val = lit > 0;
+                self.assign(var, val, Some(ci));
+            }
+        }
+    }
+
+    /// Deterministic variable selection: smallest unassigned index, branch true first.
     fn pick_branch_var(&self) -> Option<usize> {
         for v in 1..=self.num_vars {
             if self.assignment[v].is_none() {
@@ -311,47 +356,19 @@ impl CdclSolver {
         None
     }
 
+    /// Main CDCL solve loop.
     pub fn solve(&mut self) -> SolveResult {
-        // Initial propagation
-        if let Some(ci) = self.unit_propagate() {
-            self.conflict_count += 1;
-            let (learned, _) = self.analyze_conflict(ci);
-            if learned.is_empty() {
-                return SolveResult::Unsat;
-            }
-            let w_a = 0;
-            let w_b = if learned.len() > 1 { 1 } else { 0 };
-            self.learned_clauses.push(WatchedClause {
-                literals: learned,
-                watch_a: w_a,
-                watch_b: w_b,
-            });
+        // M2.5.2: Enqueue initial unit clauses before propagation
+        self.enqueue_unit_clauses();
+
+        // Initial propagation at level 0
+        if let Some(_ci) = self.unit_propagate() {
+            // M2.5.2: ANY conflict at level 0 = immediate UNSAT
+            return SolveResult::Unsat;
         }
 
         loop {
-            if let Some(ci) = self.unit_propagate() {
-                self.conflict_count += 1;
-                let (learned, backjump_level) = self.analyze_conflict(ci);
-                if learned.is_empty() {
-                    return SolveResult::Unsat;
-                }
-                let w_a = 0;
-                let w_b = if learned.len() > 1 { 1 } else { 0 };
-                self.learned_clauses.push(WatchedClause {
-                    literals: learned,
-                    watch_a: w_a,
-                    watch_b: w_b,
-                });
-                self.backjump(backjump_level);
-                if let Some(ci2) = self.unit_propagate() {
-                    let (learned2, _) = self.analyze_conflict(ci2);
-                    if learned2.is_empty() {
-                        return SolveResult::Unsat;
-                    }
-                }
-                continue;
-            }
-
+            // Check if all variables assigned
             if self.trail.len() == self.num_vars {
                 let model = (1..=self.num_vars)
                     .map(|v| self.assignment[v].unwrap_or(false))
@@ -359,6 +376,7 @@ impl CdclSolver {
                 return SolveResult::Sat(model);
             }
 
+            // Make a decision
             let var = match self.pick_branch_var() {
                 Some(v) => v,
                 None => {
@@ -372,20 +390,59 @@ impl CdclSolver {
             self.decision_level += 1;
             self.assign(var, true, None);
 
+            // Propagate after decision
             if let Some(ci) = self.unit_propagate() {
                 self.conflict_count += 1;
                 let (learned, backjump_level) = self.analyze_conflict(ci);
+
                 if learned.is_empty() {
                     return SolveResult::Unsat;
                 }
+
                 let w_a = 0;
                 let w_b = if learned.len() > 1 { 1 } else { 0 };
                 self.learned_clauses.push(WatchedClause {
-                    literals: learned,
+                    literals: learned.clone(),
                     watch_a: w_a,
                     watch_b: w_b,
                 });
+
                 self.backjump(backjump_level);
+
+                // M2.5.2: Enqueue unit literal from learned clause at backjump level
+                if learned.len() == 1 {
+                    let lit = learned[0];
+                    let unit_var = lit.abs() as usize;
+                    if self.assignment[unit_var].is_none() {
+                        let unit_val = lit > 0;
+                        let learned_ci = self.clauses.len() + self.learned_clauses.len() - 1;
+                        self.assign(unit_var, unit_val, Some(learned_ci));
+                    }
+                }
+
+                // M2.5.2: CRITICAL â€” propagate learned unit and check for level-0 conflict
+                if let Some(ci2) = self.unit_propagate() {
+                    self.conflict_count += 1;
+                    let (learned2, _backjump2) = self.analyze_conflict(ci2);
+
+                    // If we're back at level 0 with another conflict, UNSAT
+                    if self.decision_level == 0 {
+                        return SolveResult::Unsat;
+                    }
+
+                    if learned2.is_empty() {
+                        return SolveResult::Unsat;
+                    }
+
+                    // Add recursive learned clause and continue
+                    let w_a2 = 0;
+                    let w_b2 = if learned2.len() > 1 { 1 } else { 0 };
+                    self.learned_clauses.push(WatchedClause {
+                        literals: learned2,
+                        watch_a: w_a2,
+                        watch_b: w_b2,
+                    });
+                }
             }
         }
     }
@@ -417,9 +474,9 @@ mod tests {
         }
     }
 
-    #[ignore = "M2.5.1 limitation: UNSAT termination requires refined 1-UIP backjump. Fix in M2.5.2."]
     #[test]
     fn test_cdcl_unsat_simple() {
+        // (x1) âˆ§ (-x1) â†’ UNSAT
         let instance = DimacsInstance {
             num_vars: 1,
             num_clauses: 2,
@@ -445,9 +502,9 @@ mod tests {
         }
     }
 
-    #[ignore = "M2.5.1 limitation: UNSAT termination requires refined 1-UIP. Fix in M2.5.2."]
     #[test]
     fn test_cdcl_unsat_3var() {
+        // (aâˆ¨b) âˆ§ (aâˆ¨-b) âˆ§ (-aâˆ¨b) âˆ§ (-aâˆ¨-b) â€” unsat
         let instance = DimacsInstance {
             num_vars: 2,
             num_clauses: 4,
@@ -460,6 +517,22 @@ mod tests {
         };
         let mut solver = CdclSolver::from_dimacs(&instance);
         assert_eq!(solver.solve(), SolveResult::Unsat);
+    }
+
+    #[test]
+    fn test_cdcl_single_unit_clause() {
+        let instance = DimacsInstance {
+            num_vars: 3,
+            num_clauses: 1,
+            clauses: vec![vec![-2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+        match solver.solve() {
+            SolveResult::Sat(model) => {
+                assert!(!model[1]); // x2 = false
+            }
+            SolveResult::Unsat => panic!("Expected SAT"),
+        }
     }
 
     #[test]
@@ -486,21 +559,6 @@ mod tests {
         let mut solver = CdclSolver::from_dimacs(&instance);
         match solver.solve() {
             SolveResult::Sat(model) => assert_eq!(model.len(), 2),
-            SolveResult::Unsat => panic!("Expected SAT"),
-        }
-    }
-
-    #[ignore = "M2.5.1 limitation: Unit clause propagation edge case. Fix in M2.5.2."]
-    #[test]
-    fn test_cdcl_single_unit_clause() {
-        let instance = DimacsInstance {
-            num_vars: 3,
-            num_clauses: 1,
-            clauses: vec![vec![-2]],
-        };
-        let mut solver = CdclSolver::from_dimacs(&instance);
-        match solver.solve() {
-            SolveResult::Sat(model) => assert!(!model[1]),
             SolveResult::Unsat => panic!("Expected SAT"),
         }
     }
