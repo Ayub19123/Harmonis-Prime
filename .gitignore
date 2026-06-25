@@ -15,3 +15,10 @@ docs/get hub codes.txt
 # Clippy diagnostic files
 clippy_*.txt
 
+
+# Diagnostic artifacts
+check_errors.txt
+
+
+.workspace/
+
