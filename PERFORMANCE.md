@@ -42,7 +42,8 @@
 etwork_calculus | 7 | ~12ms | Min-plus algebra |
 | energy_telemetry | 10 | ~20ms | 4-workload calibration |
 | euler | 9 | ~25ms | Fluid dynamics |
-| amanujan | 4 | ~10ms | Mock-theta, HCN |
+| 
+amanujan | 4 | ~10ms | Mock-theta, HCN |
 | pim_solver | 8 | ~30ms | Crossbar evaluation |
 | zeta_resonance | 7 | ~35ms | Dirichlet series |
 | 	hermodynamic_balance | 19 | ~10ms | Shannon, KL, RC Thermal |

@@ -29,9 +29,13 @@ pub struct CdclSolver {
     conflict_count: u64,
     propagate_queue: VecDeque<usize>,
     // M2.5.6: VSIDS heuristic fields
-    activity: Vec<f64>,           // Per-variable activity score
-    saved_phase: Vec<Option<bool>>, // Phase saving: last assigned polarity
-    var_decay: f64,               // Activity decay factor
+    activity: Vec<f64>,               // Per-variable activity score
+    saved_phase: Vec<Option<bool>>,   // Phase saving: last assigned polarity
+    var_decay: f64,                   // Activity decay factor
+    // M2.5.7: Adaptive restart fields
+    restart_count: u64,               // Total restarts performed
+    conflicts_since_restart: u64,     // Conflicts since last restart
+    luby_index: usize,                // Current position in Luby sequence
 }
 
 /// Solver result.
@@ -84,6 +88,10 @@ impl CdclSolver {
             activity: vec![0.0; instance.num_vars + 1],
             saved_phase: vec![None; instance.num_vars + 1],
             var_decay: 0.95,
+            // M2.5.7: Restart initialization
+            restart_count: 0,
+            conflicts_since_restart: 0,
+            luby_index: 0,
         }
     }
 
@@ -330,6 +338,68 @@ impl CdclSolver {
         best_var.map(|v| (v, self.saved_phase[v].unwrap_or(true)))
     }
 
+    // M2.5.7: Adaptive restart methods
+
+    /// Luby sequence for restart scheduling.
+    /// Returns the n-th Luby number (0-indexed).
+    /// Sequence: 1, 1, 2, 1, 1, 2, 4, 1, 1, 2, 1, 1, 2, 4, 8, ...
+    fn luby(x: usize) -> u64 {
+        let mut size = 1;
+        let mut seq = 0;
+        while size < x + 1 {
+            size = 2 * size + 1;
+            seq += 1;
+        }
+        let mut x = x;
+        while size - 1 != x {
+            size = (size - 1) >> 1;
+            seq -= 1;
+            x = x % size;
+        }
+        1u64 << seq
+    }
+
+    /// Compute current restart threshold from Luby sequence.
+    /// Scaled by 100 conflicts per unit.
+    fn restart_threshold(&self) -> u64 {
+        Self::luby(self.luby_index) * 100
+    }
+
+    /// Perform a restart: clear trail, reset decision level, keep learned clauses and activities.
+    fn restart(&mut self) {
+        self.restart_count += 1;
+        self.conflicts_since_restart = 0;
+        self.luby_index += 1;
+
+        // Clear all search state
+        for v in 1..=self.num_vars {
+            self.assignment[v] = None;
+        }
+        self.trail.clear();
+        self.propagate_queue.clear();
+        self.decision_level = 0;
+
+        // --- FIX: Collect unit literals first to avoid borrow conflict ---
+        let mut unit_lits: Vec<i32> = Vec::new();
+        for clause in &self.clauses {
+            if clause.literals.len() == 1 {
+                unit_lits.push(clause.literals[0]);
+            }
+        }
+
+        // Assign original unit clauses at level 0
+        for lit in unit_lits {
+            let var = lit.abs() as usize;
+            if self.assignment[var].is_none() {
+                let val = lit > 0;
+                self.assign(var, val, None);
+            }
+        }
+
+        // Re-enforce learned unit clauses at level 0
+        self.enqueue_unit_clauses();
+    }
+
     /// Main CDCL solve loop.
     pub fn solve(&mut self) -> SolveResult {
         // Enqueue initial unit clauses before propagation
@@ -366,6 +436,7 @@ impl CdclSolver {
             // Propagate after decision
             if let Some(ci) = self.unit_propagate() {
                 self.conflict_count += 1;
+                self.conflicts_since_restart += 1;
                 let (learned, backjump_level) = self.analyze_conflict(ci);
 
                 if learned.is_empty() {
@@ -403,6 +474,7 @@ impl CdclSolver {
                 // Propagate learned unit and check for level-0 conflict
                 if let Some(ci2) = self.unit_propagate() {
                     self.conflict_count += 1;
+                    self.conflicts_since_restart += 1;
                     let (learned2, _backjump2) = self.analyze_conflict(ci2);
 
                     if self.decision_level == 0 {
@@ -421,6 +493,15 @@ impl CdclSolver {
                         watch_a: w_a2,
                         watch_b: w_b2,
                     });
+                }
+
+                // M2.5.7: Check if restart is needed
+                if self.conflicts_since_restart >= self.restart_threshold() {
+                    self.restart();
+                    // After restart, propagate any unit clauses
+                    if let Some(_ci) = self.unit_propagate() {
+                        return SolveResult::Unsat;
+                    }
                 }
             }
         }
