@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{VecDeque, HashSet};
 
 /// Trail entry recording assignment.
 #[derive(Debug, Clone, Copy)]
@@ -36,6 +36,10 @@ pub struct CdclSolver {
     restart_count: u64,               // Total restarts performed
     conflicts_since_restart: u64,     // Conflicts since last restart
     luby_index: usize,                // Current position in Luby sequence
+    // M2.5.8: Clause database reduction fields
+    clause_activity: Vec<f64>,        // Per-learned-clause activity score
+    clause_decay: f64,                // Clause activity decay factor
+    reduction_counter: u64,           // Conflicts since last database reduction
 }
 
 /// Solver result.
@@ -92,6 +96,10 @@ impl CdclSolver {
             restart_count: 0,
             conflicts_since_restart: 0,
             luby_index: 0,
+            // M2.5.8: Clause database initialization
+            clause_activity: Vec::new(),
+            clause_decay: 0.999,
+            reduction_counter: 0,
         }
     }
 
@@ -284,6 +292,16 @@ impl CdclSolver {
             *a *= self.var_decay;
         }
 
+        // M2.5.8: Decay clause activities
+        self.decay_clause_activities();
+
+        // M2.5.8: Bump activity for reason clauses used in resolution
+        if let Some(entry) = self.trail.last() {
+            if let Some(reason_ci) = entry.reason {
+                self.bump_clause_activity(reason_ci);
+            }
+        }
+
         (learned, backjump_level)
     }
 
@@ -400,6 +418,77 @@ impl CdclSolver {
         self.enqueue_unit_clauses();
     }
 
+    // M2.5.8: Clause database reduction methods
+
+    /// Literal Block Distance (LBD): count of distinct decision levels in a clause.
+    /// Lower LBD = better clause (more "glued" variables).
+    fn lbd(&self, clause: &[i32]) -> usize {
+        let mut levels = HashSet::new();
+        for &lit in clause {
+            let var = lit.abs() as usize;
+            if let Some(entry) = self.trail.iter().find(|e| e.var == var) {
+                levels.insert(entry.decision_level);
+            }
+        }
+        levels.len()
+    }
+
+    /// Bump activity for a learned clause (called when clause participates in conflict).
+    fn bump_clause_activity(&mut self, ci: usize) {
+        let learned_ci = ci.saturating_sub(self.clauses.len());
+        if learned_ci < self.clause_activity.len() {
+            self.clause_activity[learned_ci] += 1.0;
+        }
+    }
+
+    /// Decay all clause activities.
+    fn decay_clause_activities(&mut self) {
+        for a in &mut self.clause_activity {
+            *a *= self.clause_decay;
+        }
+    }
+
+    /// Reduce learned clause database: remove low-activity clauses.
+    /// Preserve unit clauses and clauses with LBD ≤ 3 (glue clauses).
+    fn reduce_database(&mut self) {
+        if self.learned_clauses.is_empty() {
+            return;
+        }
+
+        // Compute median activity threshold
+        let mut activities: Vec<f64> = self.clause_activity.clone();
+        activities.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let median_idx = activities.len() / 2;
+        let threshold = activities[median_idx];
+
+        let mut new_clauses: Vec<WatchedClause> = Vec::new();
+        let mut new_activities: Vec<f64> = Vec::new();
+
+        for (_i, (clause, activity)) in self.learned_clauses.iter().zip(self.clause_activity.iter()).enumerate() {
+            // Always keep unit clauses
+            if clause.literals.len() == 1 {
+                new_clauses.push(clause.clone());
+                new_activities.push(*activity);
+                continue;
+            }
+            // Always keep glue clauses (LBD ≤ 3)
+            let lbd = self.lbd(&clause.literals);
+            if lbd <= 3 {
+                new_clauses.push(clause.clone());
+                new_activities.push(*activity);
+                continue;
+            }
+            // Keep if activity above median
+            if *activity >= threshold {
+                new_clauses.push(clause.clone());
+                new_activities.push(*activity);
+            }
+        }
+
+        self.learned_clauses = new_clauses;
+        self.clause_activity = new_activities;
+    }
+
     /// Main CDCL solve loop.
     pub fn solve(&mut self) -> SolveResult {
         // Enqueue initial unit clauses before propagation
@@ -447,10 +536,12 @@ impl CdclSolver {
                 let w_a = 0;
                 let w_b = if learned.len() > 1 { 1 } else { 0 };
                 self.learned_clauses.push(WatchedClause {
-                    literals: learned,
+                    literals: learned.clone(),
                     watch_a: w_a,
                     watch_b: w_b,
                 });
+                // M2.5.8: Initialize clause activity for new learned clause
+                self.clause_activity.push(1.0);
 
                 // Backjump
                 self.backjump(backjump_level);
@@ -489,10 +580,19 @@ impl CdclSolver {
                     let w_a2 = 0;
                     let w_b2 = if learned2.len() > 1 { 1 } else { 0 };
                     self.learned_clauses.push(WatchedClause {
-                        literals: learned2,
+                        literals: learned2.clone(),
                         watch_a: w_a2,
                         watch_b: w_b2,
                     });
+                    // M2.5.8: Initialize clause activity for recursive learned clause
+                    self.clause_activity.push(1.0);
+                }
+
+                // M2.5.8: Increment reduction counter and check if reduction needed
+                self.reduction_counter += 1;
+                if self.reduction_counter >= 2000 {
+                    self.reduction_counter = 0;
+                    self.reduce_database();
                 }
 
                 // M2.5.7: Check if restart is needed
