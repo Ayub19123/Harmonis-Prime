@@ -40,6 +40,9 @@ pub struct CdclSolver {
     clause_activity: Vec<f64>,        // Per-learned-clause activity score
     clause_decay: f64,                // Clause activity decay factor
     reduction_counter: u64,           // Conflicts since last database reduction
+    // M2.5.9: Proof logging fields
+    proof_trace: Vec<String>,         // DRAT proof lines
+    proof_enabled: bool,              // Toggle proof generation
 }
 
 /// Solver result.
@@ -100,6 +103,9 @@ impl CdclSolver {
             clause_activity: Vec::new(),
             clause_decay: 0.999,
             reduction_counter: 0,
+            // M2.5.9: Proof logging initialization
+            proof_trace: Vec::new(),
+            proof_enabled: true,
         }
     }
 
@@ -463,8 +469,10 @@ impl CdclSolver {
 
         let mut new_clauses: Vec<WatchedClause> = Vec::new();
         let mut new_activities: Vec<f64> = Vec::new();
+        // M2.5.9: Collect deletion candidates to avoid borrow conflict
+        let mut to_delete: Vec<Vec<i32>> = Vec::new();
 
-        for (_i, (clause, activity)) in self.learned_clauses.iter().zip(self.clause_activity.iter()).enumerate() {
+        for (clause, activity) in self.learned_clauses.iter().zip(self.clause_activity.iter()) {
             // Always keep unit clauses
             if clause.literals.len() == 1 {
                 new_clauses.push(clause.clone());
@@ -478,15 +486,60 @@ impl CdclSolver {
                 new_activities.push(*activity);
                 continue;
             }
-            // Keep if activity above median
+            // Keep if activity above median, else mark for deletion
             if *activity >= threshold {
                 new_clauses.push(clause.clone());
                 new_activities.push(*activity);
+            } else {
+                to_delete.push(clause.literals.clone());
             }
+        }
+
+        // M2.5.9: Log deletions after loop (mutable borrow safe)
+        for deleted in &to_delete {
+            self.proof_delete(deleted);
         }
 
         self.learned_clauses = new_clauses;
         self.clause_activity = new_activities;
+    }
+
+    // M2.5.9: DRAT proof logging methods
+
+    /// Emit a clause addition to the proof trace.
+    fn proof_add(&mut self, clause: &[i32]) {
+        if !self.proof_enabled {
+            return;
+        }
+        let mut line = String::from("a");
+        for &lit in clause {
+            line.push_str(&format!(" {}", lit));
+        }
+        line.push_str(" 0");
+        self.proof_trace.push(line);
+    }
+
+    /// Emit a clause deletion to the proof trace.
+    fn proof_delete(&mut self, clause: &[i32]) {
+        if !self.proof_enabled {
+            return;
+        }
+        let mut line = String::from("d");
+        for &lit in clause {
+            line.push_str(&format!(" {}", lit));
+        }
+        line.push_str(" 0");
+        self.proof_trace.push(line);
+    }
+
+    /// Write proof trace to file.
+    pub fn write_proof(&self, path: &str) -> std::io::Result<()> {
+        use std::io::Write;
+        let mut file = std::fs::File::create(path)?;
+        for line in &self.proof_trace {
+            writeln!(file, "{}", line)?;
+        }
+        Ok(())
     }
 
     /// Main CDCL solve loop.
@@ -540,8 +593,9 @@ impl CdclSolver {
                     watch_a: w_a,
                     watch_b: w_b,
                 });
-                // M2.5.8: Initialize clause activity for new learned clause
                 self.clause_activity.push(1.0);
+                // M2.5.9: Log clause addition
+                self.proof_add(&learned);
 
                 // Backjump
                 self.backjump(backjump_level);
@@ -584,8 +638,9 @@ impl CdclSolver {
                         watch_a: w_a2,
                         watch_b: w_b2,
                     });
-                    // M2.5.8: Initialize clause activity for recursive learned clause
                     self.clause_activity.push(1.0);
+                    // M2.5.9: Log recursive clause addition
+                    self.proof_add(&learned2);
                 }
 
                 // M2.5.8: Increment reduction counter and check if reduction needed
