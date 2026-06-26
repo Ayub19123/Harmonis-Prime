@@ -24,6 +24,7 @@
 | 2026-06-18 | d134eb3 | 80 | 0.20s | 4 | Per-workload calibration |
 | 2026-06-18 | 8f85b62 | 80 | 0.20s | 4 | Documentation suite |
 | 2026-06-18 | 77e2824 | 99 | 0.42s | 4 | Thermodynamic balancing |
+| 2026-06-26 | 1aba375 | 161 | 0.41s | 0 | M2.5.9 DRAT Proof Logging |
 | 2026-06-18 | 2b39c7b | **103** | **0.28s** | **0** | **SET-8: Warning-free** |
 
 ## Key Insight
