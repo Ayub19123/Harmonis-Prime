@@ -178,3 +178,4 @@ pub mod truncation_budget;
 // LIMITATION: Windows compilation may fail — f64 fallback activated automatically
 pub mod mpfr_zeta;
 pub mod audit;
+pub mod bench;
