@@ -4,23 +4,9 @@
 |-------|--------|--------|-------|-------------|
 | M2.5 | ✅ SEALED | 80681f2 | 164/164 | DIMACS CNF adapter + CDCL engine |
 | M2.5.1 | ✅ SEALED | 80681f2 | 164/164 | Minimal CDCL with telemetry & DRAT |
-| M2.5.5 | ✅ SEALED | 80681f2 | 6/6 benchmarks | CI benchmark suite (XOR, contradiction, unit SAT) |
-| **M2.6** | **✅ SEALED** | **32178f** | **164/164 + CLI validated** | **SAT Competition 2027 CLI binary** |
-| M2.6.1 | 🔲 READY | — | — | Checkpoint serialization (procedural memory) |
+| M2.5.5 | ✅ SEALED | 80681f2 | 6/6 benchmarks | CI benchmark suite |
+| M2.6 | ✅ SEALED | b32178f | 164/164 + CLI validated | SAT Competition 2027 CLI binary |
+| M2.6.1 | ✅ SEALED | d4745b1 | 164/164 + checkpoint validated | Deterministic checkpoint serialization |
+| M2.6.2 | 🔲 READY | — | — | Periodic conflict-interval snapshots |
 | M2.7 | 🔲 READY | — | — | Distributed clause registry / DHT mesh |
-
-## M2.6 CLI Interface
-\\\ash
-cargo run --bin sat_solver <input.cnf> [--proof <file.drat>] [--mem-profile] [--clause-db-stats]
-\\\
-- Exit 10 = SATISFIABLE
-- Exit 20 = UNSATISFIABLE
-- Exit 1 = Error
-- stdout: DIMACS results | stderr: telemetry & proof logs
-
-## Latest Validation
-- Full regression: 164 passed, 0 failed, 8 ignored
-- SAT sweep: exit 10 ✅
-- UNSAT sweep: exit 20 ✅
-- DRAT proof artifact: generated ✅
-- Telemetry flags: active ✅
+| M3.0 | 🔲 READY | — | — | Proof-carrying state snapshots |
