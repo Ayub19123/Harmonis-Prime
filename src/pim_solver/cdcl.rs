@@ -1,7 +1,7 @@
 use std::collections::{VecDeque, HashSet};
 
 /// Trail entry recording assignment.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 #[allow(dead_code)]
 struct TrailEntry {
     var: usize,
@@ -11,7 +11,7 @@ struct TrailEntry {
 }
 
 /// Watched literal state for a clause.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct WatchedClause {
     literals: Vec<i32>,
     watch_a: usize,
@@ -19,7 +19,7 @@ struct WatchedClause {
 }
 
 /// M2.5.10: Solver telemetry — self-observation metrics for meta-cognition.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct SolverTelemetry {
     pub clause_db_size: usize,        // Total clauses (original + learned)
     pub learned_clause_count: usize,  // Learned clauses only
@@ -39,6 +39,7 @@ pub enum SolveResult {
 }
 
 /// CDCL Solver state.
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct CdclSolver {
     num_vars: usize,
     clauses: Vec<WatchedClause>,
@@ -719,6 +720,22 @@ impl CdclSolver {
                 }
             }
         }
+    }
+
+    // M2.6.1: Deterministic checkpoint serialization
+    /// Save solver state to a file for resumable execution.
+    pub fn save_checkpoint(&self, path: &str) -> std::io::Result<()> {
+        let json = serde_json::to_string(self)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+        std::fs::write(path, json)
+    }
+
+    /// Load solver state from a checkpoint file.
+    pub fn load_checkpoint(path: &str) -> std::io::Result<Self> {
+        let json = std::fs::read_to_string(path)?;
+        let solver: Self = serde_json::from_str(&json)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+        Ok(solver)
     }
 }
 
