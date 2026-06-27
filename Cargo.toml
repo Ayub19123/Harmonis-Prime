@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "sovereign_core"
 version = "6.2.0"
 edition = "2021"
@@ -68,3 +68,7 @@ harness = false
 name = "mpfr_zeta"
 path = "src/mpfr_zeta/benchmark.rs"
 harness = false
+
+[[bin]]
+name = "sat_solver"
+path = "src/bin/sat_solver.rs"
