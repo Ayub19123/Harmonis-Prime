@@ -5,7 +5,6 @@ pub mod thermo;
 pub mod energy;
 pub mod quantum;
 use crate::engine::SovereignOrchestrator;
-use pyo3::prelude::*;
 use std::sync::{Arc, Mutex};
 
 pub mod config;
@@ -35,11 +34,16 @@ pub mod pom;
 
 pub use engine::create_sovereign_engine;
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
+#[cfg(feature = "python")]
 #[pyclass]
 pub struct SovereignEngine {
     inner: Arc<Mutex<SovereignOrchestrator>>,
 }
 
+#[cfg(feature = "python")]
 #[pymethods]
 impl SovereignEngine {
     #[new]
@@ -77,6 +81,7 @@ impl SovereignEngine {
     }
 }
 
+#[cfg(feature = "python")]
 #[pymodule]
 fn sovereign_core(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<SovereignEngine>()?;

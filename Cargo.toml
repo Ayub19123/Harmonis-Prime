@@ -29,11 +29,12 @@ crate-type = ["cdylib", "rlib"]
 [features]
 default = []
 mpfr = ["rug"]
+python = ["pyo3"]
 
 [dependencies]
 hex = "0.4"
 sha2 = "0.10"
-pyo3 = ">=0.24.1"
+pyo3 = { version = ">=0.24.1", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 rand = "0.8"
 serde_json = "1.0"
