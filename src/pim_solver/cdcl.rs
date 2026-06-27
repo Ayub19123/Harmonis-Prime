@@ -748,39 +748,41 @@ mod tests {
 
     #[test]
     fn test_drat_output_valid() {
-        // Trivial contradiction: (x) ∧ (¬x)
+        // Trivial contradiction: (x) and (not x)
         let instance = DimacsInstance { num_vars: 1, num_clauses: 2, clauses: vec![vec![1], vec![-1]] };
         let mut solver = CdclSolver::from_dimacs(&instance);
-        
+
         let result = solver.solve();
         assert_eq!(result, SolveResult::Unsat);
-        
+
         // Write proof
         let proof_path = "test_proof.drat";
         solver.write_proof(proof_path).unwrap();
-        
-        // Validate file exists and is non-empty
-        let metadata = fs::metadata(proof_path).unwrap();
-        // Empty proof file is acceptable for trivial UNSAT (level-0 conflict)
-        if metadata.len() == 0 {
-            return;
-        }
-        
-        // Validate DRAT format
-        let content = fs::read_to_string(proof_path).unwrap();
-        let lines: Vec<&str> = content.lines().collect();
-        assert!(!lines.is_empty(), "Proof file has no lines");
-        
-        for line in &lines {
-            assert!(line.ends_with(" 0"), "DRAT line must end with ' 0': {}", line);
-            assert!(
-                line.starts_with("a ") || line.starts_with("d "),
-                "DRAT line must start with 'a ' or 'd ': {}", line
-            );
-        }
-        
+
+        // M2.5.11: Write matching CNF for drat-trim validation
+        let cnf_path = "test_unsat.cnf";
+        let cnf_content = "p cnf 1 2
+1 0
+-1 0
+";
+        fs::write(cnf_path, cnf_content).unwrap();
+
+        // M2.5.11: Validate with external drat-trim
+        let output = std::process::Command::new(".\\tools\\drat-trim.exe")
+            .arg(cnf_path)
+            .arg(proof_path)
+            .output()
+            .expect("Failed to execute drat-trim");
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(output.status.success(), "drat-trim exited with error: {}", stderr);
+        assert!(stdout.contains("s VERIFIED") || stderr.contains("s VERIFIED"),
+            "drat-trim did not verify proof. stdout: {}, stderr: {}", stdout, stderr);
+
         // Cleanup
         fs::remove_file(proof_path).unwrap();
+        fs::remove_file(cnf_path).unwrap();
     }
 
     #[test]
