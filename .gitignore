@@ -23,3 +23,6 @@ check_errors.txt
 .workspace/
 
 tools/drat-trim-src/
+*.exe
+*.dll
+tools/drat-trim-src/
