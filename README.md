@@ -1,12 +1,12 @@
-Harmonis Prime
-https://github.com/Ayub19123/Harmonis-Prime/actions
-https://github.com/Ayub19123/Harmonis-Prime/actions
-https://github.com/Ayub19123/Harmonis-Prime
-https://www.rust-lang.org
-LICENSE
-https://doi.org/10.5281/zenodo.15542022
-https://figshare.com/articles/software/Harmonis_Prime_v6_2_0_SET_8_GM/26103446
-Harmonis Prime is a Rust-based SAT solver with sovereign-grade distributed memory architecture. It unifies CDCL core correctness, epistemic DRAT proof logging, deterministic checkpointing, and DHT-based clause exchange into a single test-governed, competition-ready system.
+.# Harmonis Prime
+
+[![Tests](https://img.shields.io/badge/tests-170%2F170%20passing-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
+[![CI](https://img.shields.io/badge/CI-Ubuntu%20%7C%20Windows%20%7C%20macOS-blue)](https://github.com/Ayub19123/Harmonis-Prime/actions)
+[![DRAT](https://img.shields.io/badge/DRAT-verified%20s%20VERIFIED-success)](https://github.com/Ayub19123/Harmonis-Prime)
+[![Rust](https://img.shields.io/badge/rust-1.96%2B-orange?logo=rust)](https://www.rust-lang.org)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue)](LICENSE)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.15542022-blue)](https://doi.org/10.5281/zenodo.15542022)
+[![Whitepaper](https://img.shields.io/badge/whitepaper-v1.2-lightgrey)](https://figshare.com/articles/software/Harmonis_Prime_v6_2_0_SET_8_GM/26103446)
 Overview
 Harmonis Prime is a SAT Competition 2027 candidate solver built on four inviolable pillars:
 Table
