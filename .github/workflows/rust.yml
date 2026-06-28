@@ -6,11 +6,15 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   test:
     name: Run Tests
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
@@ -21,5 +25,62 @@ jobs:
     - name: Setup Rust toolchain
       uses: dtolnay/rust-toolchain@stable
 
-    - name: Run cargo test
-      run: cargo test --all-targets
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo index
+      uses: actions/cache@v4
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Cache cargo build
+      uses: actions/cache@v4
+      with:
+        path: target
+        key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+    # M2.6.3: Compile drat-trim on Ubuntu for DRAT proof validation
+    - name: Compile drat-trim (Ubuntu only)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc
+        git clone https://github.com/marijnheule/drat-trim.git tools/drat-trim-src
+        gcc -O2 -o tools/drat-trim tools/drat-trim-src/drat-trim.c
+        file tools/drat-trim
+
+    - name: Build library (no default features)
+      run: cargo build --lib --no-default-features
+
+    - name: Run tests (no default features)
+      run: cargo test --lib --no-default-features -- --nocapture
+
+    - name: Build SAT solver binary (no default features)
+      run: cargo build --release --bin sat_solver --no-default-features
+
+    # M2.6.3: End-to-end DRAT validation on Ubuntu
+    - name: Validate DRAT proof end-to-end (Ubuntu only)
+      if: runner.os == 'Linux'
+      run: |
+        echo -e "p cnf 1 2\n1 0\n-1 0" > test_unsat.cnf
+        ./target/release/sat_solver test_unsat.cnf --proof proof.drat
+        ./tools/drat-trim test_unsat.cnf proof.drat
+
+    - name: Build library (all features)
+      run: cargo build --lib
+
+    - name: Run tests (all features)
+      run: cargo test --lib -- --nocapture
+
+    - name: Build SAT solver binary (all features)
+      run: cargo build --release --bin sat_solver
+
+    - name: Check formatting
+      run: cargo fmt -- --check
+
+    - name: Run clippy
+      run: cargo clippy --lib -- -D warnings
