@@ -1,4 +1,4 @@
-﻿//! Zero-egress firewall — drops all outbound packets
+//! Zero-egress firewall — drops all outbound packets
 
 /// Packet inspection result
 #[derive(Debug, PartialEq)]
@@ -17,17 +17,19 @@ impl ZeroEgressFilter {
         if destination.starts_with("external.") || destination.contains("internet") {
             return FilterResult::Drop("External destination blocked by air-gap policy");
         }
-        
+
         // Air-gap rule: no non-empty payloads (simulated zero-egress)
         if !payload.is_empty() {
             return FilterResult::Drop("Non-zero payload blocked by zero-egress policy");
         }
-        
+
         FilterResult::Allow
     }
 
     /// Check if destination is internal mesh only
     pub fn is_internal_destination(destination: &str) -> bool {
-        destination.starts_with("192.168.") || destination.starts_with("10.") || destination == "localhost"
+        destination.starts_with("192.168.")
+            || destination.starts_with("10.")
+            || destination == "localhost"
     }
 }

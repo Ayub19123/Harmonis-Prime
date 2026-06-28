@@ -1,12 +1,12 @@
-﻿//! M2.3: MPFR Z(t) vs Odlyzko Validation Engine
+//! M2.3: MPFR Z(t) vs Odlyzko Validation Engine
 //! LIMITATION: Requires Odlyzko cache pre-populated (M2.2).
 //! LIMITATION: Single-threaded until M2.4 NUMA scaling.
 //! LIMITATION: No formal proof â€” only numerical convergence verification.
-//! 
+//!
 //! HONEST CONSTRAINT: Tolerance depends on mpfr feature:
 //! - mpfr enabled: 1e-10 (400-bit precision)
 //! - mpfr disabled: 1.0 (f64 fallback, Dirichlet series truncated at 100k terms)
-//! 
+//!
 //! VALIDATION CONTRACT:
 //! - For each Odlyzko zero t_n, compute |Î¶(t_n)| via oracle
 //! - Target: |Î¶(t_n)| < TOLERANCE for all tested zeros
@@ -44,43 +44,43 @@ pub enum ValidationError {
 }
 
 #[cfg(feature = "mpfr")]
-const TOLERANCE: f64 = 1e-10;  // 400-bit MPFR precision
+const TOLERANCE: f64 = 1e-10; // 400-bit MPFR precision
 
 #[cfg(not(feature = "mpfr"))]
-const TOLERANCE: f64 = 1.0;     // f64 fallback â€” honest constraint, calibrated by measurement
+const TOLERANCE: f64 = 1.0; // f64 fallback â€” honest constraint, calibrated by measurement
 
 /// Validate oracle against Odlyzko ground truth.
-/// 
+///
 /// LIMITATION: Uses f64 oracle path if MPFR feature unavailable.
 /// LIMITATION: Only checks first `max_zeros` from cache (default: 100).
 pub fn validate_oracle(max_zeros: usize) -> Result<ValidationReport, ValidationError> {
     let cache = OdlyzkoCache::load();
-    
+
     if cache.len() == 0 {
         return Err(ValidationError::CacheError("Odlyzko cache empty".into()));
     }
-    
+
     let zeros_to_check = max_zeros.min(cache.len());
     let mut validations = Vec::with_capacity(zeros_to_check);
     let mut max_dev = 0.0f64;
     let mut sum_dev = 0.0f64;
     let mut passed = 0usize;
-    
+
     for i in 0..zeros_to_check {
         let t = cache.first_n(i + 1)[i];
-        
+
         // Compute Î¶(Â½+it) via oracle â€” returns (real, imag)
         let (real, imag) = zeta_half_plus_it(t);
         let z_abs = (real * real + imag * imag).sqrt();
-        
+
         let within = z_abs < TOLERANCE;
         if within {
             passed += 1;
         }
-        
+
         max_dev = max_dev.max(z_abs);
         sum_dev += z_abs;
-        
+
         validations.push(ZeroValidation {
             index: i,
             t,
@@ -88,9 +88,9 @@ pub fn validate_oracle(max_zeros: usize) -> Result<ValidationReport, ValidationE
             within_tolerance: within,
         });
     }
-    
+
     let mean_dev = sum_dev / zeros_to_check as f64;
-    
+
     Ok(ValidationReport {
         zeros_checked: zeros_to_check,
         zeros_passed: passed,

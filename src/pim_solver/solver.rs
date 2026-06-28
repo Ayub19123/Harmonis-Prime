@@ -1,8 +1,8 @@
-﻿//! SET-7A: PIM Crossbar Simulation - Energy-Based k-SAT Evaluation
-//! 
+//! SET-7A: PIM Crossbar Simulation - Energy-Based k-SAT Evaluation
+//!
 //! Phase 1 (Software): Simulated crossbar with deterministic evaluation
 //! Phase 2 (Silicon): Physical PIM array with analog threshold detection
-//! 
+//!
 //! Physical Parallelism Principle:
 //!   All clauses evaluated simultaneously via Kirchhoff's Current Law.
 //!   For fixed crossbar: O(1) evaluation time vs clause count.
@@ -46,15 +46,19 @@ impl Clause {
     /// Penalty function: 0 if satisfied, 1 if violated
     /// Used in energy minimization formulation
     pub fn penalty(&self, assignment: &[VariableAssignment]) -> u64 {
-        if self.evaluate(assignment) { 0 } else { 1 }
+        if self.evaluate(assignment) {
+            0
+        } else {
+            1
+        }
     }
 }
 
 /// Crossbar configuration: physical dimensions and constraints
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrossbarConfig {
-    pub rows: usize,        // m = number of clauses
-    pub columns: usize,     // n = number of variables
+    pub rows: usize,          // m = number of clauses
+    pub columns: usize,       // n = number of variables
     pub max_clauses: usize,   // physical limit
     pub max_variables: usize, // physical limit
 }
@@ -88,7 +92,7 @@ impl CrossbarConfig {
 /// E(v) = sum of clause penalties (Ising/QUBO formulation)
 #[derive(Debug, Clone, PartialEq)]
 pub struct EnergyState {
-    pub total_energy: u64,      // sum of all clause penalties
+    pub total_energy: u64, // sum of all clause penalties
     pub satisfied_clauses: usize,
     pub violated_clauses: usize,
     pub assignment: Vec<VariableAssignment>,
@@ -115,7 +119,11 @@ impl PimSolver {
         if self.clauses.len() >= self.config.max_clauses {
             return Err("Crossbar capacity exceeded");
         }
-        if clause.literals.iter().any(|(idx, _)| *idx >= self.config.columns) {
+        if clause
+            .literals
+            .iter()
+            .any(|(idx, _)| *idx >= self.config.columns)
+        {
             return Err("Variable index exceeds crossbar width");
         }
         self.clauses.push(clause);
@@ -191,7 +199,7 @@ mod tests {
     fn test_clause_evaluation_basic() {
         // Clause: x0 OR NOT(x1)
         let clause = Clause::new(&[(0, false), (1, true)]);
-        
+
         // x0=true, x1=false: satisfied (x0 is true)
         let assignment = vec![VariableAssignment::True, VariableAssignment::False];
         assert!(clause.evaluate(&assignment));
@@ -215,16 +223,22 @@ mod tests {
     fn test_solver_parallel_evaluation() {
         let config = CrossbarConfig::new(3, 2).unwrap();
         let mut solver = PimSolver::new(config);
-        
+
         // (x0 OR x1) AND (NOT(x0) OR x1) AND (x0 OR NOT(x1))
-        solver.add_clause(Clause::new(&[(0, false), (1, false)])).unwrap();
-        solver.add_clause(Clause::new(&[(0, true), (1, false)])).unwrap();
-        solver.add_clause(Clause::new(&[(0, false), (1, true)])).unwrap();
-        
+        solver
+            .add_clause(Clause::new(&[(0, false), (1, false)]))
+            .unwrap();
+        solver
+            .add_clause(Clause::new(&[(0, true), (1, false)]))
+            .unwrap();
+        solver
+            .add_clause(Clause::new(&[(0, false), (1, true)]))
+            .unwrap();
+
         // Test x0=true, x1=true
         let assignment = vec![VariableAssignment::True, VariableAssignment::True];
         let state = solver.evaluate_parallel(&assignment);
-        
+
         // Clause 1: true OR true = true (penalty 0)
         // Clause 2: false OR true = true (penalty 0)
         // Clause 3: true OR false = true (penalty 0)

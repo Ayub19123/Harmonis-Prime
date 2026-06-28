@@ -1,4 +1,4 @@
-﻿//! SET-5.6: Thermodynamic Optimization Loops
+//! SET-5.6: Thermodynamic Optimization Loops
 //! Invariant: Entropy production minimized
 //! Invariant: State transitions are reversible where possible
 
@@ -8,8 +8,8 @@ use super::fluid_dynamics::FluidState;
 #[derive(Debug, Clone)]
 pub struct ThermodynamicLoop {
     pub fluid: FluidState,
-    pub temperature: f64,         // System temperature (analogous to load)
-    pub entropy: f64,             // Current entropy
+    pub temperature: f64,          // System temperature (analogous to load)
+    pub entropy: f64,              // Current entropy
     pub joules_per_consensus: f64, // Energy cost per consensus round
 }
 
@@ -17,7 +17,7 @@ impl ThermodynamicLoop {
     pub fn new(dimensions: usize) -> Self {
         Self {
             fluid: FluidState::new(dimensions),
-            temperature: 300.0,       // Room temperature baseline
+            temperature: 300.0, // Room temperature baseline
             entropy: 0.0,
             joules_per_consensus: 0.0,
         }
@@ -28,10 +28,10 @@ impl ThermodynamicLoop {
     pub fn cycle(&mut self, load: &[f64], dt: f64) -> (f64, f64) {
         // Pressure gradient from load
         let grad_p: Vec<f64> = load.iter().map(|&l| l / self.temperature).collect();
-        
+
         // Euler fluid step
         self.fluid.euler_step(&grad_p, dt);
-        
+
         // Ensure laminar flow
         let char_length = 1.0;
         if !self.fluid.is_laminar(char_length) {
@@ -42,14 +42,14 @@ impl ThermodynamicLoop {
                 *v *= dampen;
             }
         }
-        
+
         // Compute energy and entropy
         let energy = self.fluid.kinetic_energy();
         let dissipation = self.fluid.dissipation_rate();
         let delta_entropy = dissipation / self.temperature;
         self.entropy += delta_entropy;
         self.joules_per_consensus = energy;
-        
+
         (energy, delta_entropy)
     }
 

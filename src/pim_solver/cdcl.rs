@@ -1,4 +1,4 @@
-use std::collections::{VecDeque, HashSet};
+use std::collections::{HashSet, VecDeque};
 
 /// Trail entry recording assignment.
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
@@ -21,14 +21,14 @@ struct WatchedClause {
 /// M2.5.10: Solver telemetry — self-observation metrics for meta-cognition.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct SolverTelemetry {
-    pub clause_db_size: usize,        // Total clauses (original + learned)
-    pub learned_clause_count: usize,  // Learned clauses only
-    pub memory_pressure_mb: usize,    // Estimated memory footprint
-    pub conflict_rate: f64,           // Conflicts per decision
-    pub restart_count: u64,           // Total restarts performed
-    pub reduction_count: u64,         // Total database reductions
-    pub decision_count: u64,          // Total decisions made
-    pub propagation_count: u64,       // Total propagations
+    pub clause_db_size: usize,       // Total clauses (original + learned)
+    pub learned_clause_count: usize, // Learned clauses only
+    pub memory_pressure_mb: usize,   // Estimated memory footprint
+    pub conflict_rate: f64,          // Conflicts per decision
+    pub restart_count: u64,          // Total restarts performed
+    pub reduction_count: u64,        // Total database reductions
+    pub decision_count: u64,         // Total decisions made
+    pub propagation_count: u64,      // Total propagations
 }
 
 /// Solver result.
@@ -50,20 +50,20 @@ pub struct CdclSolver {
     conflict_count: u64,
     propagate_queue: VecDeque<usize>,
     // M2.5.6: VSIDS heuristic fields
-    activity: Vec<f64>,               // Per-variable activity score
-    saved_phase: Vec<Option<bool>>,   // Phase saving: last assigned polarity
-    var_decay: f64,                   // Activity decay factor
+    activity: Vec<f64>,             // Per-variable activity score
+    saved_phase: Vec<Option<bool>>, // Phase saving: last assigned polarity
+    var_decay: f64,                 // Activity decay factor
     // M2.5.7: Adaptive restart fields
-    restart_count: u64,               // Total restarts performed
-    conflicts_since_restart: u64,     // Conflicts since last restart
-    luby_index: usize,                // Current position in Luby sequence
+    restart_count: u64,           // Total restarts performed
+    conflicts_since_restart: u64, // Conflicts since last restart
+    luby_index: usize,            // Current position in Luby sequence
     // M2.5.8: Clause database reduction fields
-    clause_activity: Vec<f64>,        // Per-learned-clause activity score
-    clause_decay: f64,                // Clause activity decay factor
-    reduction_counter: u64,           // Conflicts since last database reduction
+    clause_activity: Vec<f64>, // Per-learned-clause activity score
+    clause_decay: f64,         // Clause activity decay factor
+    reduction_counter: u64,    // Conflicts since last database reduction
     // M2.5.9: Proof logging fields
-    proof_trace: Vec<String>,         // DRAT proof lines
-    proof_enabled: bool,              // Toggle proof generation
+    proof_trace: Vec<String>, // DRAT proof lines
+    proof_enabled: bool,      // Toggle proof generation
     // M2.5.10: Memory telemetry
     telemetry: SolverTelemetry,
 }
@@ -152,12 +152,25 @@ impl CdclSolver {
         while let Some(var) = self.propagate_queue.pop_front() {
             let num_clauses = self.clauses.len() + self.learned_clauses.len();
             for ci in 0..num_clauses {
-                let (w_a_lit, w_b_lit, watch_a_idx, watch_b_idx, lits) = if ci < self.clauses.len() {
+                let (w_a_lit, w_b_lit, watch_a_idx, watch_b_idx, lits) = if ci < self.clauses.len()
+                {
                     let c = &self.clauses[ci];
-                    (c.literals[c.watch_a], c.literals[c.watch_b], c.watch_a, c.watch_b, &c.literals as &[i32])
+                    (
+                        c.literals[c.watch_a],
+                        c.literals[c.watch_b],
+                        c.watch_a,
+                        c.watch_b,
+                        &c.literals as &[i32],
+                    )
                 } else {
                     let c = &self.learned_clauses[ci - self.clauses.len()];
-                    (c.literals[c.watch_a], c.literals[c.watch_b], c.watch_a, c.watch_b, &c.literals as &[i32])
+                    (
+                        c.literals[c.watch_a],
+                        c.literals[c.watch_b],
+                        c.watch_a,
+                        c.watch_b,
+                        &c.literals as &[i32],
+                    )
                 };
 
                 // Step 1: If either watch true, clause satisfied
@@ -176,7 +189,11 @@ impl CdclSolver {
                     continue;
                 }
 
-                let other_lit = if to_update.unwrap() == 0 { w_b_lit } else { w_a_lit };
+                let other_lit = if to_update.unwrap() == 0 {
+                    w_b_lit
+                } else {
+                    w_a_lit
+                };
 
                 // Step 3: If other watch true, clause satisfied
                 if self.eval(other_lit) == Some(true) {
@@ -237,16 +254,22 @@ impl CdclSolver {
         let conflict_clause = if conflict_ci < self.clauses.len() {
             &self.clauses[conflict_ci].literals.clone()
         } else {
-            &self.learned_clauses[conflict_ci - self.clauses.len()].literals.clone()
+            &self.learned_clauses[conflict_ci - self.clauses.len()]
+                .literals
+                .clone()
         };
 
         let mut learned = conflict_clause.clone();
-        let mut current_level_count = learned.iter().filter(|&&lit| {
-            let var = lit.abs() as usize;
-            self.trail.iter().find(|e| e.var == var).map_or(false, |e| {
-                e.decision_level == self.decision_level
+        let mut current_level_count = learned
+            .iter()
+            .filter(|&&lit| {
+                let var = lit.abs() as usize;
+                self.trail
+                    .iter()
+                    .find(|e| e.var == var)
+                    .map_or(false, |e| e.decision_level == self.decision_level)
             })
-        }).count();
+            .count();
 
         let mut idx = self.trail.len();
         while current_level_count > 1 && idx > 0 {
@@ -270,7 +293,9 @@ impl CdclSolver {
             let reason_clause = if reason_ci < self.clauses.len() {
                 self.clauses[reason_ci].literals.clone()
             } else {
-                self.learned_clauses[reason_ci - self.clauses.len()].literals.clone()
+                self.learned_clauses[reason_ci - self.clauses.len()]
+                    .literals
+                    .clone()
             };
 
             // Resolution: learned = learned ∪ reason \ {var, -var}
@@ -287,12 +312,16 @@ impl CdclSolver {
             }
             learned = new_learned;
 
-            current_level_count = learned.iter().filter(|&&lit| {
-                let v = lit.abs() as usize;
-                self.trail.iter().find(|e| e.var == v).map_or(false, |e| {
-                    e.decision_level == self.decision_level
+            current_level_count = learned
+                .iter()
+                .filter(|&&lit| {
+                    let v = lit.abs() as usize;
+                    self.trail
+                        .iter()
+                        .find(|e| e.var == v)
+                        .map_or(false, |e| e.decision_level == self.decision_level)
                 })
-            }).count();
+                .count();
         }
 
         // Compute backjump level: highest decision level in learned clause below current
@@ -300,7 +329,9 @@ impl CdclSolver {
         for &lit in &learned {
             let var = lit.abs() as usize;
             if let Some(entry) = self.trail.iter().find(|e| e.var == var) {
-                if entry.decision_level < self.decision_level && entry.decision_level > backjump_level {
+                if entry.decision_level < self.decision_level
+                    && entry.decision_level > backjump_level
+                {
                     backjump_level = entry.decision_level;
                 }
             }
@@ -345,7 +376,10 @@ impl CdclSolver {
 
     /// Enqueue unit clauses from learned clauses at level 0.
     fn enqueue_unit_clauses(&mut self) {
-        let unit_clauses: Vec<(usize, i32)> = self.learned_clauses.iter().enumerate()
+        let unit_clauses: Vec<(usize, i32)> = self
+            .learned_clauses
+            .iter()
+            .enumerate()
             .filter(|(_, c)| c.literals.len() == 1)
             .map(|(ci, c)| (ci + self.clauses.len(), c.literals[0]))
             .collect();
@@ -370,7 +404,8 @@ impl CdclSolver {
         for v in 1..=self.num_vars {
             if self.assignment[v].is_none() {
                 let score = self.activity[v];
-                if score > best_score || (score == best_score && best_var.map_or(true, |bv| v < bv)) {
+                if score > best_score || (score == best_score && best_var.map_or(true, |bv| v < bv))
+                {
                     best_score = score;
                     best_var = Some(v);
                 }
@@ -570,16 +605,21 @@ impl CdclSolver {
         self.telemetry.restart_count = self.restart_count;
         self.telemetry.reduction_count = self.reduction_counter / 2000; // Approximate
         if self.telemetry.decision_count > 0 {
-            self.telemetry.conflict_rate = self.conflict_count as f64 / self.telemetry.decision_count as f64;
+            self.telemetry.conflict_rate =
+                self.conflict_count as f64 / self.telemetry.decision_count as f64;
         }
     }
 
     /// Estimate memory footprint in MB (deterministic heuristic).
     fn estimate_memory_mb(&self) -> usize {
-        let clause_bytes: usize = self.clauses.iter()
+        let clause_bytes: usize = self
+            .clauses
+            .iter()
             .map(|c| c.literals.len() * std::mem::size_of::<i32>())
             .sum();
-        let learned_bytes: usize = self.learned_clauses.iter()
+        let learned_bytes: usize = self
+            .learned_clauses
+            .iter()
             .map(|c| c.literals.len() * std::mem::size_of::<i32>())
             .sum();
         let trail_bytes = self.trail.len() * std::mem::size_of::<TrailEntry>();
@@ -749,7 +789,11 @@ mod tests {
     #[test]
     fn test_drat_output_valid() {
         // Trivial contradiction: (x) and (not x)
-        let instance = DimacsInstance { num_vars: 1, num_clauses: 2, clauses: vec![vec![1], vec![-1]] };
+        let instance = DimacsInstance {
+            num_vars: 1,
+            num_clauses: 2,
+            clauses: vec![vec![1], vec![-1]],
+        };
         let mut solver = CdclSolver::from_dimacs(&instance);
 
         let result = solver.solve();
@@ -774,12 +818,13 @@ mod tests {
         } else {
             "./tools/drat-trim"
         };
-        
+
         // Skip external validation if drat-trim is not installed (CI environments)
         let output = match std::process::Command::new(drat_trim_path)
             .arg(cnf_path)
             .arg(proof_path)
-            .output() {
+            .output()
+        {
             Ok(out) => out,
             Err(_) => {
                 eprintln!("c drat-trim not found, skipping external proof validation");
@@ -791,9 +836,17 @@ mod tests {
 
         let stdout = String::from_utf8_lossy(&output.stdout);
         let stderr = String::from_utf8_lossy(&output.stderr);
-        assert!(output.status.success(), "drat-trim exited with error: {}", stderr);
-        assert!(stdout.contains("s VERIFIED") || stderr.contains("s VERIFIED"),
-            "drat-trim did not verify proof. stdout: {}, stderr: {}", stdout, stderr);
+        assert!(
+            output.status.success(),
+            "drat-trim exited with error: {}",
+            stderr
+        );
+        assert!(
+            stdout.contains("s VERIFIED") || stderr.contains("s VERIFIED"),
+            "drat-trim did not verify proof. stdout: {}, stderr: {}",
+            stdout,
+            stderr
+        );
 
         // Cleanup
         fs::remove_file(proof_path).unwrap();
@@ -802,24 +855,32 @@ mod tests {
 
     #[test]
     fn test_telemetry_collected() {
-        let instance = DimacsInstance { num_vars: 2, num_clauses: 2, clauses: vec![vec![1, 2], vec![-1, -2]] };
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 2,
+            clauses: vec![vec![1, 2], vec![-1, -2]],
+        };
         let mut solver = CdclSolver::from_dimacs(&instance);
-        
+
         let _ = solver.solve();
         let telemetry = solver.telemetry();
-        
+
         assert!(telemetry.clause_db_size > 0);
         assert!(telemetry.decision_count > 0 || telemetry.propagation_count > 0);
     }
 
     #[test]
     fn test_telemetry_memory_pressure() {
-        let instance = DimacsInstance { num_vars: 3, num_clauses: 3, clauses: vec![vec![1, 2], vec![-1, 3], vec![2, -3]] };
+        let instance = DimacsInstance {
+            num_vars: 3,
+            num_clauses: 3,
+            clauses: vec![vec![1, 2], vec![-1, 3], vec![2, -3]],
+        };
         let mut solver = CdclSolver::from_dimacs(&instance);
-        
+
         let _ = solver.solve();
         let telemetry = solver.telemetry();
-        
+
         // Memory pressure should be deterministic and non-zero for non-trivial instances
         assert!(telemetry.clause_db_size > 0);
         assert!(telemetry.clause_db_size >= 3);

@@ -1,4 +1,4 @@
-﻿//! SET-6E: Energy Telemetry Invariant Tests
+//! SET-6E: Energy Telemetry Invariant Tests
 //!
 //! Invariants:
 //!   - energy_telemetry_drift: |E_pmu - E_meter| / E_meter <= 0.01 (per-workload calibration)
@@ -73,11 +73,16 @@ fn test_energy_telemetry_drift_within_1_percent() {
         }
     }
 
-    assert!(all_within,
+    assert!(
+        all_within,
         "Max drift {:.4}% exceeds 1% tolerance across calibrated workloads",
-        max_error * 100.0);
-    assert!(max_error <= 0.01,
-        "Max error {:.4}% exceeds 1%", max_error * 100.0);
+        max_error * 100.0
+    );
+    assert!(
+        max_error <= 0.01,
+        "Max error {:.4}% exceeds 1%",
+        max_error * 100.0
+    );
 }
 
 #[test]
@@ -91,7 +96,11 @@ fn test_ema_filter_convergence() {
     }
 
     let final_drift = ema.drift(model);
-    assert!(final_drift < 0.01, "EMA failed to converge: drift = {:.4}%", final_drift * 100.0);
+    assert!(
+        final_drift < 0.01,
+        "EMA failed to converge: drift = {:.4}%",
+        final_drift * 100.0
+    );
 }
 
 #[test]
@@ -105,8 +114,11 @@ fn test_dvfs_frequency_scaling_error_within_5_percent() {
     let expected_power = original_power * 2.0;
     let error = (new_power - expected_power).abs() / expected_power;
 
-    assert!(error <= 0.05,
-        "DVFS scaling error {:.2}% exceeds 5%", error * 100.0);
+    assert!(
+        error <= 0.05,
+        "DVFS scaling error {:.2}% exceeds 5%",
+        error * 100.0
+    );
 }
 
 #[test]
@@ -118,7 +130,11 @@ fn test_dvfs_voltage_scaling() {
     let power_2v = compute_dynamic_power(&profile_2v);
 
     let ratio = power_2v / power_1v;
-    assert!((ratio - 4.0).abs() < 0.01, "V^2 scaling violated: ratio = {}", ratio);
+    assert!(
+        (ratio - 4.0).abs() < 0.01,
+        "V^2 scaling violated: ratio = {}",
+        ratio
+    );
 }
 
 #[test]
@@ -145,7 +161,9 @@ fn test_byzantine_energy_outlier_rejection() {
     let outlier = 10.0;
     let drift = telemetry.sample(outlier);
 
-    assert!(drift.drift_ratio > 0.01,
+    assert!(
+        drift.drift_ratio > 0.01,
         "Byzantine outlier should cause detectable drift: {:.4}%",
-        drift.drift_ratio * 100.0);
+        drift.drift_ratio * 100.0
+    );
 }

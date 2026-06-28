@@ -1,10 +1,10 @@
-﻿//! SET-5.3: Endurance Harness — N-hour sustained operation validator (accelerated)
+//! SET-5.3: Endurance Harness — N-hour sustained operation validator (accelerated)
 //! Invariant: Zero state divergence or memory leakage over N-hour cycles
 
-use std::time::{Instant, Duration};
-use crate::endurance::memory::MemoryProfiler;
 use crate::endurance::checkpoint::CheckpointEngine;
+use crate::endurance::memory::MemoryProfiler;
 use crate::endurance::telemetry::TelemetryStream;
+use std::time::{Duration, Instant};
 
 /// Endurance test configuration
 #[derive(Debug, Clone)]
@@ -96,7 +96,8 @@ impl EnduranceHarness {
                 self.memory.snapshot(current_heap);
 
                 let entropy = 0.5 + (self.operation_counter as f64).sin() * 0.001; // stable entropy
-                self.checkpoints.seal(entropy, self.operation_counter, current_heap);
+                self.checkpoints
+                    .seal(entropy, self.operation_counter, current_heap);
 
                 next_checkpoint_secs += checkpoint_interval_secs;
             }
@@ -105,7 +106,8 @@ impl EnduranceHarness {
         // Final snapshot and seal
         self.memory.snapshot(current_heap);
         let final_entropy = 0.5 + (self.operation_counter as f64).sin() * 0.001;
-        self.checkpoints.seal(final_entropy, self.operation_counter, current_heap);
+        self.checkpoints
+            .seal(final_entropy, self.operation_counter, current_heap);
 
         // Build report
         let heap_growth = self.memory.growth_rate_per_hour();

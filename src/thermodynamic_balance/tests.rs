@@ -1,5 +1,5 @@
 //! SET-7C: Thermodynamic Workload Balancing — Invariant Tests
-//! 
+//!
 //! Invariants:
 //!   - entropy_zero_for_certain: H = 0 when p = 1 for one outcome
 //!   - entropy_maximum_for_uniform: H = ln(N) for uniform distribution
@@ -22,7 +22,11 @@ fn test_entropy_zero_for_certain_distribution() {
     let engine = EntropyEngine::new();
     let p = vec![1.0, 0.0, 0.0];
     let h = engine.shannon_entropy(&p);
-    assert!(h.abs() < 1e-12, "Entropy of certain distribution must be zero, got {}", h);
+    assert!(
+        h.abs() < 1e-12,
+        "Entropy of certain distribution must be zero, got {}",
+        h
+    );
 }
 
 #[test]
@@ -32,8 +36,13 @@ fn test_entropy_maximum_for_uniform() {
     let p = vec![1.0 / n as f64; n];
     let h = engine.shannon_entropy(&p);
     let expected = (n as f64).ln();
-    assert!((h - expected).abs() < 1e-12,
-        "Uniform entropy should be ln({}) = {}, got {}", n, expected, h);
+    assert!(
+        (h - expected).abs() < 1e-12,
+        "Uniform entropy should be ln({}) = {}, got {}",
+        n,
+        expected,
+        h
+    );
 }
 
 #[test]
@@ -49,7 +58,11 @@ fn test_entropy_convention_zero_times_ln_zero() {
     let engine = EntropyEngine::new();
     let p = vec![0.0, 1.0];
     let h = engine.shannon_entropy(&p);
-    assert!(h.abs() < 1e-12, "0·ln(0) convention must yield 0, got {}", h);
+    assert!(
+        h.abs() < 1e-12,
+        "0·ln(0) convention must yield 0, got {}",
+        h
+    );
 }
 
 // --- KL Divergence Invariants ---
@@ -86,7 +99,10 @@ fn test_kl_divergence_undefined_when_q_zero() {
     let p = vec![0.5, 0.5];
     let q = vec![0.0, 1.0];
     let result = engine.kl_divergence(&p, &q);
-    assert!(result.is_err(), "Zero in Q where P non-zero must return error");
+    assert!(
+        result.is_err(),
+        "Zero in Q where P non-zero must return error"
+    );
 }
 
 // --- Thermal Model Invariants ---
@@ -97,8 +113,12 @@ fn test_thermal_ambient_stability() {
     let temp_before = thermal.temperature();
     thermal.step(0.0, 1.0).unwrap();
     let temp_after = thermal.temperature();
-    assert!((temp_before - temp_after).abs() < 1e-12,
-        "Zero power must not change temperature: {} -> {}", temp_before, temp_after);
+    assert!(
+        (temp_before - temp_after).abs() < 1e-12,
+        "Zero power must not change temperature: {} -> {}",
+        temp_before,
+        temp_after
+    );
 }
 
 #[test]
@@ -112,9 +132,13 @@ fn test_thermal_convergence_to_steady_state() {
     }
 
     let final_temp = thermal.temperature();
-    assert!((final_temp - expected_steady).abs() < 0.01,
+    assert!(
+        (final_temp - expected_steady).abs() < 0.01,
         "Must converge to steady state {} (got {}), error {}",
-        expected_steady, final_temp, (final_temp - expected_steady).abs());
+        expected_steady,
+        final_temp,
+        (final_temp - expected_steady).abs()
+    );
 }
 
 #[test]
@@ -127,9 +151,12 @@ fn test_thermal_higher_power_higher_temp() {
         thermal2.step(10.0, 0.1).unwrap();
     }
 
-    assert!(thermal2.temperature() > thermal1.temperature(),
+    assert!(
+        thermal2.temperature() > thermal1.temperature(),
         "Higher power must produce higher temperature: {} vs {}",
-        thermal2.temperature(), thermal1.temperature());
+        thermal2.temperature(),
+        thermal1.temperature()
+    );
 }
 
 #[test]
@@ -141,9 +168,18 @@ fn test_thermal_negative_dt_error() {
 
 #[test]
 fn test_thermal_invalid_construction_error() {
-    assert!(ThermalModel::new(0.0, 10.0, 1.0).is_err(), "Zero ambient must error");
-    assert!(ThermalModel::new(300.0, 0.0, 1.0).is_err(), "Zero resistance must error");
-    assert!(ThermalModel::new(300.0, 10.0, 0.0).is_err(), "Zero capacitance must error");
+    assert!(
+        ThermalModel::new(0.0, 10.0, 1.0).is_err(),
+        "Zero ambient must error"
+    );
+    assert!(
+        ThermalModel::new(300.0, 0.0, 1.0).is_err(),
+        "Zero resistance must error"
+    );
+    assert!(
+        ThermalModel::new(300.0, 10.0, 0.0).is_err(),
+        "Zero capacitance must error"
+    );
 }
 
 // --- Workload Drift Invariants ---
@@ -181,12 +217,18 @@ fn test_drift_magnitude_finite() {
     let observed = vec![0.1, 0.1, 0.1, 0.7];
     let mag = detector.drift_magnitude(&expected, &observed).unwrap();
     assert!(mag.is_finite(), "Drift magnitude must be finite");
-    assert!(mag > 0.0, "Drift magnitude must be positive for different distributions");
+    assert!(
+        mag > 0.0,
+        "Drift magnitude must be positive for different distributions"
+    );
 }
 
 #[test]
 fn test_drift_detector_invalid_threshold_error() {
-    assert!(WorkloadDriftDetector::new(-0.1).is_err(), "Negative threshold must error");
+    assert!(
+        WorkloadDriftDetector::new(-0.1).is_err(),
+        "Negative threshold must error"
+    );
 }
 
 // --- Determinism Invariant ---

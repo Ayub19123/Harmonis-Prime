@@ -6,8 +6,8 @@
 /// Thermal parameters for a single domain
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ThermalParams {
-    pub ambient_temp: f64,      // K
-    pub thermal_resistance: f64, // K/W
+    pub ambient_temp: f64,        // K
+    pub thermal_resistance: f64,  // K/W
     pub thermal_capacitance: f64, // J/K
 }
 
@@ -63,8 +63,8 @@ impl DomainThermalModel {
         let tau = r * c;
         let exp_factor = (-dt / tau).exp();
 
-        self.current_temp = t_amb + steady_rise
-            + (self.current_temp - t_amb - steady_rise) * exp_factor;
+        self.current_temp =
+            t_amb + steady_rise + (self.current_temp - t_amb - steady_rise) * exp_factor;
 
         Ok(())
     }

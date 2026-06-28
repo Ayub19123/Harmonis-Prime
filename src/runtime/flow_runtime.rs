@@ -1,4 +1,4 @@
-﻿use crate::governance::gdo::ResourceAllocation;
+use crate::governance::gdo::ResourceAllocation;
 use crate::hal::atomic_boot::HardwareBindings;
 use std::time::Instant;
 
@@ -50,8 +50,8 @@ impl FlowRuntime {
             flow_state: FlowState::Initializing,
             topology: ExecutionTopology {
                 active_threads: cpu_threads,
-            #[allow(dead_code)]
-            bindings: bindings_clone.clone(),
+                #[allow(dead_code)]
+                bindings: bindings_clone.clone(),
                 memory_pressure: 0.0,
                 thermal_pressure: 0.0,
                 throughput_estimate: 0.0,
@@ -149,5 +149,3 @@ impl FlowRuntime {
         self.start_time.elapsed().as_secs_f64()
     }
 }
-
-

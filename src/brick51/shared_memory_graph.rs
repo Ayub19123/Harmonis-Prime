@@ -1,4 +1,4 @@
-﻿//! BRICK-51 Layer 1: Shared Memory Graph
+//! BRICK-51 Layer 1: Shared Memory Graph
 //! Distributed key-value store with causal consistency
 //! CMF-511: Consistency Ã¢â€°Â¥99.99% across 10 nodes, 10,000 KV pairs
 
@@ -85,5 +85,3 @@ impl SharedMemoryGraph {
         )
     }
 }
-
-

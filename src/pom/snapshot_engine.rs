@@ -1,4 +1,4 @@
-﻿use crate::pom::operational_memory::Snapshot;
+use crate::pom::operational_memory::Snapshot;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
@@ -87,5 +87,3 @@ impl SnapshotEngine {
         self.compaction_threshold_entries = threshold;
     }
 }
-
-

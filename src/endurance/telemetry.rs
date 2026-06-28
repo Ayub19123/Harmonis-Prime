@@ -1,4 +1,4 @@
-﻿//! SET-5.3: Telemetry Stream
+//! SET-5.3: Telemetry Stream
 
 use std::time::Instant;
 
@@ -31,7 +31,13 @@ impl TelemetryStream {
         }
     }
 
-    pub fn record(&mut self, operation_id: u64, latency_micros: u64, energy_joules: f64, success: bool) {
+    pub fn record(
+        &mut self,
+        operation_id: u64,
+        latency_micros: u64,
+        energy_joules: f64,
+        success: bool,
+    ) {
         let record = TelemetryRecord {
             timestamp: Instant::now(),
             operation_id,
@@ -49,10 +55,18 @@ impl TelemetryStream {
     }
 
     pub fn avg_latency_micros(&self) -> f64 {
-        if self.total_operations == 0 { 0.0 } else { self.total_latency_micros as f64 / self.total_operations as f64 }
+        if self.total_operations == 0 {
+            0.0
+        } else {
+            self.total_latency_micros as f64 / self.total_operations as f64
+        }
     }
 
     pub fn success_rate(&self) -> f64 {
-        if self.records.is_empty() { 1.0 } else { self.records.iter().filter(|r| r.success).count() as f64 / self.records.len() as f64 }
+        if self.records.is_empty() {
+            1.0
+        } else {
+            self.records.iter().filter(|r| r.success).count() as f64 / self.records.len() as f64
+        }
     }
 }

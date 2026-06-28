@@ -1,4 +1,4 @@
-﻿use std::sync::atomic::AtomicU64;
+use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
 
 /// Physical node abstraction for air-gapped cluster simulation
@@ -24,7 +24,7 @@ impl PhysicalNode {
     }
 
     /// Activate network interface (for testing only)
-        pub fn activate_network(&mut self) {
+    pub fn activate_network(&mut self) {
         self.network_interface_active = true;
     }
 
@@ -33,5 +33,3 @@ impl PhysicalNode {
         self.network_interface_active = false;
     }
 }
-
-

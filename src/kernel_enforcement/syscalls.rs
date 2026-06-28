@@ -1,4 +1,4 @@
-﻿#![allow(dead_code)]
+#![allow(dead_code)]
 
 //! Syscall interception for airgap enforcement
 //! Filters connect(), sendto(), socket() before kernel network stack
@@ -68,5 +68,3 @@ impl SyscallFilter {
         self.active
     }
 }
-
-

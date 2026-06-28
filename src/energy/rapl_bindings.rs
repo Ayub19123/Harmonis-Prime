@@ -2,17 +2,17 @@
 //! Invariant: Hardware-measured joules correlate with software-estimated JLO
 //! Platform: Linux (intel-rapl sysfs interface). Windows uses software fallback.
 
-use std::time::Instant;
 use crate::energy::monitor::{EnergyMonitor, EnergySample, JloReport};
+use std::time::Instant;
 
 /// RAPL domain identifiers for Intel processors
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum RaplDomain {
-    Package,      // Entire CPU package
-    Core,         // CPU cores only
-    Uncore,       // GPU / uncore logic
-    Dram,         // Memory controller
-    Psu,          // Platform / PSU level
+    Package, // Entire CPU package
+    Core,    // CPU cores only
+    Uncore,  // GPU / uncore logic
+    Dram,    // Memory controller
+    Psu,     // Platform / PSU level
 }
 
 impl RaplDomain {
@@ -31,7 +31,7 @@ impl RaplDomain {
 #[derive(Debug, Clone)]
 pub struct RaplReading {
     pub domain: RaplDomain,
-    pub energy_uj: u64,          // Microjoules since boot
+    pub energy_uj: u64, // Microjoules since boot
     pub timestamp: Instant,
     pub max_energy_range_uj: u64, // Wraparound threshold
 }
@@ -117,8 +117,8 @@ impl EnergyMonitor for RaplHardwareMonitor {
                 let joules = if let Some(ref baseline) = self.baseline {
                     if self.detect_wraparound(&reading, baseline) {
                         // Handle wraparound: add max range to delta
-                        let wrapped_delta = reading.energy_uj +
-                            (reading.max_energy_range_uj - baseline.energy_uj);
+                        let wrapped_delta =
+                            reading.energy_uj + (reading.max_energy_range_uj - baseline.energy_uj);
                         wrapped_delta as f64 / 1_000_000.0
                     } else {
                         (reading.energy_uj - baseline.energy_uj) as f64 / 1_000_000.0
@@ -155,7 +155,8 @@ impl EnergyMonitor for RaplHardwareMonitor {
     fn report(&self) -> JloReport {
         let total_joules: f64 = self.samples.iter().map(|s| s.joules).sum();
         let total_ops = self.samples.len() as u64;
-        let total_duration_micros: f64 = self.samples
+        let total_duration_micros: f64 = self
+            .samples
             .iter()
             .map(|s| s.duration.as_micros() as f64)
             .sum();
@@ -212,7 +213,9 @@ impl JloCorrelation {
         let mean_s = sum_s / n;
         let mean_h = sum_h / n;
 
-        let covariance: f64 = software.iter().zip(hardware.iter())
+        let covariance: f64 = software
+            .iter()
+            .zip(hardware.iter())
             .map(|(s, h)| (s - mean_s) * (h - mean_h))
             .sum();
 

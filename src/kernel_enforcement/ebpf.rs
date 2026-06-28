@@ -1,12 +1,12 @@
-﻿//! eBPF dev_queue_xmit drop filter
+//! eBPF dev_queue_xmit drop filter
 //! Drops all packets at XDP layer (before kernel network stack)
 
 /// eBPF program type for airgap enforcement
 #[derive(Debug, Clone, Copy)]
 pub enum EbpfProgramType {
-    XdpDrop,        // Drop at driver level
-    TCIngress,      // Traffic control ingress
-    TCEgress,       // Traffic control egress (before wire)
+    XdpDrop,   // Drop at driver level
+    TCIngress, // Traffic control ingress
+    TCEgress,  // Traffic control egress (before wire)
 }
 
 /// Kernel-space packet inspection result
@@ -75,4 +75,3 @@ impl EbpfAirgapEnforcer {
         KernelFilterResult::Drop("eBPF airgap: all egress denied at kernel level")
     }
 }
-

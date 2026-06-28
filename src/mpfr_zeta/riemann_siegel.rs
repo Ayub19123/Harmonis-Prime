@@ -1,4 +1,4 @@
-﻿//! M2.3.1: Riemann-Siegel Z(t) Formula â€“ Order-0
+//! M2.3.1: Riemann-Siegel Z(t) Formula â€“ Order-0
 //!
 //! ACHIEVED (M2.3.1):
 //! - Order-0 Riemann-Siegel fallback: |Z(tâ‚)| â‰ˆ 1.02 (22Ã— improvement over Dirichlet)
@@ -24,7 +24,9 @@
 use std::f64::consts::PI;
 
 pub fn rs_theta(t: f64) -> f64 {
-    if t <= 0.0 { return 0.0; }
+    if t <= 0.0 {
+        return 0.0;
+    }
     let t_2pi = t / (2.0 * PI);
     let leading = (t / 2.0) * t_2pi.ln() - (t / 2.0) - (PI / 8.0);
     let corr1 = 1.0 / (48.0 * t);
@@ -34,7 +36,9 @@ pub fn rs_theta(t: f64) -> f64 {
 
 /// Order-0 remainder â€“ optimal for f64 fallback at small t.
 fn rs_remainder_order0(_t: f64, n: usize, p: f64) -> f64 {
-    if n == 0 { return 0.0; }
+    if n == 0 {
+        return 0.0;
+    }
     let n_f = n as f64;
     let phi = p - 0.5;
     let cos_term = (2.0 * PI * (phi * phi + 0.125)).cos();
@@ -47,12 +51,16 @@ fn rs_remainder_order0(_t: f64, n: usize, p: f64) -> f64 {
 }
 
 pub fn hardy_z(t: f64) -> f64 {
-    if t.abs() < 1e-9 { return -0.5; }
+    if t.abs() < 1e-9 {
+        return -0.5;
+    }
     let abs_t = t.abs();
     let tau = abs_t / (2.0 * PI);
     let tau_sqrt = tau.sqrt();
     let upper_n = tau_sqrt.floor() as usize;
-    if upper_n == 0 { return 0.0; }
+    if upper_n == 0 {
+        return 0.0;
+    }
     let theta = rs_theta(abs_t);
     let mut main_sum = 0.0f64;
     for n in 1..=upper_n {
@@ -67,7 +75,9 @@ pub fn hardy_z(t: f64) -> f64 {
 }
 
 pub fn zeta_from_hardy_z(t: f64) -> (f64, f64) {
-    if t <= 0.0 { return (-1.4603545088, 0.0); }
+    if t <= 0.0 {
+        return (-1.4603545088, 0.0);
+    }
     let theta = rs_theta(t);
     let z = hardy_z(t);
     (z * theta.cos(), -z * theta.sin())
@@ -89,8 +99,11 @@ mod tests {
         let val = hardy_z(t1);
         println!(">>> ORDER-0 |Z(tâ‚)| = {}", val.abs());
         // Measured: ~1.02 (22Ã— improvement over Dirichlet)
-        assert!(val.abs() < 1.2,
-            "Order-0 |Z(tâ‚)| = {} exceeds 1.2 tolerance", val.abs());
+        assert!(
+            val.abs() < 1.2,
+            "Order-0 |Z(tâ‚)| = {} exceeds 1.2 tolerance",
+            val.abs()
+        );
     }
 
     #[test]

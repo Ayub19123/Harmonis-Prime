@@ -1,4 +1,4 @@
-﻿//! SET-5.2: RAPL Hardware-in-the-Loop Invariant Tests
+//! SET-5.2: RAPL Hardware-in-the-Loop Invariant Tests
 
 use sovereign_core::energy::rapl_bindings::JloCorrelation;
 
@@ -23,11 +23,14 @@ fn perfect_correlation_invariant() {
 
 #[test]
 fn rapl_fallback_on_windows() {
-    use sovereign_core::energy::rapl_bindings::{RaplHardwareMonitor, RaplDomain};
     use sovereign_core::energy::monitor::EnergyMonitor;
+    use sovereign_core::energy::rapl_bindings::{RaplDomain, RaplHardwareMonitor};
     let mut monitor = RaplHardwareMonitor::new(RaplDomain::Package);
     let sample = monitor.sample("test_op");
-    assert_eq!(sample.joules, 0.0, "Non-Linux RAPL should report 0.0 joules");
+    assert_eq!(
+        sample.joules, 0.0,
+        "Non-Linux RAPL should report 0.0 joules"
+    );
     let report = monitor.report();
     assert_eq!(report.total_joules, 0.0, "Total joules should be 0.0");
     // On Windows, no samples are recorded because reading returns None, so total_operations may be 0

@@ -2,11 +2,11 @@
 //! Zero external dependency validation for sovereign computation.
 //! Invariant: No network, cloud, or external API calls during execution.
 
-use std::time::Instant;
-use crate::mesh::dag::{CognitiveMesh, Message, MessageId, NodeId};
-use crate::thermo::entropy::{EntropyTracker, ThermodynamicState};
-use crate::quantum::approximation::QuantumStateBuilder;
 use crate::energy::monitor::{EnergyMonitor, SoftwareEnergyMonitor};
+use crate::mesh::dag::{CognitiveMesh, Message, MessageId, NodeId};
+use crate::quantum::approximation::QuantumStateBuilder;
+use crate::thermo::entropy::{EntropyTracker, ThermodynamicState};
+use std::time::Instant;
 
 /// Audit log entry for external operations
 #[derive(Debug, Clone, PartialEq)]
@@ -139,10 +139,13 @@ impl SovereignEnvironment {
     }
 
     /// Execute a full sovereignty heartbeat with synthetic data
-    pub fn heartbeat(&mut self, dataset: &SyntheticDataset) -> Result<SovereigntyReport, SovereigntyError> {
+    pub fn heartbeat(
+        &mut self,
+        dataset: &SyntheticDataset,
+    ) -> Result<SovereigntyReport, SovereigntyError> {
         if !self.barrier.verify_airgapped() {
             return Err(SovereigntyError::HeartbeatFailed(
-                "Environment not sealed or isolation violated".to_string()
+                "Environment not sealed or isolation violated".to_string(),
             ));
         }
 
@@ -182,7 +185,7 @@ impl SovereignEnvironment {
                 if let Ok(state) = QuantumStateBuilder::new()
                     .add_basis_state(1.0 / 2.0_f64.sqrt(), 0.0)
                     .add_basis_state(1.0 / 2.0_f64.sqrt(), 0.0)
-                    .build("superposition") 
+                    .build("superposition")
                 {
                     let result = state.collapse(dataset.quantum_seeds[i]);
                     hasher.consume(&result.selected_index.to_le_bytes());

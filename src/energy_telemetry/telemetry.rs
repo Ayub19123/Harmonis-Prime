@@ -1,25 +1,33 @@
 //! SET-6E: Software PMU Simulation, EMA Filter, DVFS Model
-//! 
+//!
 //! Phase 1 (x86_64): Deterministic timers, synthetic workload profiles
 //! Phase 2 (ARM): Real CoreSight PMU integration
 
 /// DVFS profile: voltage and frequency operating point
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct DvfsProfile {
-    pub voltage_v: f64,      // Volts
-    pub frequency_hz: f64,   // Hz
-    pub capacitance_f: f64,  // Farads (simplified)
+    pub voltage_v: f64,     // Volts
+    pub frequency_hz: f64,  // Hz
+    pub capacitance_f: f64, // Farads (simplified)
 }
 
 impl DvfsProfile {
-    pub fn new(voltage_v: f64, frequency_hz: f64, capacitance_f: f64) -> Result<Self, &'static str> {
+    pub fn new(
+        voltage_v: f64,
+        frequency_hz: f64,
+        capacitance_f: f64,
+    ) -> Result<Self, &'static str> {
         if voltage_v <= 0.0 || frequency_hz <= 0.0 || capacitance_f <= 0.0 {
             return Err("DVFS parameters must be positive");
         }
         if !voltage_v.is_finite() || !frequency_hz.is_finite() || !capacitance_f.is_finite() {
             return Err("DVFS parameters must be finite");
         }
-        Ok(Self { voltage_v, frequency_hz, capacitance_f })
+        Ok(Self {
+            voltage_v,
+            frequency_hz,
+            capacitance_f,
+        })
     }
 }
 
@@ -32,8 +40,8 @@ pub fn compute_dynamic_power(profile: &DvfsProfile) -> f64 {
 /// E_t = alpha * E_measured + (1-alpha) * E_model
 #[derive(Debug, Clone)]
 pub struct EmaFilter {
-    pub alpha: f64,           // smoothing factor (0.0 - 1.0)
-    pub ema_value: f64,       // current filtered value
+    pub alpha: f64,     // smoothing factor (0.0 - 1.0)
+    pub ema_value: f64, // current filtered value
 }
 
 impl EmaFilter {
@@ -44,7 +52,10 @@ impl EmaFilter {
         if !alpha.is_finite() || !initial_value.is_finite() {
             return Err("Parameters must be finite");
         }
-        Ok(Self { alpha, ema_value: initial_value })
+        Ok(Self {
+            alpha,
+            ema_value: initial_value,
+        })
     }
 
     /// Apply EMA filter to new measurement
@@ -118,7 +129,7 @@ pub struct EnergyTelemetry {
     pub profile: DvfsProfile,
     pub ema: EmaFilter,
     pub pmu: PmuSimulator,
-    pub power_model: f64,  // theoretical baseline
+    pub power_model: f64, // theoretical baseline
 }
 
 impl EnergyTelemetry {
@@ -126,7 +137,7 @@ impl EnergyTelemetry {
         let ema = EmaFilter::new(alpha, initial_power)?;
         let pmu = PmuSimulator::new();
         let power_model = compute_dynamic_power(&profile);
-        
+
         Ok(Self {
             profile,
             ema,
@@ -139,7 +150,7 @@ impl EnergyTelemetry {
     pub fn sample(&mut self, measured_power: f64) -> TelemetryDrift {
         let _filtered = self.ema.update(measured_power, self.power_model);
         let drift_ratio = self.ema.drift(self.power_model);
-        
+
         TelemetryDrift {
             measured: measured_power,
             model: self.power_model,
@@ -228,9 +239,11 @@ impl Workload {
                 Workload::Ramping => {
                     let ramp = (i as f64 / num_samples as f64).min(1.0);
                     let scale = 1.0 + ramp * 4.0;
-                    ((base_cycles as f64 * scale) as u64,
-                     (base_misses as f64 * scale) as u64,
-                     (base_mem as f64 * scale) as u64)
+                    (
+                        (base_cycles as f64 * scale) as u64,
+                        (base_misses as f64 * scale) as u64,
+                        (base_mem as f64 * scale) as u64,
+                    )
                 }
             };
             counters.push((cycles, misses, mem));
@@ -249,7 +262,11 @@ pub struct PowerModel {
 
 impl PowerModel {
     pub fn new(cycle_energy_j: f64, cache_miss_energy_j: f64, memory_energy_j: f64) -> Self {
-        Self { cycle_energy_j, cache_miss_energy_j, memory_energy_j }
+        Self {
+            cycle_energy_j,
+            cache_miss_energy_j,
+            memory_energy_j,
+        }
     }
 
     /// Estimate power from a single counter sample.
@@ -272,7 +289,11 @@ impl PmuEstimator {
         if alpha < 0.0 || alpha > 1.0 {
             return Err("Alpha must be in [0.0, 1.0]");
         }
-        Ok(Self { model, alpha, ema_power: 0.0 })
+        Ok(Self {
+            model,
+            alpha,
+            ema_power: 0.0,
+        })
     }
 
     /// Estimate total energy from PMU counter stream.
@@ -299,7 +320,11 @@ impl PhysicalMeter {
         if adc_bits == 0 || adc_bits > 32 {
             return Err("ADC bits must be in [1, 32]");
         }
-        Ok(Self { adc_bits, sampling_jitter, seed })
+        Ok(Self {
+            adc_bits,
+            sampling_jitter,
+            seed,
+        })
     }
 
     /// Measure energy by integrating V·I over time with ADC effects.

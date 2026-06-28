@@ -6,11 +6,11 @@
 /// RAPL domain identifiers for Intel/AMD processors
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum RaplDomain {
-    Package,  // Entire CPU package
-    Core,     // CPU cores only
-    Uncore,   // GPU / uncore logic
-    Dram,     // Memory controller
-    Psu,      // Platform / PSU level
+    Package, // Entire CPU package
+    Core,    // CPU cores only
+    Uncore,  // GPU / uncore logic
+    Dram,    // Memory controller
+    Psu,     // Platform / PSU level
 }
 
 impl RaplDomain {
@@ -18,10 +18,10 @@ impl RaplDomain {
     pub fn sysfs_path(&self) -> &'static str {
         match self {
             RaplDomain::Package => "intel-rapl:0",
-            RaplDomain::Core    => "intel-rapl:0:0",
-            RaplDomain::Uncore  => "intel-rapl:0:1",
-            RaplDomain::Dram    => "intel-rapl:0:2",
-            RaplDomain::Psu     => "intel-rapl:0:3",
+            RaplDomain::Core => "intel-rapl:0:0",
+            RaplDomain::Uncore => "intel-rapl:0:1",
+            RaplDomain::Dram => "intel-rapl:0:2",
+            RaplDomain::Psu => "intel-rapl:0:3",
         }
     }
 
@@ -46,10 +46,7 @@ pub struct MultiDomainRapl {
 impl MultiDomainRapl {
     pub fn new() -> Self {
         Self {
-            domains: RaplDomain::all()
-                .iter()
-                .map(|&d| (d, 0.0))
-                .collect(),
+            domains: RaplDomain::all().iter().map(|&d| (d, 0.0)).collect(),
         }
     }
 

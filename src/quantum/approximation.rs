@@ -2,7 +2,6 @@
 //! Non-binary probabilistic state distributions for cognitive decision-making
 //! |ψ⟩ = α|0⟩ + β|1⟩ where |α|² + |β|² = 1
 
-
 /// Quantum amplitude: complex probability amplitude
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Amplitude {
@@ -64,10 +63,10 @@ impl QuantumState {
     /// Uses weighted random selection based on |α_i|²
     pub fn collapse(&self, seed: u64) -> CollapseResult {
         let start = std::time::Instant::now();
-        
+
         let probs: Vec<f64> = self.amplitudes.iter().map(|a| a.probability()).collect();
         let total: f64 = probs.iter().sum();
-        
+
         // Deterministic pseudo-random for reproducibility
         let mut rng = seed;
         let roll = loop {
@@ -106,7 +105,11 @@ impl QuantumState {
             .iter()
             .map(|a| {
                 let p = a.probability();
-                if p > 0.0 { -p * p.ln() } else { 0.0 }
+                if p > 0.0 {
+                    -p * p.ln()
+                } else {
+                    0.0
+                }
             })
             .sum()
     }
@@ -115,10 +118,18 @@ impl QuantumState {
     pub fn interpolate(&self, other: &Self, t: f64) -> Self {
         let n = self.amplitudes.len().max(other.amplitudes.len());
         let mut new_amps = Vec::with_capacity(n);
-        
+
         for i in 0..n {
-            let a = self.amplitudes.get(i).copied().unwrap_or(Amplitude::new(0.0, 0.0));
-            let b = other.amplitudes.get(i).copied().unwrap_or(Amplitude::new(0.0, 0.0));
+            let a = self
+                .amplitudes
+                .get(i)
+                .copied()
+                .unwrap_or(Amplitude::new(0.0, 0.0));
+            let b = other
+                .amplitudes
+                .get(i)
+                .copied()
+                .unwrap_or(Amplitude::new(0.0, 0.0));
             new_amps.push(Amplitude::new(
                 a.real * (1.0 - t) + b.real * t,
                 a.imag * (1.0 - t) + b.imag * t,
@@ -149,7 +160,9 @@ pub struct QuantumStateBuilder {
 
 impl QuantumStateBuilder {
     pub fn new() -> Self {
-        Self { amplitudes: Vec::new() }
+        Self {
+            amplitudes: Vec::new(),
+        }
     }
 
     pub fn add_basis_state(mut self, real: f64, imag: f64) -> Self {

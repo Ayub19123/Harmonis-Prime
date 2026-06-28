@@ -51,7 +51,7 @@ impl ThermodynamicState {
     pub fn verify_monotonic_decrease(&self, previous: &Self) -> Result<(), ThermoError> {
         let current_h = self.shannon_entropy();
         let previous_h = previous.shannon_entropy();
-        
+
         if current_h > previous_h {
             return Err(ThermoError::EntropyIncreased {
                 current: current_h,
@@ -67,7 +67,7 @@ impl ThermodynamicState {
         let h = self.shannon_entropy();
         let landauer = self.landauer_energy(temperature_k);
         let bits = h;
-        
+
         let is_monotonic = if let Some(prev) = previous {
             self.verify_monotonic_decrease(prev).is_ok()
         } else {
@@ -87,11 +87,15 @@ impl ThermodynamicState {
 #[derive(Debug, thiserror::Error)]
 pub enum ThermoError {
     #[error("Entropy increased: {current:.6} > {previous:.6} (delta: +{delta:.6})")]
-    EntropyIncreased { current: f64, previous: f64, delta: f64 },
-    
+    EntropyIncreased {
+        current: f64,
+        previous: f64,
+        delta: f64,
+    },
+
     #[error("Invalid probability distribution: sum = {sum}, expected 1.0")]
     InvalidDistribution { sum: f64 },
-    
+
     #[error("Temperature must be positive: {0}")]
     InvalidTemperature(f64),
 }
@@ -118,7 +122,7 @@ impl EntropyTracker {
         if let Some(last) = self.states.last() {
             state.verify_monotonic_decrease(last)?;
         }
-        
+
         let report = state.report(self.temperature_k, self.states.last());
         self.states.push(state);
         Ok(report)

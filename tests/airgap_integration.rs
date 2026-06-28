@@ -1,4 +1,4 @@
-﻿//! SET-6A integration test — 3-node cluster simulation
+//! SET-6A integration test — 3-node cluster simulation
 
 use sovereign_core::airgap::mesh::Mesh;
 use sovereign_core::airgap::node::PhysicalNode;
@@ -30,7 +30,10 @@ fn test_three_node_cluster_partition_recovery() {
 
     // Partition 1 node — quorum STILL holds (2 > 1.5)
     mesh.partition_node(1).unwrap();
-    assert!(mesh.has_quorum(), "Partitioning 1 of 3 must NOT break quorum");
+    assert!(
+        mesh.has_quorum(),
+        "Partitioning 1 of 3 must NOT break quorum"
+    );
     assert_eq!(mesh.active_node_count(), 2);
 
     // Partition 2nd node — quorum BREAKS (1 > 1.5 is FALSE)

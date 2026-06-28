@@ -1,9 +1,9 @@
 //! SET-5.1: Sovereign Node — Individual node in distributed simulation
 //! Invariant: Each node maintains local DAG consistency with global convergence
 
-use std::time::Instant;
-use crate::mesh::dag::{CognitiveMesh, Message, MessageId, NodeId, DagReceipt, DagError};
+use crate::mesh::dag::{CognitiveMesh, DagError, DagReceipt, Message, MessageId, NodeId};
 use crate::thermo::entropy::{EntropyTracker, ThermodynamicState};
+use std::time::Instant;
 
 /// Node state in the distributed simulation
 #[derive(Debug, Clone)]
@@ -29,11 +29,14 @@ pub struct NodeTelemetry {
 }
 
 impl NodeState {
-    pub fn new(node_id: NodeId, genesis: Message) -> Result<Self, crate::thermo::entropy::ThermoError> {
+    pub fn new(
+        node_id: NodeId,
+        genesis: Message,
+    ) -> Result<Self, crate::thermo::entropy::ThermoError> {
         let mesh = CognitiveMesh::new(genesis).map_err(|_| {
             crate::thermo::entropy::ThermoError::InvalidTemperature(0.0) // placeholder
         })?;
-        
+
         Ok(Self {
             node_id,
             mesh,
@@ -46,12 +49,15 @@ impl NodeState {
     }
 
     /// Append message to local DAG with telemetry
-    pub fn process_message(&mut self, msg: Message) -> Result<(DagReceipt, NodeTelemetry), DagError> {
+    pub fn process_message(
+        &mut self,
+        msg: Message,
+    ) -> Result<(DagReceipt, NodeTelemetry), DagError> {
         let start = Instant::now();
-        
+
         let result = self.mesh.append_message(msg);
         let latency = start.elapsed();
-        
+
         let telemetry = NodeTelemetry {
             node_id: self.node_id,
             operation: "dag_append".to_string(),
@@ -60,17 +66,20 @@ impl NodeState {
             success: result.is_ok(),
             timestamp: Instant::now(),
         };
-        
+
         if let Ok(ref receipt) = result {
             self.message_log.push(receipt.message_id);
             self.last_heartbeat = Instant::now();
         }
-        
+
         result.map(|r| (r, telemetry))
     }
 
     /// Record entropy state for thermodynamic tracking
-    pub fn record_entropy(&mut self, state: ThermodynamicState) -> Result<(), crate::thermo::entropy::ThermoError> {
+    pub fn record_entropy(
+        &mut self,
+        state: ThermodynamicState,
+    ) -> Result<(), crate::thermo::entropy::ThermoError> {
         self.entropy_tracker.record(state)?;
         Ok(())
     }

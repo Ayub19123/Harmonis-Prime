@@ -1,24 +1,24 @@
 //! Backlund-Type Truncation Bound
-//! 
+//!
 //! ACHIEVED:
 //! - Monotonically decreasing bound as N increases (verified by test)
 //! - Explicit formula for remainder after N terms of Dirichlet series
 //! - Deterministic: same N, same t → same bound, bit-exact
-//! 
+//!
 //! LIMITATION:
 //! - This is an upper bound, not the exact remainder. Actual error may be smaller.
 //! - Bound becomes loose for large t (t > 10^6). Phase 3 will implement Riemann-Siegel.
 //! - Assumes Dirichlet series convergence. Does not apply to Riemann-Siegel formula.
 //! - No formal proof that bound is tight — only numerical monotonicity verification.
-//! 
+//!
 //! Reference: Backlund (1914) on zeros of ζ(s); Edwards "Riemann's Zeta Function" Ch. 6
 
 /// Backlund-type truncation bound for Dirichlet series remainder.
-/// 
+///
 /// For ζ(s) = Σ_{n=1}^N n^{-s} + R_N(s), where s = ½ + it,
 /// the remainder is bounded by integral approximation:
 /// |R_N(s)| ≤ (1/σ) · N^{-σ} where σ = Re(s) = ½
-/// 
+///
 /// LIMITATION: This is the crude integral bound. The Euler-Maclaurin refinement
 /// is not yet implemented (M2.2 scope).
 pub fn truncation_bound_dirichlet(n: u64, t: f64) -> f64 {
@@ -30,7 +30,7 @@ pub fn truncation_bound_dirichlet(n: u64, t: f64) -> f64 {
 }
 
 /// Truncation bound for the Riemann-Siegel theta function remainder.
-/// 
+///
 /// LIMITATION: Placeholder. Real implementation requires Odlyzko dataset (M2.2).
 pub fn truncation_bound_theta(_n: u64, _t: f64) -> f64 {
     // LIMITATION: Riemann-Siegel formula not yet implemented.
@@ -54,7 +54,10 @@ mod tests {
             assert!(
                 bound < prev_bound,
                 "Truncation bound must decrease with N: bound({}) = {} >= bound({}) = {}",
-                n, bound, n / 2, prev_bound
+                n,
+                bound,
+                n / 2,
+                prev_bound
             );
             prev_bound = bound;
         }
@@ -77,7 +80,12 @@ mod tests {
     fn test_truncation_positive() {
         for n in [1, 10, 100, 1000, 10000] {
             let bound = truncation_bound_dirichlet(n, 100.0);
-            assert!(bound > 0.0, "Truncation bound must be positive, got {} at N={}", bound, n);
+            assert!(
+                bound > 0.0,
+                "Truncation bound must be positive, got {} at N={}",
+                bound,
+                n
+            );
         }
     }
 

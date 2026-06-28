@@ -1,10 +1,10 @@
 //! SET-6D: Min-Plus Network Calculus - Deterministic Latency Bounds
-//! 
+//!
 //! Mathematical model:
 //!   Arrival curve alpha(t) = rate * t + burst  (affine, sub-additive)
 //!   Service curve beta(t)  = rate * t          (strict service)
 //!   Delay bound W = horizontal deviation
-//! 
+//!
 //! For strict service curves: W = burst / service_rate
 
 use std::f64;
@@ -71,7 +71,10 @@ impl ServiceCurve {
     }
 }
 
-pub fn compute_delay_bound(arrival: &ArrivalCurve, service: &ServiceCurve) -> Result<DelayBound, &'static str> {
+pub fn compute_delay_bound(
+    arrival: &ArrivalCurve,
+    service: &ServiceCurve,
+) -> Result<DelayBound, &'static str> {
     if service.rate <= arrival.rate {
         return Err("Service rate must exceed arrival rate for stability");
     }

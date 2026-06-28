@@ -1,6 +1,6 @@
-﻿//! SET-5.3: Memory Profiler — Heap growth tracking
+//! SET-5.3: Memory Profiler — Heap growth tracking
 
-use std::time::{Instant, Duration};
+use std::time::{Duration, Instant};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct MemorySnapshot {
@@ -30,7 +30,10 @@ impl MemoryProfiler {
     }
 
     pub fn snapshot(&mut self, heap_bytes: usize) -> MemorySnapshot {
-        let snap = MemorySnapshot { heap_bytes, timestamp: Instant::now() };
+        let snap = MemorySnapshot {
+            heap_bytes,
+            timestamp: Instant::now(),
+        };
         if self.baseline.is_none() {
             self.baseline = Some(snap);
         }
@@ -39,12 +42,21 @@ impl MemoryProfiler {
     }
 
     pub fn growth_rate_per_hour(&self) -> f64 {
-        if self.snapshots.len() < 2 { return 0.0; }
+        if self.snapshots.len() < 2 {
+            return 0.0;
+        }
         let baseline = self.baseline.unwrap();
         let latest = self.snapshots.last().unwrap();
-        let elapsed_hours = latest.timestamp.duration_since(baseline.timestamp).as_secs_f64() / 3600.0;
-        if elapsed_hours == 0.0 { return 0.0; }
-        let growth = (latest.heap_bytes as f64 - baseline.heap_bytes as f64) / baseline.heap_bytes as f64;
+        let elapsed_hours = latest
+            .timestamp
+            .duration_since(baseline.timestamp)
+            .as_secs_f64()
+            / 3600.0;
+        if elapsed_hours == 0.0 {
+            return 0.0;
+        }
+        let growth =
+            (latest.heap_bytes as f64 - baseline.heap_bytes as f64) / baseline.heap_bytes as f64;
         growth / elapsed_hours * 100.0
     }
 

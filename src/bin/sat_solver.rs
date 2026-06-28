@@ -1,4 +1,4 @@
-﻿//! M2.6: SAT Solver CLI Binary — Competition Entry Point
+//! M2.6: SAT Solver CLI Binary — Competition Entry Point
 //!
 //! Usage: cargo run --bin sat_solver <input.cnf> [--proof <file.drat>] [--mem-profile] [--clause-db-stats] [--save-checkpoint <file>] [--load-checkpoint <file>]
 //!
@@ -15,7 +15,9 @@ fn print_usage(program: &str) {
     eprintln!("  --mem-profile              Print memory telemetry after solving");
     eprintln!("  --clause-db-stats          Print clause database statistics");
     eprintln!("  --save-checkpoint <file>   Save solver state snapshot before solving");
-    eprintln!("  --load-checkpoint <file>   Load solver state from checkpoint (bypasses CNF parsing)");
+    eprintln!(
+        "  --load-checkpoint <file>   Load solver state from checkpoint (bypasses CNF parsing)"
+    );
     eprintln!("Exit codes: 10 = SAT, 20 = UNSAT, 1 = ERROR");
 }
 
@@ -75,7 +77,11 @@ fn main() {
                 } else if cnf_path.is_none() {
                     cnf_path = Some(other.to_string());
                 } else {
-                    eprintln!("ERROR: Multiple input targets specified: {} and {}", cnf_path.as_ref().unwrap(), other);
+                    eprintln!(
+                        "ERROR: Multiple input targets specified: {} and {}",
+                        cnf_path.as_ref().unwrap(),
+                        other
+                    );
                     std::process::exit(1);
                 }
             }
@@ -129,7 +135,11 @@ fn main() {
             println!("s SATISFIABLE");
             print!("v");
             for (var_idx, &value) in model.iter().enumerate() {
-                let lit = if value { (var_idx + 1) as i32 } else { -((var_idx + 1) as i32) };
+                let lit = if value {
+                    (var_idx + 1) as i32
+                } else {
+                    -((var_idx + 1) as i32)
+                };
                 print!(" {}", lit);
             }
             println!(" 0");
@@ -165,7 +175,10 @@ fn print_telemetry(solver: &CdclSolver, mem_profile: bool, clause_db_stats: bool
 
     if clause_db_stats {
         eprintln!("c Clause DB size:        {}", telemetry.clause_db_size);
-        eprintln!("c Learned clauses:       {}", telemetry.learned_clause_count);
+        eprintln!(
+            "c Learned clauses:       {}",
+            telemetry.learned_clause_count
+        );
         eprintln!("c Conflict rate:         {:.4}", telemetry.conflict_rate);
     }
     if mem_profile {

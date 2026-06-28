@@ -16,14 +16,14 @@
 pub fn theta_mpfr(t: f64) -> f64 {
     assert!(t > 0.0, "t must be positive");
     assert!(t.is_finite(), "t must be finite");
-    
+
     let half_t = t * 0.5;
     let two_pi = std::f64::consts::TAU;
     let log_term = (t / two_pi).ln();
-    
+
     // Compensated sum of 5 Stirling terms
     let terms = [
-        half_t * log_term,      // dominant
+        half_t * log_term, // dominant
         -half_t,
         -std::f64::consts::PI / 8.0,
         1.0 / (48.0 * t),
@@ -38,7 +38,11 @@ fn neumaier_sum(vals: &[f64]) -> f64 {
     let mut c = 0.0_f64;
     for &v in vals {
         let t = sum + v;
-        c += if sum.abs() >= v.abs() { (sum - t) + v } else { (v - t) + sum };
+        c += if sum.abs() >= v.abs() {
+            (sum - t) + v
+        } else {
+            (v - t) + sum
+        };
         sum = t;
     }
     sum + c
@@ -49,11 +53,10 @@ fn neumaier_sum(vals: &[f64]) -> f64 {
 pub fn theta_f64(t: f64) -> f64 {
     assert!(t > 0.0, "t must be positive");
     assert!(t.is_finite(), "t must be finite");
-    
+
     let half_t = t * 0.5;
     let two_pi = std::f64::consts::TAU;
-    half_t * (t / two_pi).ln() - half_t - std::f64::consts::PI / 8.0
-        + 1.0 / (48.0 * t)
+    half_t * (t / two_pi).ln() - half_t - std::f64::consts::PI / 8.0 + 1.0 / (48.0 * t)
         - 7.0 / (5760.0 * t * t * t)
 }
 
@@ -76,15 +79,14 @@ mod tests {
     /// for first 5 non-trivial zeros (known imaginary parts).
     #[test]
     fn test_theta_mpfr_accuracy_rq001_subcomponent() {
-        let known_t = [
-            14.134725, 21.022040, 25.010858, 30.424876, 32.935062,
-        ];
+        let known_t = [14.134725, 21.022040, 25.010858, 30.424876, 32.935062];
         for &t in &known_t {
             let err = theta_relative_error(t);
             assert!(
                 err <= 1e-14,
                 "RQ-001 sub: theta(t) relative error {:.3e} > 1e-14 at t={}",
-                err, t
+                err,
+                t
             );
         }
     }
@@ -97,7 +99,8 @@ mod tests {
         let r1 = theta_mpfr(t);
         let r2 = theta_mpfr(t);
         assert_eq!(
-            r1.to_bits(), r2.to_bits(),
+            r1.to_bits(),
+            r2.to_bits(),
             "Compensated oracle is not bitwise reproducible -- non-determinism detected"
         );
     }

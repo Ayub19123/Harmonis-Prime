@@ -8,15 +8,15 @@
 //!
 //! The precision is eternal.
 
+pub mod domain_balancer;
+pub mod jlo_correlation;
 pub mod multi_domain;
 pub mod thermal_rc;
-pub mod jlo_correlation;
-pub mod domain_balancer;
 
 #[cfg(test)]
 mod tests;
 
-pub use multi_domain::{RaplDomain, MultiDomainRapl};
-pub use thermal_rc::{DomainThermalModel, ThermalParams};
-pub use jlo_correlation::{JloCorrelation, DomainPair};
 pub use domain_balancer::{DomainBalancer, WorkloadPlacement};
+pub use jlo_correlation::{DomainPair, JloCorrelation};
+pub use multi_domain::{MultiDomainRapl, RaplDomain};
+pub use thermal_rc::{DomainThermalModel, ThermalParams};

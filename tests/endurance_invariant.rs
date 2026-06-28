@@ -1,7 +1,7 @@
-﻿//! SET-5.3: Long-Run Sovereign Organism Invariant Tests (CI‑friendly)
+//! SET-5.3: Long-Run Sovereign Organism Invariant Tests (CI‑friendly)
 
-use sovereign_core::endurance::harness::{EnduranceHarness, EnduranceConfig};
 use sovereign_core::endurance::checkpoint::CheckpointEngine;
+use sovereign_core::endurance::harness::{EnduranceConfig, EnduranceHarness};
 
 #[test]
 fn heap_growth_bounded_invariant() {
@@ -54,5 +54,5 @@ fn liveness_sustained_invariant() {
     let report = harness.run_simulated();
     assert!(report.total_operations > 0);
     assert!(report.success_rate >= 0.99);
-    assert!(report.checkpoints >= 1);  // At least one checkpoint
+    assert!(report.checkpoints >= 1); // At least one checkpoint
 }

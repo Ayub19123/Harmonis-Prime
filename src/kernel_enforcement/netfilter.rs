@@ -41,13 +41,11 @@ pub struct NetfilterPolicy {
 impl NetfilterPolicy {
     pub fn airgap_default() -> Self {
         Self {
-            rules: vec![
-                NetfilterRule {
-                    hook: NetfilterHook::Output,
-                    action: NetfilterAction::Drop,
-                    priority: -100,
-                },
-            ],
+            rules: vec![NetfilterRule {
+                hook: NetfilterHook::Output,
+                action: NetfilterAction::Drop,
+                priority: -100,
+            }],
             default_action: NetfilterAction::Drop,
         }
     }
@@ -67,4 +65,3 @@ impl NetfilterPolicy {
         self.default_action
     }
 }
-

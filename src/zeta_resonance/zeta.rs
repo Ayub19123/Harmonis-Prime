@@ -1,12 +1,12 @@
 //! SET-7B: Zeta Zero Approximation — Riemann-Siegel Formula
-//! 
+//!
 //! Phase 1 (Software): Numerical approximation with f64 precision
 //! Phase 2 (Hardware): FPGA-based Z(t) evaluation for clock optimization
-//! 
+//!
 //! Numerical Discipline:
 //!   ε < 10⁻⁶ for f64 (software)
 //!   ε < 10⁻¹² for arbitrary precision (future)
-//! 
+//!
 //! CRITICAL LIMITATION — RH DISCIPLINE:
 //!   This module computes numerical approximations of zeta zeros.
 //!   - High-precision evaluation of ζ(s) on the critical line
@@ -20,12 +20,12 @@ use std::f64::consts::PI;
 
 /// Riemann zeta function approximation on the critical line
 /// ζ(1/2 + it) — using truncated Dirichlet series
-/// 
+///
 /// LIMITATION: This is an approximation, not exact evaluation.
 /// For |t| < 100, error < 10⁻⁶. For larger t, precision degrades.
 #[derive(Debug, Clone)]
 pub struct ZetaResonance {
-    pub max_terms: usize,  // truncation limit for Dirichlet series
+    pub max_terms: usize, // truncation limit for Dirichlet series
 }
 
 impl ZetaResonance {
@@ -42,24 +42,24 @@ impl ZetaResonance {
         if !t.is_finite() {
             return Err("t must be finite");
         }
-        
+
         let sigma = 0.5; // critical line
         let mut real_sum = 0.0;
         let mut imag_sum = 0.0;
-        
+
         for n in 1..=self.max_terms {
             let n_f = n as f64;
             let log_n = n_f.ln();
-            
+
             // n^{-s} = n^{-σ} * e^{-it ln n}
             //       = n^{-σ} * (cos(t ln n) - i sin(t ln n))
             let magnitude = n_f.powf(-sigma);
             let phase = -t * log_n;
-            
+
             real_sum += magnitude * phase.cos();
             imag_sum += magnitude * phase.sin();
         }
-        
+
         Ok((real_sum, imag_sum))
     }
 
@@ -67,13 +67,13 @@ impl ZetaResonance {
     /// Simplified: Z(t) ≈ sqrt(Re(ζ)^2 + Im(ζ)^2) * sign(Re(ζ) * cos(θ) + Im(ζ) * sin(θ))
     pub fn hardy_z(&self, t: f64) -> Result<f64, &'static str> {
         let (re, im) = self.zeta_critical(t)?;
-        
+
         // Riemann-Siegel theta function approximation
         let theta = self.riemann_siegel_theta(t);
-        
+
         // Z(t) = Re(ζ) * cos(θ) + Im(ζ) * sin(θ)
         let z = re * theta.cos() + im * theta.sin();
-        
+
         Ok(z)
     }
 
@@ -92,19 +92,19 @@ impl ZetaResonance {
         let mut brackets = Vec::new();
         let mut t = t_start;
         let mut z_prev = self.hardy_z(t).unwrap_or(0.0);
-        
+
         while t < t_end {
             t += step;
             let z_curr = self.hardy_z(t).unwrap_or(0.0);
-            
+
             if z_prev * z_curr < 0.0 {
                 // Sign change — zero bracketed
                 brackets.push((t - step, t));
             }
-            
+
             z_prev = z_curr;
         }
-        
+
         brackets
     }
 }

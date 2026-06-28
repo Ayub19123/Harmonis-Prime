@@ -1,10 +1,10 @@
-﻿// src/benchmark/mlperf_telemetry.rs
+// src/benchmark/mlperf_telemetry.rs
 // HONEST TELEMETRY: Zero dependencies. std::time::Instant only.
 // Industrial standard: 0 errors, 0 warnings, 0 vulnerabilities.
 
-use std::time::Instant;
 use std::fs::File;
 use std::io::Write;
+use std::time::Instant;
 
 /// Honest measurement of what we can actually prove.
 #[derive(Debug)]
@@ -19,7 +19,12 @@ pub struct MLPerfResult {
     pub seed: u64,
 }
 
-pub fn run_mlperf_benchmark<F>(iterations: u64, seed: u64, benchmark_name: &str, mut workload: F) -> Vec<MLPerfResult>
+pub fn run_mlperf_benchmark<F>(
+    iterations: u64,
+    seed: u64,
+    benchmark_name: &str,
+    mut workload: F,
+) -> Vec<MLPerfResult>
 where
     F: FnMut(u64),
 {
@@ -66,9 +71,9 @@ pub fn write_mlperf_json(results: &[MLPerfResult], path: &str) {
     "energy_joules": null,
     "seed": {}
   }}"#,
-            r.benchmark_name, r.version, r.iteration, r.latency_ns,
-            r.throughput_ops_sec, r.seed
-        ).unwrap();
+            r.benchmark_name, r.version, r.iteration, r.latency_ns, r.throughput_ops_sec, r.seed
+        )
+        .unwrap();
         if i < results.len() - 1 {
             writeln!(file, "  ,").unwrap();
         }
@@ -78,7 +83,9 @@ pub fn write_mlperf_json(results: &[MLPerfResult], path: &str) {
 
 pub fn write_limitations_md(path: &str) {
     let mut file = File::create(path).expect("Failed to create limitations file");
-    writeln!(file, r#"# Honest Limitations — Harmonis Prime Telemetry
+    writeln!(
+        file,
+        r#"# Honest Limitations — Harmonis Prime Telemetry
 
 ## Measurement Boundaries
 | Limitation | Status | Impact |
@@ -100,6 +107,7 @@ pub fn write_limitations_md(path: &str) {
 
 ## Sovereign Principle
 **Claims = Measurements. Nothing more. Nothing less.**
-"#).unwrap();
+"#
+    )
+    .unwrap();
 }
-

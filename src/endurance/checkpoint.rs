@@ -1,4 +1,4 @@
-﻿//! SET-5.3: Checkpoint Engine
+//! SET-5.3: Checkpoint Engine
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -20,10 +20,18 @@ pub struct CheckpointEngine {
 
 impl CheckpointEngine {
     pub fn new() -> Self {
-        Self { sequence: 0, checkpoints: Vec::new() }
+        Self {
+            sequence: 0,
+            checkpoints: Vec::new(),
+        }
     }
 
-    pub fn seal(&mut self, entropy_value: f64, operation_count: u64, heap_bytes: usize) -> Checkpoint {
+    pub fn seal(
+        &mut self,
+        entropy_value: f64,
+        operation_count: u64,
+        heap_bytes: usize,
+    ) -> Checkpoint {
         let mut hasher = DefaultHasher::new();
         entropy_value.to_bits().hash(&mut hasher);
         operation_count.hash(&mut hasher);
@@ -41,11 +49,15 @@ impl CheckpointEngine {
     }
 
     pub fn verify_determinism(&self, a: &Checkpoint, b: &Checkpoint) -> bool {
-        a.determinism_hash == b.determinism_hash && a.entropy_value == b.entropy_value && a.operation_count == b.operation_count
+        a.determinism_hash == b.determinism_hash
+            && a.entropy_value == b.entropy_value
+            && a.operation_count == b.operation_count
     }
 
     pub fn entropy_variance(&self) -> f64 {
-        if self.checkpoints.len() < 2 { return 0.0; }
+        if self.checkpoints.len() < 2 {
+            return 0.0;
+        }
         let mut sum_sq = 0.0;
         for w in self.checkpoints.windows(2) {
             let diff = w[1].entropy_value - w[0].entropy_value;
@@ -54,5 +66,7 @@ impl CheckpointEngine {
         sum_sq / (self.checkpoints.len() - 1) as f64
     }
 
-    pub fn checkpoint_count(&self) -> usize { self.checkpoints.len() }
+    pub fn checkpoint_count(&self) -> usize {
+        self.checkpoints.len()
+    }
 }

@@ -3,8 +3,8 @@
 //! Honest Limitation: Greedy, not proven optimal. No real power data.
 //! Uses Shannon entropy from domain balancer to guide PIM allocation.
 
-use crate::set9_telemetry::multi_domain::{MultiDomainRapl, RaplDomain};
 use crate::set10_fusion::theta_approx::ThetaApproximation;
+use crate::set9_telemetry::multi_domain::{MultiDomainRapl, RaplDomain};
 
 /// Placement decision with entropy context
 #[derive(Debug, Clone, PartialEq)]
@@ -23,10 +23,7 @@ pub struct EntropyPimPlacement {
 }
 
 impl EntropyPimPlacement {
-    pub fn new(
-        monitor: MultiDomainRapl,
-        entropy_threshold: f64,
-    ) -> Result<Self, &'static str> {
+    pub fn new(monitor: MultiDomainRapl, entropy_threshold: f64) -> Result<Self, &'static str> {
         if entropy_threshold < 0.0 {
             return Err("entropy_threshold must be non-negative");
         }

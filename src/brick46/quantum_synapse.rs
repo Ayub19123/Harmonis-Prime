@@ -63,7 +63,8 @@ impl QuantumSynapse {
         let seed = Self::context_hash(key);
         let mut amplitudes = Vec::with_capacity(key.dimension);
         for i in 0..key.dimension {
-            let pseudo_random = ((seed.wrapping_add((i as u64).wrapping_mul(6364136223846793005)) >> 16) as f64)
+            let pseudo_random = ((seed.wrapping_add((i as u64).wrapping_mul(6364136223846793005))
+                >> 16) as f64)
                 / u16::MAX as f64;
             amplitudes.push(pseudo_random);
         }
@@ -138,4 +139,3 @@ fn now_ns() -> u128 {
         .unwrap()
         .as_nanos()
 }
-

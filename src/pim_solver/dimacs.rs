@@ -58,7 +58,7 @@ impl DimacsInstance {
     pub fn parse<P: AsRef<Path>>(path: P) -> Result<Self, DimacsError> {
         let file = File::open(path).map_err(|e| DimacsError::Io(e.to_string()))?;
         let reader = BufReader::new(file);
-        
+
         let mut num_vars = 0usize;
         let mut num_clauses = 0usize;
         let mut header_found = false;
@@ -68,7 +68,7 @@ impl DimacsInstance {
         for (line_idx, line_res) in reader.lines().enumerate() {
             let line = line_res.map_err(|e| DimacsError::Io(e.to_string()))?;
             let trimmed = line.trim();
-            
+
             // Skip empty lines and comments
             if trimmed.is_empty() || trimmed.starts_with('c') {
                 continue;
@@ -77,25 +77,27 @@ impl DimacsInstance {
             // Parse problem line: p cnf <vars> <clauses>
             if trimmed.starts_with('p') {
                 if header_found {
-                    return Err(DimacsError::InvalidFormat(
-                        format!("Duplicate problem line at line {}", line_idx + 1)
-                    ));
-                }
-                
-                let tokens: Vec<&str> = trimmed.split_whitespace().collect();
-                if tokens.len() < 4 || tokens[1] != "cnf" {
-                    return Err(DimacsError::InvalidFormat(
-                        format!("Malformed problem line at line {}. Expected 'p cnf <vars> <clauses>'", line_idx + 1)
-                    ));
+                    return Err(DimacsError::InvalidFormat(format!(
+                        "Duplicate problem line at line {}",
+                        line_idx + 1
+                    )));
                 }
 
-                num_vars = tokens[2].parse::<usize>().map_err(|e| {
-                    DimacsError::Parse(format!("Invalid variable count: {}", e))
-                })?;
-                
-                num_clauses = tokens[3].parse::<usize>().map_err(|e| {
-                    DimacsError::Parse(format!("Invalid clause count: {}", e))
-                })?;
+                let tokens: Vec<&str> = trimmed.split_whitespace().collect();
+                if tokens.len() < 4 || tokens[1] != "cnf" {
+                    return Err(DimacsError::InvalidFormat(format!(
+                        "Malformed problem line at line {}. Expected 'p cnf <vars> <clauses>'",
+                        line_idx + 1
+                    )));
+                }
+
+                num_vars = tokens[2]
+                    .parse::<usize>()
+                    .map_err(|e| DimacsError::Parse(format!("Invalid variable count: {}", e)))?;
+
+                num_clauses = tokens[3]
+                    .parse::<usize>()
+                    .map_err(|e| DimacsError::Parse(format!("Invalid clause count: {}", e)))?;
 
                 header_found = true;
                 continue;
@@ -103,17 +105,21 @@ impl DimacsInstance {
 
             // Clause data before header is invalid
             if !header_found {
-                return Err(DimacsError::InvalidFormat(
-                    format!("Clause data before problem line at line {}", line_idx + 1)
-                ));
+                return Err(DimacsError::InvalidFormat(format!(
+                    "Clause data before problem line at line {}",
+                    line_idx + 1
+                )));
             }
 
             // Parse clause literals
             for token in trimmed.split_whitespace() {
                 let literal = token.parse::<i32>().map_err(|e| {
-                    DimacsError::MalformedClause(
-                        format!("Non-integer token '{}' at line {}: {}", token, line_idx + 1, e)
-                    )
+                    DimacsError::MalformedClause(format!(
+                        "Non-integer token '{}' at line {}: {}",
+                        token,
+                        line_idx + 1,
+                        e
+                    ))
                 })?;
 
                 if literal == 0 {
@@ -125,9 +131,12 @@ impl DimacsInstance {
                 } else {
                     // Validate literal bounds
                     if literal.abs() as usize > num_vars {
-                        return Err(DimacsError::MalformedClause(
-                            format!("Literal {} out of bounds (max {}) at line {}", literal, num_vars, line_idx + 1)
-                        ));
+                        return Err(DimacsError::MalformedClause(format!(
+                            "Literal {} out of bounds (max {}) at line {}",
+                            literal,
+                            num_vars,
+                            line_idx + 1
+                        )));
                     }
                     current_clause.push(literal);
                 }
@@ -153,14 +162,22 @@ impl DimacsInstance {
     /// s SATISFIABLE
     /// v <assignment> 0
     /// ```
-    pub fn write_model<W: Write>(&self, writer: &mut W, assignment: &[bool]) -> std::io::Result<()> {
+    pub fn write_model<W: Write>(
+        &self,
+        writer: &mut W,
+        assignment: &[bool],
+    ) -> std::io::Result<()> {
         writeln!(writer, "s SATISFIABLE")?;
-        
+
         let mut line = String::from("v ");
         for (idx, &is_true) in assignment.iter().enumerate() {
             let var = (idx + 1) as i32;
-            let token = if is_true { format!("{} ", var) } else { format!("-{} ", var) };
-            
+            let token = if is_true {
+                format!("{} ", var)
+            } else {
+                format!("-{} ", var)
+            };
+
             // Line length limit for DIMACS format
             if line.len() + token.len() > 76 {
                 writeln!(writer, "{}", line.trim_end())?;
@@ -168,7 +185,7 @@ impl DimacsInstance {
             }
             line.push_str(&token);
         }
-        
+
         line.push_str("0");
         writeln!(writer, "{}", line)?;
         writer.flush()?;
@@ -193,14 +210,14 @@ mod tests {
         let test_content = "c Test CNF file\nc Another comment\np cnf 3 2\n1 -2 0\n-1 3 0\n";
         let test_path = "test_simple.cnf";
         std::fs::write(test_path, test_content).unwrap();
-        
+
         let instance = DimacsInstance::parse(test_path).unwrap();
         assert_eq!(instance.num_vars, 3);
         assert_eq!(instance.num_clauses, 2);
         assert_eq!(instance.clauses.len(), 2);
         assert_eq!(instance.clauses[0], vec![1, -2]);
         assert_eq!(instance.clauses[1], vec![-1, 3]);
-        
+
         std::fs::remove_file(test_path).unwrap();
     }
 
@@ -209,10 +226,10 @@ mod tests {
         let test_content = "p sat 3 2\n1 0\n";
         let test_path = "test_malformed.cnf";
         std::fs::write(test_path, test_content).unwrap();
-        
+
         let result = DimacsInstance::parse(test_path);
         assert!(result.is_err());
-        
+
         std::fs::remove_file(test_path).unwrap();
     }
 
@@ -221,10 +238,10 @@ mod tests {
         let test_content = "p cnf 2 1\n1 3 0\n";
         let test_path = "test_bounds.cnf";
         std::fs::write(test_path, test_content).unwrap();
-        
+
         let result = DimacsInstance::parse(test_path);
         assert!(result.is_err());
-        
+
         std::fs::remove_file(test_path).unwrap();
     }
 
@@ -235,10 +252,10 @@ mod tests {
             num_clauses: 2,
             clauses: vec![vec![1, -2], vec![3, 4]],
         };
-        
+
         let mut output = Vec::new();
         let assignment = vec![true, false, true, false];
-        
+
         instance.write_model(&mut output, &assignment).unwrap();
         let result = String::from_utf8(output).unwrap();
         let lines: Vec<&str> = result.lines().collect();
@@ -255,11 +272,11 @@ mod tests {
             num_clauses: 1,
             clauses: vec![vec![1], vec![-1]],
         };
-        
+
         let mut output = Vec::new();
         instance.write_unsat(&mut output).unwrap();
         let result = String::from_utf8(output).unwrap();
-        
+
         assert_eq!(result.trim(), "s UNSATISFIABLE");
     }
 }

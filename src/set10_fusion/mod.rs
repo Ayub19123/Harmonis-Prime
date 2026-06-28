@@ -8,15 +8,15 @@
 //!
 //! The precision is eternal.
 
-pub mod theta_approx;
+pub mod entropy_placement;
 pub mod extended_series;
 pub mod thermal_bridge;
-pub mod entropy_placement;
+pub mod theta_approx;
 
 #[cfg(test)]
 mod tests;
 
-pub use theta_approx::ThetaApproximation;
+pub use entropy_placement::EntropyPimPlacement;
 pub use extended_series::ExtendedDirichletSeries;
 pub use thermal_bridge::PimThermalBridge;
-pub use entropy_placement::EntropyPimPlacement;
+pub use theta_approx::ThetaApproximation;

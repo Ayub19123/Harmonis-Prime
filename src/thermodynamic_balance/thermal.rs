@@ -1,5 +1,5 @@
 /// Simplified RC thermal model for PIM crossbar energy dissipation.
-/// 
+///
 /// Math: T_new = T_ambient + P·R + (T_old − T_ambient − P·R)·exp(−dt/(R·C))
 #[derive(Debug, Clone)]
 pub struct ThermalModel {
@@ -10,7 +10,11 @@ pub struct ThermalModel {
 }
 
 impl ThermalModel {
-    pub fn new(ambient_temp: f64, thermal_resistance: f64, thermal_capacitance: f64) -> Result<Self, &'static str> {
+    pub fn new(
+        ambient_temp: f64,
+        thermal_resistance: f64,
+        thermal_capacitance: f64,
+    ) -> Result<Self, &'static str> {
         if ambient_temp <= 0.0 {
             return Err("ambient temperature must be positive");
         }
@@ -41,7 +45,8 @@ impl ThermalModel {
         let tau = self.thermal_resistance * self.thermal_capacitance;
         let exp_factor = (-dt / tau).exp();
 
-        self.current_temp = self.ambient_temp + steady_state_rise
+        self.current_temp = self.ambient_temp
+            + steady_state_rise
             + (self.current_temp - self.ambient_temp - steady_state_rise) * exp_factor;
 
         Ok(())

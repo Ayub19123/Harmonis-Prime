@@ -1,4 +1,4 @@
-﻿//! Truncation Budget -- Backlund-type remainder bound for Dirichlet series.
+//! Truncation Budget -- Backlund-type remainder bound for Dirichlet series.
 //!
 //! HONEST SCOPE (M1.4b):
 //! - Simplified remainder bound for truncated zeta evaluation
@@ -21,7 +21,7 @@ impl TruncationBudget {
 
     /// Backlund-type remainder bound for truncated zeta(s) with sigma > 1.
     /// bound = (N+1)^(1-sigma) / (sigma - 1)
-    /// 
+    ///
     /// Honest: this is the integral remainder, not the sharp Backlund bound.
     pub fn remainder_bound(&self, n: usize, sigma: f64) -> Result<f64, &'static str> {
         if n < 1 {
@@ -33,7 +33,7 @@ impl TruncationBudget {
         if !sigma.is_finite() {
             return Err("sigma must be finite");
         }
-        
+
         let n_plus_1 = (n + 1) as f64;
         let bound = n_plus_1.powf(1.0 - sigma) / (sigma - 1.0);
         Ok(bound)
@@ -52,11 +52,11 @@ impl TruncationBudget {
         if !sigma.is_finite() || !epsilon.is_finite() {
             return Err("sigma and epsilon must be finite");
         }
-        
+
         let exponent = 1.0 / (1.0 - sigma);
         let n_float = (epsilon * (sigma - 1.0)).powf(exponent) - 1.0;
         let n = n_float.ceil() as usize;
-        
+
         // Ensure at least 1
         Ok(n.max(1))
     }
@@ -70,11 +70,11 @@ impl TruncationBudget {
         if sigma <= 1.0 {
             return Err("sigma must be > 1.0");
         }
-        
+
         let mut table = Vec::with_capacity(points);
         let log_min = 14.0_f64.ln();
         let log_max = 1e6_f64.ln();
-        
+
         for i in 0..points {
             let log_t = log_min + (log_max - log_min) * (i as f64 / (points - 1) as f64);
             let t = log_t.exp();
@@ -83,7 +83,7 @@ impl TruncationBudget {
             let bound = self.remainder_bound(n, sigma)?;
             table.push((t, bound));
         }
-        
+
         Ok(table)
     }
 }
@@ -98,7 +98,7 @@ mod tests {
     #[test]
     fn test_truncation_bound_small_enough() {
         let budget = TruncationBudget::new();
-        
+
         // Case 1: Large N with sigma=2 gives ~1e-5
         let n = 100_000;
         let sigma = 2.0;
@@ -106,16 +106,19 @@ mod tests {
         assert!(
             bound <= 1e-5,
             "Bound {:.3e} > 1e-5 for N={}, sigma={}",
-            bound, n, sigma
+            bound,
+            n,
+            sigma
         );
-        
+
         // Case 2: Larger sigma=3 gives tighter bound
         let sigma3 = 3.0;
         let bound3 = budget.remainder_bound(n, sigma3).unwrap();
         assert!(
             bound3 <= 1e-10,
             "Bound {:.3e} > 1e-10 for N={}, sigma=3",
-            bound3, n
+            bound3,
+            n
         );
     }
 
@@ -125,13 +128,15 @@ mod tests {
         let budget = TruncationBudget::new();
         let sigma = 2.0;
         let mut prev_bound = f64::INFINITY;
-        
+
         for n in [100, 1000, 10000, 100000] {
             let bound = budget.remainder_bound(n, sigma).unwrap();
             assert!(
                 bound < prev_bound,
                 "Bound must decrease with N: N={} bound={:.3e} >= prev={:.3e}",
-                n, bound, prev_bound
+                n,
+                bound,
+                prev_bound
             );
             prev_bound = bound;
         }

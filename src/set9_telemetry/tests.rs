@@ -68,9 +68,12 @@ fn test_thermal_convergence_per_domain() {
         thermal.step(power, 0.01).unwrap();
     }
 
-    assert!((thermal.temperature() - expected).abs() < 0.01,
+    assert!(
+        (thermal.temperature() - expected).abs() < 0.01,
         "Must converge to steady state {} (got {})",
-        expected, thermal.temperature());
+        expected,
+        thermal.temperature()
+    );
 }
 
 #[test]
@@ -85,8 +88,10 @@ fn test_thermal_monotonic_power_higher_temp() {
         t2.step(10.0, 0.1).unwrap();
     }
 
-    assert!(t2.temperature() > t1.temperature(),
-        "Higher power must produce higher temperature");
+    assert!(
+        t2.temperature() > t1.temperature(),
+        "Higher power must produce higher temperature"
+    );
 }
 
 #[test]
@@ -109,8 +114,11 @@ fn test_correlation_perfect_positive() {
     let a = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let b = vec![2.0, 4.0, 6.0, 8.0, 10.0]; // perfectly correlated
     let corr = JloCorrelation::compute(pair, &a, &b).unwrap();
-    assert!((corr.pearson_r - 1.0).abs() < 1e-12,
-        "Perfect correlation must yield r=1, got {}", corr.pearson_r);
+    assert!(
+        (corr.pearson_r - 1.0).abs() < 1e-12,
+        "Perfect correlation must yield r=1, got {}",
+        corr.pearson_r
+    );
     assert!(corr.is_strong());
     assert!(corr.is_positive());
 }
@@ -121,8 +129,11 @@ fn test_correlation_perfect_negative() {
     let a = vec![1.0, 2.0, 3.0, 4.0, 5.0];
     let b = vec![5.0, 4.0, 3.0, 2.0, 1.0]; // perfectly anti-correlated
     let corr = JloCorrelation::compute(pair, &a, &b).unwrap();
-    assert!((corr.pearson_r + 1.0).abs() < 1e-12,
-        "Perfect anti-correlation must yield r=-1, got {}", corr.pearson_r);
+    assert!(
+        (corr.pearson_r + 1.0).abs() < 1e-12,
+        "Perfect anti-correlation must yield r=-1, got {}",
+        corr.pearson_r
+    );
     assert!(corr.is_strong());
     assert!(!corr.is_positive());
 }
@@ -153,15 +164,18 @@ fn test_correlation_zero_variance_error() {
 fn test_balancer_selects_lowest_energy() {
     let mut monitor = MultiDomainRapl::new();
     monitor.inject(RaplDomain::Package, 10.0);
-    monitor.inject(RaplDomain::Core, 5.0);    // lowest
+    monitor.inject(RaplDomain::Core, 5.0); // lowest
     monitor.inject(RaplDomain::Uncore, 8.0);
     monitor.inject(RaplDomain::Dram, 12.0);
     monitor.inject(RaplDomain::Psu, 15.0);
 
     let balancer = DomainBalancer::new(monitor);
     let placement = balancer.place().unwrap();
-    assert_eq!(placement.domain, RaplDomain::Core,
-        "Must select domain with lowest energy");
+    assert_eq!(
+        placement.domain,
+        RaplDomain::Core,
+        "Must select domain with lowest energy"
+    );
     assert_eq!(placement.estimated_energy, 5.0);
 }
 

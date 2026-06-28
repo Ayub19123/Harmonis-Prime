@@ -1,7 +1,7 @@
 use crate::thermodynamic_balance::entropy::EntropyEngine;
 
 /// Workload drift detector using KL divergence.
-/// 
+///
 /// Compares expected workload distribution against observed.
 /// Flags drift when D_KL(observed || expected) > threshold.
 #[derive(Debug, Clone)]

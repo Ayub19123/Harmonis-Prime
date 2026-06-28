@@ -96,7 +96,8 @@ impl EnergyMonitor for RaplMonitor {
     fn report(&self) -> JloReport {
         let total_joules: f64 = self.samples.iter().map(|s| s.joules).sum();
         let total_ops = self.samples.len() as u64;
-        let total_duration_micros: f64 = self.samples
+        let total_duration_micros: f64 = self
+            .samples
             .iter()
             .map(|s| s.duration.as_micros() as f64)
             .sum();

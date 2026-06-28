@@ -1,8 +1,8 @@
-﻿//! SET-5.1: Multi-Node Simulation Invariants
+//! SET-5.1: Multi-Node Simulation Invariants
 //! Validates consensus correctness under scaling, Byzantine noise, and node failures.
 
 use proptest::prelude::*;
-use sovereign_core::simulation::cluster::{ClusterSimulation, ClusterConfig};
+use sovereign_core::simulation::cluster::{ClusterConfig, ClusterSimulation};
 
 proptest! {
     /// INVARIANT: Consensus achieves liveness with < 1/3 Byzantine nodes
@@ -19,11 +19,11 @@ proptest! {
             message_count,
             max_latency_micros: 50000,
         };
-        
+
         let mut sim = ClusterSimulation::new(config).expect("Valid cluster");
         let report = sim.run().expect("Simulation completes");
-        
-        prop_assert!(report.consensus_achieved, "Consensus failed with {} nodes, {} Byzantine ratio", 
+
+        prop_assert!(report.consensus_achieved, "Consensus failed with {} nodes, {} Byzantine ratio",
             node_count, byzantine_ratio);
         prop_assert!(report.successful_appends > 0, "No messages appended");
     }
@@ -42,11 +42,11 @@ proptest! {
             message_count,
             max_latency_micros: 50000,
         };
-        
+
         let mut sim = ClusterSimulation::new(config).expect("Valid cluster");
         let report = sim.run().expect("Simulation completes");
-        
-        prop_assert!(report.byzantine_detected, 
+
+        prop_assert!(report.byzantine_detected,
             "Failed to detect Byzantine noise at ratio {}", byzantine_ratio);
     }
 
@@ -64,11 +64,11 @@ proptest! {
             message_count,
             max_latency_micros: 50000,
         };
-        
+
         let mut sim = ClusterSimulation::new(config).expect("Valid cluster");
         let report = sim.run().expect("Simulation completes");
-        
-        prop_assert!(report.max_latency_micros <= 50000, 
+
+        prop_assert!(report.max_latency_micros <= 50000,
             "Latency exceeded bound: {} Âµs", report.max_latency_micros);
         prop_assert!(report.avg_latency_micros > 0.0, "Zero average latency");
     }
@@ -86,16 +86,15 @@ proptest! {
             message_count,
             max_latency_micros: 50000,
         };
-        
+
         let mut sim_a = ClusterSimulation::new(config.clone()).expect("Valid cluster A");
         let report_a = sim_a.run().expect("Simulation A completes");
-        
+
         let mut sim_b = ClusterSimulation::new(config.clone()).expect("Valid cluster B");
         let report_b = sim_b.run().expect("Simulation B completes");
-        
+
         prop_assert!(report_a.determinism_hash == report_b.determinism_hash,
             "Cluster simulation non-deterministic: {} vs {}",
             report_a.determinism_hash, report_b.determinism_hash);
     }
 }
-

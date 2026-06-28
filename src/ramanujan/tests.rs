@@ -1,10 +1,10 @@
-﻿//! SET-5.5: Ramanujan Mathematical Invariant Tests
+//! SET-5.5: Ramanujan Mathematical Invariant Tests
 //! Invariant: Mock theta convergence, HCN correctness, partition advantage
 
 #[cfg(test)]
 mod tests {
-    use crate::ramanujan::mock_theta::{mock_theta_f, mock_theta_weight};
     use crate::ramanujan::hcn::highly_composite_numbers;
+    use crate::ramanujan::mock_theta::{mock_theta_f, mock_theta_weight};
 
     #[test]
     fn test_mock_theta_convergence() {
@@ -27,10 +27,16 @@ mod tests {
         }
         // Weights should decrease monotonically
         for i in 1..weights.len() {
-            assert!(weights[i] <= weights[i-1], "Weight must decrease monotonically");
+            assert!(
+                weights[i] <= weights[i - 1],
+                "Weight must decrease monotonically"
+            );
         }
         // All weights positive
-        assert!(weights.iter().all(|&w| w > 0.0), "All weights must be positive");
+        assert!(
+            weights.iter().all(|&w| w > 0.0),
+            "All weights must be positive"
+        );
     }
 
     #[test]
@@ -48,7 +54,12 @@ mod tests {
         let mut prev_divisors = 0;
         for &num in &hcn {
             let div_count = divisor_count(num);
-            assert!(div_count > prev_divisors, "HCN {} must have > {} divisors", num, prev_divisors);
+            assert!(
+                div_count > prev_divisors,
+                "HCN {} must have > {} divisors",
+                num,
+                prev_divisors
+            );
             prev_divisors = div_count;
         }
     }
@@ -59,7 +70,9 @@ mod tests {
         for i in 1..=limit {
             if n % i == 0 {
                 count += 1;
-                if i != n / i { count += 1; }
+                if i != n / i {
+                    count += 1;
+                }
             }
         }
         count

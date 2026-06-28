@@ -1,9 +1,9 @@
 pub mod endurance;
+pub mod energy;
+pub mod quantum;
 pub mod simulation;
 pub mod sovereign;
 pub mod thermo;
-pub mod energy;
-pub mod quantum;
 use crate::engine::SovereignOrchestrator;
 use std::sync::{Arc, Mutex};
 
@@ -153,12 +153,12 @@ pub mod benchmark;
 pub mod mesh;
 pub mod stats;
 
-pub mod ramanujan;
 pub mod euler;
+pub mod ramanujan;
 
 pub mod airgap;
-pub mod kernel_enforcement;
 pub mod identity;
+pub mod kernel_enforcement;
 pub mod network_calculus;
 
 // ========== SET-6E: Energy Telemetry ==========
@@ -181,6 +181,6 @@ pub mod truncation_budget;
 // SET-12: MPFR Z(t) Oracle — 400-bit ζ(½+it) with honest fallback
 // LIMITATION: Software-only, no hardware acceleration until Phase 3
 // LIMITATION: Windows compilation may fail — f64 fallback activated automatically
-pub mod mpfr_zeta;
 pub mod audit;
 pub mod bench;
+pub mod mpfr_zeta;

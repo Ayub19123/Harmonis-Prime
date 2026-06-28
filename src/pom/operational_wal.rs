@@ -1,4 +1,4 @@
-﻿#[allow(dead_code)]
+#[allow(dead_code)]
 const WAL_MAGIC: [u8; 4] = *b"SPOM";
 
 #[allow(dead_code)]
@@ -136,5 +136,3 @@ impl OperationalWal {
         self.segment_sequence + 1
     }
 }
-
-

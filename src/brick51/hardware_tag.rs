@@ -1,4 +1,4 @@
-﻿//! BRICK-51.1: Hardware Classification Tag
+//! BRICK-51.1: Hardware Classification Tag
 //! Every latency/performance claim must carry its measurement domain
 
 #[derive(Clone, Debug, PartialEq)]
@@ -59,4 +59,3 @@ impl TaggedMetric {
         )
     }
 }
-

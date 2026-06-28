@@ -1,4 +1,4 @@
-﻿use std::collections::HashMap;
+use std::collections::HashMap;
 
 pub struct FederationRouter {
     #[allow(dead_code)]
@@ -36,5 +36,3 @@ impl FederationRouter {
         (endpoint, false)
     }
 }
-
-

@@ -17,8 +17,10 @@ fn test_theta_monotonicity() {
     let theta = ThetaApproximation::new();
     let t1 = 100.0;
     let t2 = 200.0;
-    assert!(theta.is_monotonic(t1, t2).unwrap(),
-        "Theta(t) must be monotonically increasing");
+    assert!(
+        theta.is_monotonic(t1, t2).unwrap(),
+        "Theta(t) must be monotonically increasing"
+    );
 }
 
 #[test]
@@ -26,7 +28,11 @@ fn test_theta_derivative_positive() {
     let theta = ThetaApproximation::new();
     let t = 100.0;
     let d = theta.derivative(t).unwrap();
-    assert!(d > 0.0, "dtheta/dt must be positive for t > 1/(2*pi), got {}", d);
+    assert!(
+        d > 0.0,
+        "dtheta/dt must be positive for t > 1/(2*pi), got {}",
+        d
+    );
 }
 
 #[test]
@@ -46,18 +52,25 @@ fn test_theta_finite_evaluation() {
 fn test_extended_series_converges_sigma_gt_one() {
     let series = ExtendedDirichletSeries::new(100).unwrap();
     let (real, imag) = series.evaluate(2.0, 0.0).unwrap();
-    assert!(real.is_finite() && imag.is_finite(),
-        "Series must converge for sigma > 1");
+    assert!(
+        real.is_finite() && imag.is_finite(),
+        "Series must converge for sigma > 1"
+    );
     // zeta(2) = pi^2/6 ~ 1.6449
-    assert!((real - std::f64::consts::PI.powi(2) / 6.0).abs() < 0.02,
-        "Truncated zeta(2) should approximate pi^2/6");
+    assert!(
+        (real - std::f64::consts::PI.powi(2) / 6.0).abs() < 0.02,
+        "Truncated zeta(2) should approximate pi^2/6"
+    );
 }
 
 #[test]
 fn test_extended_series_rejects_sigma_le_one() {
     let series = ExtendedDirichletSeries::new(100).unwrap();
     let result = series.evaluate(1.0, 0.0);
-    assert!(result.is_err(), "Sigma = 1 must return error -- honest divergence");
+    assert!(
+        result.is_err(),
+        "Sigma = 1 must return error -- honest divergence"
+    );
 }
 
 // ============================================================
@@ -82,8 +95,10 @@ fn test_thermal_bridge_energy_rises_with_temperature() {
     let energy1 = bridge1.step_and_estimate(0.0, 0.01).unwrap();
     let energy2 = bridge2.step_and_estimate(0.0, 0.01).unwrap();
 
-    assert!(energy1 > energy2,
-        "Higher thermal history must produce higher energy estimate");
+    assert!(
+        energy1 > energy2,
+        "Higher thermal history must produce higher energy estimate"
+    );
 }
 
 #[test]
@@ -98,10 +113,14 @@ fn test_thermal_bridge_finite_output() {
 #[test]
 fn test_thermal_bridge_rejects_invalid_params() {
     let params = crate::set9_telemetry::thermal_rc::ThermalParams::new(300.0, 10.0, 1.0).unwrap();
-    assert!(PimThermalBridge::new(params, 0.0, 1.0e-8).is_err(),
-        "Zero base energy must error");
-    assert!(PimThermalBridge::new(params, 1.0e-6, -1.0).is_err(),
-        "Negative thermal coefficient must error");
+    assert!(
+        PimThermalBridge::new(params, 0.0, 1.0e-8).is_err(),
+        "Zero base energy must error"
+    );
+    assert!(
+        PimThermalBridge::new(params, 1.0e-6, -1.0).is_err(),
+        "Negative thermal coefficient must error"
+    );
 }
 
 // ============================================================
@@ -111,16 +130,22 @@ fn test_thermal_bridge_rejects_invalid_params() {
 #[test]
 fn test_entropy_placement_selects_lowest_energy() {
     let mut monitor = crate::set9_telemetry::multi_domain::MultiDomainRapl::new();
-    monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Package, 10.0);
-    monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Core, 5.0);      // lowest
+    monitor.inject(
+        crate::set9_telemetry::multi_domain::RaplDomain::Package,
+        10.0,
+    );
+    monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Core, 5.0); // lowest
     monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Uncore, 8.0);
     monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Dram, 12.0);
     monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Psu, 15.0);
 
     let placement = EntropyPimPlacement::new(monitor, 0.1).unwrap();
     let result = placement.place(100.0).unwrap();
-    assert_eq!(result.domain, crate::set9_telemetry::multi_domain::RaplDomain::Core,
-        "Must select domain with lowest energy");
+    assert_eq!(
+        result.domain,
+        crate::set9_telemetry::multi_domain::RaplDomain::Core,
+        "Must select domain with lowest energy"
+    );
     assert_eq!(result.estimated_energy, 5.0);
 }
 
@@ -135,10 +160,16 @@ fn test_entropy_placement_uninitialized_error() {
 #[test]
 fn test_entropy_placement_threshold_respected() {
     let mut monitor = crate::set9_telemetry::multi_domain::MultiDomainRapl::new();
-    monitor.inject(crate::set9_telemetry::multi_domain::RaplDomain::Package, 10.0);
+    monitor.inject(
+        crate::set9_telemetry::multi_domain::RaplDomain::Package,
+        10.0,
+    );
 
     let placement = EntropyPimPlacement::new(monitor, 1000.0).unwrap(); // high threshold
     let sufficient = placement.entropy_sufficient(100.0).unwrap();
     // theta(100) ~ 176.6, which is < 1000, so this should be false
-    assert!(!sufficient, "theta(100) ~ 176.6 must be below threshold 1000");
+    assert!(
+        !sufficient,
+        "theta(100) ~ 176.6 must be below threshold 1000"
+    );
 }

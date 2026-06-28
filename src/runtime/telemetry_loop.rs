@@ -1,4 +1,4 @@
-﻿use crate::governance::policy::GovernancePolicy;
+use crate::governance::policy::GovernancePolicy;
 use crate::hal::atomic_boot::HardwareBindings;
 use crate::hal::fingerprint::HardwareFingerprint;
 use crate::runtime::flow_runtime::{FlowRuntime, FlowState};
@@ -122,5 +122,3 @@ impl TelemetryLoop {
         self.sample_count
     }
 }
-
-

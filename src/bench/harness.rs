@@ -7,9 +7,9 @@
 //! - Performance baseline is self-referential ( Harmonis Prime vs itself over time )
 //! - NO claims made against MiniSat, Glucose, or CaDiCaL
 
-use std::time::{Duration, Instant};
 use crate::pim_solver::cdcl::{CdclSolver, SolveResult};
 use crate::pim_solver::dimacs::DimacsInstance;
+use std::time::{Duration, Instant};
 
 /// Result of a single benchmark run
 #[derive(Debug, Clone)]
@@ -33,15 +33,15 @@ pub fn run_benchmark(
 ) -> BenchmarkResult {
     let start = Instant::now();
     let mut solver = CdclSolver::from_dimacs(instance);
-    
+
     // Solve with timeout check
     let result = solver.solve();
     let elapsed = start.elapsed();
     let timeout = elapsed > Duration::from_millis(timeout_ms);
-    
+
     let actual_sat = matches!(result, SolveResult::Sat(_));
     let agree = expected.map_or(true, |exp| actual_sat == exp);
-    
+
     BenchmarkResult {
         name: name.to_string(),
         num_vars: instance.num_vars,
@@ -58,48 +58,65 @@ pub fn run_benchmark(
 pub fn embedded_ci_benchmarks() -> Vec<(&'static str, DimacsInstance, Option<bool>)> {
     vec![
         // SAT: empty instance
-        ("empty_2var", DimacsInstance {
-            num_vars: 2,
-            num_clauses: 0,
-            clauses: vec![],
-        }, Some(true)),
-        
+        (
+            "empty_2var",
+            DimacsInstance {
+                num_vars: 2,
+                num_clauses: 0,
+                clauses: vec![],
+            },
+            Some(true),
+        ),
         // SAT: unit clauses
-        ("unit_sat", DimacsInstance {
-            num_vars: 3,
-            num_clauses: 2,
-            clauses: vec![vec![1], vec![2]],
-        }, Some(true)),
-        
+        (
+            "unit_sat",
+            DimacsInstance {
+                num_vars: 3,
+                num_clauses: 2,
+                clauses: vec![vec![1], vec![2]],
+            },
+            Some(true),
+        ),
         // UNSAT: direct contradiction
-        ("contradiction", DimacsInstance {
-            num_vars: 1,
-            num_clauses: 2,
-            clauses: vec![vec![1], vec![-1]],
-        }, Some(false)),
-        
+        (
+            "contradiction",
+            DimacsInstance {
+                num_vars: 1,
+                num_clauses: 2,
+                clauses: vec![vec![1], vec![-1]],
+            },
+            Some(false),
+        ),
         // SAT: choice required
-        ("choice_sat", DimacsInstance {
-            num_vars: 2,
-            num_clauses: 2,
-            clauses: vec![vec![1, 2], vec![-1, 2]],
-        }, Some(true)),
-        
+        (
+            "choice_sat",
+            DimacsInstance {
+                num_vars: 2,
+                num_clauses: 2,
+                clauses: vec![vec![1, 2], vec![-1, 2]],
+            },
+            Some(true),
+        ),
         // UNSAT: XOR-pattern (M2.5.4 fix validation)
-        ("xor_unsat", DimacsInstance {
-            num_vars: 2,
-            num_clauses: 4,
-            clauses: vec![
-                vec![1, 2], vec![1, -2], vec![-1, 2], vec![-1, -2],
-            ],
-        }, Some(false)),
-        
+        (
+            "xor_unsat",
+            DimacsInstance {
+                num_vars: 2,
+                num_clauses: 4,
+                clauses: vec![vec![1, 2], vec![1, -2], vec![-1, 2], vec![-1, -2]],
+            },
+            Some(false),
+        ),
         // SAT: single variable, single clause
-        ("single_clause", DimacsInstance {
-            num_vars: 1,
-            num_clauses: 1,
-            clauses: vec![vec![1]],
-        }, Some(true)),
+        (
+            "single_clause",
+            DimacsInstance {
+                num_vars: 1,
+                num_clauses: 1,
+                clauses: vec![vec![1]],
+            },
+            Some(true),
+        ),
     ]
 }
 
@@ -117,11 +134,20 @@ pub fn print_report(results: &[BenchmarkResult]) {
     println!("=== M2.5.5 Benchmark Report ===");
     println!("{{");
     println!("  \"total\": {},", results.len());
-    println!("  \"passed\": {},", results.iter().filter(|r| r.agree && !r.timeout).count());
-    println!("  \"failed\": {},", results.iter().filter(|r| !r.agree).count());
-    println!("  \"timeouts\": {},", results.iter().filter(|r| r.timeout).count());
+    println!(
+        "  \"passed\": {},",
+        results.iter().filter(|r| r.agree && !r.timeout).count()
+    );
+    println!(
+        "  \"failed\": {},",
+        results.iter().filter(|r| !r.agree).count()
+    );
+    println!(
+        "  \"timeouts\": {},",
+        results.iter().filter(|r| r.timeout).count()
+    );
     println!("  \"results\": [");
-    
+
     for (i, r) in results.iter().enumerate() {
         let comma = if i < results.len() - 1 { "," } else { "" };
         println!("    {{");
@@ -135,7 +161,7 @@ pub fn print_report(results: &[BenchmarkResult]) {
         println!("      \"timeout\": {}{}", r.timeout, comma);
         println!("    }}{}", comma);
     }
-    
+
     println!("  ]");
     println!("}}");
 }
@@ -147,13 +173,16 @@ mod tests {
     #[test]
     fn test_benchmark_ci_suite() {
         let results = run_ci_suite(5000); // 5 second timeout per instance
-        
+
         for r in &results {
-            assert!(r.agree, "Benchmark {} failed: expected={:?}, actual={}", 
-                    r.name, r.expected_sat, r.actual_sat);
+            assert!(
+                r.agree,
+                "Benchmark {} failed: expected={:?}, actual={}",
+                r.name, r.expected_sat, r.actual_sat
+            );
             assert!(!r.timeout, "Benchmark {} timed out", r.name);
         }
-        
+
         println!("All {} CI benchmarks passed", results.len());
         print_report(&results);
     }
@@ -163,19 +192,20 @@ mod tests {
         let instance = DimacsInstance {
             num_vars: 2,
             num_clauses: 4,
-            clauses: vec![
-                vec![1, 2], vec![1, -2], vec![-1, 2], vec![-1, -2],
-            ],
+            clauses: vec![vec![1, 2], vec![1, -2], vec![-1, 2], vec![-1, -2]],
         };
-        
+
         let result = run_benchmark("xor_perf", &instance, Some(false), 5000);
-        
+
         assert!(result.agree);
         assert!(!result.timeout);
         // XOR-pattern should solve in < 10ms after M2.5.4 fix
-        assert!(result.duration_ms < 10.0, 
-                "XOR-pattern took {:.3}ms, expected < 10ms", result.duration_ms);
-        
+        assert!(
+            result.duration_ms < 10.0,
+            "XOR-pattern took {:.3}ms, expected < 10ms",
+            result.duration_ms
+        );
+
         println!("XOR-pattern solved in {:.3}ms", result.duration_ms);
     }
 }

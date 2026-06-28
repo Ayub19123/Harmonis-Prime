@@ -40,7 +40,9 @@ impl JloCorrelation {
         let mean_a: f64 = a.iter().sum::<f64>() / n;
         let mean_b: f64 = b.iter().sum::<f64>() / n;
 
-        let covariance: f64 = a.iter().zip(b.iter())
+        let covariance: f64 = a
+            .iter()
+            .zip(b.iter())
             .map(|(x, y)| (x - mean_a) * (y - mean_b))
             .sum();
 

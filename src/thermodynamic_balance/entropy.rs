@@ -1,5 +1,5 @@
 /// Shannon entropy and KL divergence engine.
-/// 
+///
 /// All computations use f64. No unsafe code. No external dependencies.
 #[derive(Debug, Clone)]
 pub struct EntropyEngine;
@@ -10,20 +10,17 @@ impl EntropyEngine {
     }
 
     /// Shannon entropy: H = −Σ p_i · ln(p_i)
-    /// 
+    ///
     /// Convention: 0 · ln(0) = 0 (limit continuity)
     pub fn shannon_entropy(&self, probabilities: &[f64]) -> f64 {
-        probabilities.iter().map(|&p| {
-            if p > 0.0 {
-                -p * p.ln()
-            } else {
-                0.0
-            }
-        }).sum()
+        probabilities
+            .iter()
+            .map(|&p| if p > 0.0 { -p * p.ln() } else { 0.0 })
+            .sum()
     }
 
     /// Kullback-Leibler divergence: D_KL(P || Q) = Σ p_i · ln(p_i / q_i)
-    /// 
+    ///
     /// Returns error if:
     /// - Lengths mismatch
     /// - Any probability negative

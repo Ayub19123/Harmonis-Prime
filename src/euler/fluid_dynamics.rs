@@ -1,4 +1,4 @@
-﻿//! SET-5.6: Euler Fluid Dynamics — Thermodynamic State Transitions
+//! SET-5.6: Euler Fluid Dynamics — Thermodynamic State Transitions
 //! Mathematical Authority: Navier-Stokes equations for laminar flow
 //! Invariant: Reynolds number < 2300 (turbulence-free)
 //! Invariant: Energy dissipation minimized per consensus round
@@ -6,10 +6,10 @@
 /// Fluid state representing system resource allocation
 #[derive(Debug, Clone)]
 pub struct FluidState {
-    pub velocity: Vec<f64>,      // Resource flow velocity per dimension
-    pub pressure: f64,            // System load pressure
-    pub density: f64,             // Resource density
-    pub viscosity: f64,           // Friction/damping coefficient
+    pub velocity: Vec<f64>, // Resource flow velocity per dimension
+    pub pressure: f64,      // System load pressure
+    pub density: f64,       // Resource density
+    pub viscosity: f64,     // Friction/damping coefficient
 }
 
 impl FluidState {
@@ -68,7 +68,7 @@ pub fn minimize_joules_per_consensus(
     if total_dissipation <= 0.0 {
         return energy_budget;
     }
-    
+
     // Scale velocities to meet energy budget
     let scale = (energy_budget / total_dissipation).sqrt().min(1.0);
     for state in states.iter_mut() {
@@ -76,7 +76,6 @@ pub fn minimize_joules_per_consensus(
             *v *= scale;
         }
     }
-    
+
     total_dissipation * scale * scale
 }
-

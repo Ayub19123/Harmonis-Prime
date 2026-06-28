@@ -1,6 +1,6 @@
-﻿//! SET-6C: PUF-Based Identity & Zero-Trust Authentication
+//! SET-6C: PUF-Based Identity & Zero-Trust Authentication
 //! Physical Unclonable Function (SRAM PUF) simulation for hardware-rooted identity.
-//! 
+//!
 //! Invariants:
 //! - puf_unique_key: Each node generates a hardware-bound key without storing private keys.
 //! - hamming_distance: Inter-chip variation > 40%, intra-chip variation < 5%.
@@ -8,13 +8,13 @@
 //! - challenge_response: SHA-256 based with 64-bit nonce replay protection.
 //! - replay_protection: Nonce window strictly monotonic, 0 tolerance for reuse.
 
-pub mod puf;
-pub mod nist;
 pub mod auth;
+pub mod nist;
+pub mod puf;
 
-pub use puf::{SramPuf, PufResponse, HardwareFingerprint, hamming_distance};
-pub use nist::{run_nist_battery, frequency_monobit_test};
 pub use auth::{ChallengeResponse, NonceWindow, ReplayError};
+pub use nist::{frequency_monobit_test, run_nist_battery};
+pub use puf::{hamming_distance, HardwareFingerprint, PufResponse, SramPuf};
 
 #[cfg(test)]
 mod tests {
@@ -28,7 +28,10 @@ mod tests {
         let challenge = [1u8; 32];
         let r1 = puf.generate(&challenge);
         let r2 = puf.generate(&challenge);
-        assert_eq!(r1.bits, r2.bits, "Same node + challenge must produce identical response");
+        assert_eq!(
+            r1.bits, r2.bits,
+            "Same node + challenge must produce identical response"
+        );
         assert!(r1.stability_score > 0.45, "Stability must exceed threshold");
     }
 
@@ -43,8 +46,16 @@ mod tests {
         let r1 = puf1.generate(&challenge);
         let r2 = puf2.generate(&challenge);
         let hd = hamming_distance(&r1.bits, &r2.bits);
-        assert!(hd > 0.40, "Inter-chip Hamming distance must exceed 40%, got {}", hd);
-        assert!(hd < 0.60, "Inter-chip Hamming distance must be below 60%, got {}", hd);
+        assert!(
+            hd > 0.40,
+            "Inter-chip Hamming distance must exceed 40%, got {}",
+            hd
+        );
+        assert!(
+            hd < 0.60,
+            "Inter-chip Hamming distance must be below 60%, got {}",
+            hd
+        );
     }
 
     #[test]
@@ -63,7 +74,11 @@ mod tests {
     fn test_monobit_on_balanced_data() {
         let bits = vec![0x55u8; 128];
         let result = frequency_monobit_test(&bits);
-        assert!(result.passed, "Monobit test should pass for balanced data: p={}", result.p_value);
+        assert!(
+            result.passed,
+            "Monobit test should pass for balanced data: p={}",
+            result.p_value
+        );
     }
 
     #[test]
@@ -82,7 +97,11 @@ mod tests {
         let response = puf.generate(&challenge);
         let results = run_nist_battery(&response.bits);
         let pass_count = results.iter().filter(|r| r.passed).count();
-        assert!(pass_count >= 2, "At least 4/6 NIST tests should pass for PUF data, got {}", pass_count);
+        assert!(
+            pass_count >= 2,
+            "At least 4/6 NIST tests should pass for PUF data, got {}",
+            pass_count
+        );
     }
 
     #[test]
@@ -98,7 +117,10 @@ mod tests {
     fn test_nonce_replay_rejection() {
         let mut window = NonceWindow::new();
         window.validate(100).unwrap();
-        assert!(matches!(window.validate(100), Err(ReplayError::NonceAlreadySeen)));
+        assert!(matches!(
+            window.validate(100),
+            Err(ReplayError::NonceAlreadySeen)
+        ));
     }
 
     #[test]
@@ -109,7 +131,10 @@ mod tests {
         let nonce = 42u64;
         let r1 = auth.generate_response(&challenge, nonce);
         let r2 = auth.generate_response(&challenge, nonce);
-        assert_eq!(r1, r2, "Same challenge+nonce+key must produce identical response");
+        assert_eq!(
+            r1, r2,
+            "Same challenge+nonce+key must produce identical response"
+        );
     }
 
     #[test]
@@ -126,4 +151,3 @@ mod tests {
         ));
     }
 }
-
