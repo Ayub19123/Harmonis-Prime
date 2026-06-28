@@ -184,3 +184,4 @@ pub mod truncation_budget;
 pub mod audit;
 pub mod bench;
 pub mod mpfr_zeta;
+pub mod memory;  // M2.7: Distributed Clause Registry
