@@ -2,9 +2,9 @@ name: Rust CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -45,6 +45,7 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
+      # M2.6.3: Compile drat-trim on Ubuntu for DRAT proof validation
       - name: Compile drat-trim (Ubuntu only)
         if: runner.os == 'Linux'
         run: |
@@ -63,6 +64,7 @@ jobs:
       - name: Build SAT solver binary (no default features)
         run: cargo build --release --bin sat_solver --no-default-features
 
+      # M2.6.3: End-to-end DRAT validation on Ubuntu
       - name: Validate DRAT proof end-to-end (Ubuntu only)
         if: runner.os == 'Linux'
         run: |
