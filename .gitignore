@@ -26,3 +26,8 @@ tools/drat-trim-src/
 *.exe
 *.dll
 tools/drat-trim-src/
+tools/drat-trim
+*.cnf
+*.drat tools/drat-trim
+*.cnf
+*.drat

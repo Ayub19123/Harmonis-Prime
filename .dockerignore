@@ -1,0 +1,11 @@
+target/
+.git/
+.github/
+*.md
+*.txt
+*.py
+*.sh
+*.ps1
+*.bak
+*.drat
+*.cnf
