@@ -133,9 +133,7 @@ impl LitPack {
             1.0
         };
 
-        alpha * self.lbd_score as f64
-            + beta * self.clause_len as f64
-            + gamma * activity
+        alpha * self.lbd_score as f64 + beta * self.clause_len as f64 + gamma * activity
     }
 }
 

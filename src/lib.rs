@@ -183,5 +183,5 @@ pub mod truncation_budget;
 // LIMITATION: Windows compilation may fail — f64 fallback activated automatically
 pub mod audit;
 pub mod bench;
-pub mod mpfr_zeta;
-pub mod memory;  // M2.7: Distributed Clause Registry
+pub mod memory;
+pub mod mpfr_zeta; // M2.7: Distributed Clause Registry
