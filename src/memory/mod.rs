@@ -3,7 +3,9 @@
 
 pub mod dht;
 pub mod packet;
+pub mod proof;
 pub mod registry;
 
 pub use packet::LitPack;
+pub use proof::{EpistemicMeta, EpistemicProofTrace, ProofEntry};
 pub use registry::{ClauseRegistry, FilterConfig, RegistryStats};

@@ -1,3 +1,4 @@
+use crate::memory::{EpistemicMeta, EpistemicProofTrace};
 use std::collections::{HashSet, VecDeque};
 
 /// Trail entry recording assignment.
@@ -62,8 +63,8 @@ pub struct CdclSolver {
     clause_decay: f64,         // Clause activity decay factor
     reduction_counter: u64,    // Conflicts since last database reduction
     // M2.5.9: Proof logging fields
-    proof_trace: Vec<String>, // DRAT proof lines
-    proof_enabled: bool,      // Toggle proof generation
+    proof_trace: EpistemicProofTrace, // M2.7.2: Epistemic DRAT proof trace
+    proof_enabled: bool,              // Toggle proof generation
     // M2.5.10: Memory telemetry
     telemetry: SolverTelemetry,
 }
@@ -120,7 +121,7 @@ impl CdclSolver {
             clause_decay: 0.999,
             reduction_counter: 0,
             // M2.5.9: Proof logging initialization
-            proof_trace: Vec::new(),
+            proof_trace: EpistemicProofTrace::new(),
             proof_enabled: true,
             // M2.5.10: Telemetry initialization
             telemetry: SolverTelemetry::default(),
@@ -559,20 +560,37 @@ impl CdclSolver {
 
     // M2.5.9: DRAT proof logging methods
 
-    /// Emit a clause addition to the proof trace.
+    // M2.7.2: Emit a clause addition with epistemic metadata.
     fn proof_add(&mut self, clause: &[i32]) {
         if !self.proof_enabled {
             return;
         }
+        // Compute LBD: count unique decision levels in clause
+        let mut levels = std::collections::HashSet::new();
+        for &lit in clause {
+            let var = lit.abs() as usize;
+            if let Some(entry) = self.trail.iter().find(|e| e.var == var) {
+                levels.insert(entry.decision_level);
+            } else {
+                levels.insert(0); // Unassigned = level 0
+            }
+        }
+        let lbd = levels.len() as u8;
+
+        // Emit epistemic metadata comment
+        let meta = EpistemicMeta::local(lbd);
+        self.proof_trace.push_meta(meta);
+
+        // Emit standard DRAT addition line
         let mut line = String::from("a");
         for &lit in clause {
             line.push_str(&format!(" {}", lit));
         }
         line.push_str(" 0");
-        self.proof_trace.push(line);
+        self.proof_trace.push_line(line);
     }
 
-    /// Emit a clause deletion to the proof trace.
+    // M2.7.2: Emit a clause deletion (no metadata for deletions).
     fn proof_delete(&mut self, clause: &[i32]) {
         if !self.proof_enabled {
             return;
@@ -582,17 +600,12 @@ impl CdclSolver {
             line.push_str(&format!(" {}", lit));
         }
         line.push_str(" 0");
-        self.proof_trace.push(line);
+        self.proof_trace.push_line(line);
     }
 
-    /// Write proof trace to file.
+    // M2.7.2: Write epistemic proof trace to file.
     pub fn write_proof(&self, path: &str) -> std::io::Result<()> {
-        use std::io::Write;
-        let mut file = std::fs::File::create(path)?;
-        for line in &self.proof_trace {
-            writeln!(file, "{}", line)?;
-        }
-        Ok(())
+        self.proof_trace.write_to_file(path)
     }
 
     // M2.5.10: Telemetry methods
