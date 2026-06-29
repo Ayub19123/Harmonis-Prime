@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "sovereign_core"
 version = "6.2.0"
 edition = "2021"
@@ -53,6 +53,7 @@ fastrand = "2.4.1"
 rug = { version = "1.24", optional = true }
 ring = "0.17.14"
 ureq = "3.3.0"
+blake3 = "1.8.5"
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
