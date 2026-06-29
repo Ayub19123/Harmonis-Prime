@@ -72,6 +72,22 @@ impl ClauseRegistry {
         }
     }
 
+    /// Bump activity for a clause identified by its literals (not hash).
+    /// Computes the hash internally and delegates to bump_activity.
+    pub fn bump_activity_by_literals(&mut self, literals: &[i32]) {
+        // Match by sorted literal content (deterministic, timestamp-independent)
+        let mut target = literals.to_vec();
+        target.sort_unstable();
+        if let Some(entry) = self.clauses.iter_mut().find(|c| {
+            let mut stored = c.provenance.literals.clone();
+            stored.sort_unstable();
+            stored == target
+        }) {
+            entry.activity += 1.0;
+            // Recompute score with updated activity
+            entry.score = ClauseScore::compute(&entry.provenance, entry.activity, &self.params);
+        }
+    }
     /// Retrieve top-scored clauses by minimum LBD threshold.
     pub fn query_by_lbd(&self, max_lbd: u8) -> Vec<&ScoredClause> {
         self.clauses

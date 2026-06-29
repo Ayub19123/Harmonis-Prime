@@ -51,7 +51,7 @@ impl ClauseProvenance {
     ///
     /// Determinism guarantee: literals are sorted before hashing to ensure
     /// {1, -2, 3} and {3, 1, -2} produce the same hash.
-    fn compute_hash(literals: &[i32], origin_id: u8, timestamp: u64) -> [u8; 32] {
+    pub fn compute_hash(literals: &[i32], origin_id: u8, timestamp: u64) -> [u8; 32] {
         let mut hasher = blake3::Hasher::new();
 
         // Sort literals for canonical ordering (deterministic hashing)

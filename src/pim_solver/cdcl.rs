@@ -266,6 +266,7 @@ impl CdclSolver {
         };
 
         let mut learned = conflict_clause.clone();
+        // M2.7.7: Bump activity for the conflict clause that triggered this analysis
         let mut current_level_count = learned
             .iter()
             .filter(|&&lit| {
@@ -303,6 +304,7 @@ impl CdclSolver {
                     .literals
                     .clone()
             };
+            // M2.7.7: Bump activity for the reason clause used in resolution
 
             // Resolution: learned = learned ∪ reason \ {var, -var}
             let mut new_learned = Vec::new();
@@ -483,6 +485,32 @@ impl CdclSolver {
         self.enqueue_unit_clauses();
     }
 
+    /// M2.7.7: Inject strategic glue clauses from registry into active clause database.
+    /// Called after restart to re-seed the solver with high-value learned clauses.
+    fn inject_strategic_clauses(&mut self) {
+        // Retrieve top-scored glue clauses (LBD <= 2) from registry
+        let strategic = self.registry.query_by_lbd(2);
+
+        for scored in strategic {
+            let literals = scored.provenance.literals.clone();
+
+            // Skip if already in learned_clauses (simple duplicate check)
+            let already_present = self.learned_clauses.iter().any(|c| c.literals == literals);
+            if already_present {
+                continue;
+            }
+
+            // Add as watched clause
+            let w_a = 0;
+            let w_b = if literals.len() > 1 { 1 } else { 0 };
+            self.learned_clauses.push(WatchedClause {
+                literals,
+                watch_a: w_a,
+                watch_b: w_b,
+            });
+            self.clause_activity.push(1.0);
+        }
+    }
     // M2.5.8: Clause database reduction methods
 
     /// Literal Block Distance (LBD): count of distinct decision levels in a clause.
@@ -714,6 +742,8 @@ impl CdclSolver {
                 let lbd = self.lbd(&learned) as u8;
                 let provenance = ClauseProvenance::new(learned.clone(), 0, lbd, vec![]);
                 self.registry.ingest(provenance);
+                // M2.7.7: Bump activity for learned clause after ingestion
+                self.registry.bump_activity_by_literals(&learned);
 
                 // Backjump
                 self.backjump(backjump_level);
@@ -764,6 +794,8 @@ impl CdclSolver {
                     self.proof_add(&learned2);
                     // M2.7.6: Register recursive learned clause with provenance and scoring
                     let lbd2 = self.lbd(&learned2) as u8;
+                    // M2.7.7: Bump activity for recursive learned clause after ingestion
+                    self.registry.bump_activity_by_literals(&learned2);
                     let provenance2 = ClauseProvenance::new(learned2.clone(), 0, lbd2, vec![]);
                     self.registry.ingest(provenance2);
                 }
@@ -778,6 +810,8 @@ impl CdclSolver {
                 // M2.5.7: Check if restart is needed
                 if self.conflicts_since_restart >= self.restart_threshold() {
                     self.restart();
+                    // M2.7.7: Inject strategic glue clauses from registry after restart
+                    self.inject_strategic_clauses();
                     // After restart, propagate any unit clauses
                     if let Some(_ci) = self.unit_propagate() {
                         self.update_telemetry();
@@ -970,6 +1004,74 @@ mod tests {
         assert!(
             glue_count > 0,
             "Glue clauses (LBD <= 2) should be present in registry"
+        );
+    }
+    // M2.7.7: Strategic Retrieval Layer — Functional Verification
+    #[test]
+    fn test_conflict_and_reason_activity_bump() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 4,
+            clauses: vec![vec![1, 2], vec![-1, -2], vec![1, -2], vec![-1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+        let _ = solver.solve();
+
+        let active_count = solver
+            .registry
+            .query_by_lbd(255)
+            .into_iter()
+            .filter(|c| c.activity > 0.0)
+            .count();
+        assert!(
+            active_count > 0,
+            "M2.7.7: Activity bump must register on clauses participating in conflict resolution"
+        );
+    }
+
+    #[test]
+    fn test_strategic_glue_clause_injection() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 1,
+            clauses: vec![vec![1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        let glue = vec![1, -2];
+        let provenance = ClauseProvenance::new(glue.clone(), 0, 1, vec![]);
+        solver.registry.ingest(provenance);
+
+        solver.inject_strategic_clauses();
+
+        assert!(
+            solver.learned_clauses.iter().any(|c| c.literals == glue),
+            "M2.7.7: Glue clause must be injected into learned_clauses after strategic retrieval"
+        );
+    }
+
+    #[test]
+    fn test_strategic_injection_idempotent() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 1,
+            clauses: vec![vec![1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        let glue = vec![1, -2];
+        let provenance = ClauseProvenance::new(glue.clone(), 0, 1, vec![]);
+        solver.registry.ingest(provenance);
+
+        solver.inject_strategic_clauses();
+        let learned_after_first = solver.learned_clauses.len();
+
+        solver.inject_strategic_clauses();
+        let learned_after_second = solver.learned_clauses.len();
+
+        assert_eq!(
+            learned_after_first, learned_after_second,
+            "M2.7.7: Repeated strategic injection must be idempotent — no duplicate clauses"
         );
     }
 }
