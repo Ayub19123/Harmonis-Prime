@@ -6,8 +6,10 @@ pub mod packet;
 pub mod proof;
 pub mod provenance; // M2.7.3: Clause birth certificates with BLAKE3
 pub mod registry;
+pub mod scoring; // M2.7.4: Quality scoring engine
 
 pub use packet::LitPack;
 pub use proof::{EpistemicMeta, EpistemicProofTrace, ProofEntry};
 pub use provenance::ClauseProvenance;
 pub use registry::{ClauseRegistry, FilterConfig, RegistryStats};
+pub use scoring::{eviction_cutoff, mean_score, ClauseScore, ScoringParams};
