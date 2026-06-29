@@ -11,5 +11,5 @@ pub mod scoring; // M2.7.4: Quality scoring engine
 pub use packet::LitPack;
 pub use proof::{EpistemicMeta, EpistemicProofTrace, ProofEntry};
 pub use provenance::ClauseProvenance;
-pub use registry::{ClauseRegistry, FilterConfig, RegistryStats};
+pub use registry::{ClauseRegistry, RegistryStats, ScoredClause};
 pub use scoring::{eviction_cutoff, mean_score, ClauseScore, ScoringParams};
