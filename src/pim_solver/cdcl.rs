@@ -1,4 +1,4 @@
-use crate::memory::{EpistemicMeta, EpistemicProofTrace};
+use crate::memory::{ClauseProvenance, ClauseRegistry, EpistemicMeta, EpistemicProofTrace};
 use std::collections::{HashSet, VecDeque};
 
 /// Trail entry recording assignment.
@@ -67,6 +67,9 @@ pub struct CdclSolver {
     proof_enabled: bool,              // Toggle proof generation
     // M2.5.10: Memory telemetry
     telemetry: SolverTelemetry,
+    // M2.7.6: Provenance-aware clause registry for epistemic memory
+    #[serde(skip)]
+    registry: ClauseRegistry,
 }
 
 impl CdclSolver {
@@ -125,6 +128,8 @@ impl CdclSolver {
             proof_enabled: true,
             // M2.5.10: Telemetry initialization
             telemetry: SolverTelemetry::default(),
+            // M2.7.6: Initialize provenance-aware clause registry
+            registry: ClauseRegistry::new(10000),
         }
     }
 
@@ -705,6 +710,10 @@ impl CdclSolver {
                 self.clause_activity.push(1.0);
                 // M2.5.9: Log clause addition
                 self.proof_add(&learned);
+                // M2.7.6: Register learned clause with provenance and scoring
+                let lbd = self.lbd(&learned) as u8;
+                let provenance = ClauseProvenance::new(learned.clone(), 0, lbd, vec![]);
+                self.registry.ingest(provenance);
 
                 // Backjump
                 self.backjump(backjump_level);
@@ -753,6 +762,10 @@ impl CdclSolver {
                     self.clause_activity.push(1.0);
                     // M2.5.9: Log recursive clause addition
                     self.proof_add(&learned2);
+                    // M2.7.6: Register recursive learned clause with provenance and scoring
+                    let lbd2 = self.lbd(&learned2) as u8;
+                    let provenance2 = ClauseProvenance::new(learned2.clone(), 0, lbd2, vec![]);
+                    self.registry.ingest(provenance2);
                 }
 
                 // M2.5.8: Increment reduction counter and check if reduction needed
@@ -897,5 +910,66 @@ mod tests {
         // Memory pressure should be deterministic and non-zero for non-trivial instances
         assert!(telemetry.clause_db_size > 0);
         assert!(telemetry.clause_db_size >= 3);
+    }
+    // M2.7.6: CDCL → Registry Wiring Tests
+    #[test]
+    fn test_registry_initialized() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 2,
+            clauses: vec![vec![1, 2], vec![-1, -2]],
+        };
+        let solver = CdclSolver::from_dimacs(&instance);
+        let stats = solver.registry.stats();
+        assert_eq!(stats.stored, 0, "Registry starts empty");
+    }
+
+    #[test]
+    fn test_learned_clause_births_provenance() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 4,
+            clauses: vec![vec![1, 2], vec![-1, -2], vec![1, -2], vec![-1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+        let _ = solver.solve();
+        let stats = solver.registry.stats();
+        assert!(
+            stats.stored > 0,
+            "Registry should contain learned clauses after conflict"
+        );
+    }
+
+    #[test]
+    fn test_registry_stats_tracked() {
+        let instance = DimacsInstance {
+            num_vars: 3,
+            num_clauses: 3,
+            clauses: vec![vec![1, 2], vec![-1, 3], vec![2, -3]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+        let _ = solver.solve();
+        let stats = solver.registry.stats();
+        assert!(
+            stats.stored >= stats.glue_clauses,
+            "Glue clauses should be subset of stored"
+        );
+        assert!(stats.mean_score >= 0.0, "Mean score should be non-negative");
+    }
+
+    #[test]
+    fn test_glue_clauses_in_registry() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 4,
+            clauses: vec![vec![1, 2], vec![-1, -2], vec![1, -2], vec![-1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+        let _ = solver.solve();
+        let glue_count = solver.registry.stats().glue_clauses;
+        assert!(
+            glue_count > 0,
+            "Glue clauses (LBD <= 2) should be present in registry"
+        );
     }
 }

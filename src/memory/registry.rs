@@ -13,6 +13,7 @@ pub struct ScoredClause {
 }
 
 /// Provenance-aware clause registry with dynamic eviction.
+#[derive(Default)]
 pub struct ClauseRegistry {
     clauses: Vec<ScoredClause>,
     params: ScoringParams,
