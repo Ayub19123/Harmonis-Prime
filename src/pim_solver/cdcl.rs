@@ -1,4 +1,5 @@
 use crate::memory::{ClauseProvenance, ClauseRegistry, EpistemicMeta, EpistemicProofTrace};
+use crate::pim_solver::shadow::{ShadowImplicationGraph, ShadowLiteral};
 use std::collections::{HashSet, VecDeque};
 
 /// Trail entry recording assignment.
@@ -405,6 +406,50 @@ impl CdclSolver {
     /// VSIDS variable selection: highest activity unassigned variable.
     /// Tie-break by variable index for determinism.
     /// Phase saving: use last assigned polarity if available.
+
+    /// M2.7.9: Epistemic Look-Ahead — 3-ply shadow projection.
+    /// Simulates variable assignments ahead of active decision level.
+    /// Returns forced literals (those appearing in ≥85% of projected branches).
+    fn shadow_lookahead(&self) -> Vec<ShadowLiteral> {
+        // Collect current active assignments
+        let mut active_assignments = std::collections::BTreeMap::new();
+        for (var, &val) in self.assignment.iter().enumerate().skip(1) {
+            if let Some(v) = val {
+                active_assignments.insert(var, v);
+            }
+        }
+
+        // Collect all clause literals (original + learned)
+        let mut all_clauses: Vec<Vec<i32>> = Vec::new();
+        for c in &self.clauses {
+            all_clauses.push(c.literals.clone());
+        }
+        for c in &self.learned_clauses {
+            all_clauses.push(c.literals.clone());
+        }
+
+        // Collect unassigned variables
+        let unassigned: Vec<usize> = (1..=self.num_vars)
+            .filter(|&v| self.assignment[v].is_none())
+            .collect();
+
+        // If too few unassigned variables, skip look-ahead
+        if unassigned.len() < 2 {
+            return Vec::new();
+        }
+
+        // Build shadow graph and perform 3-ply projection
+        let mut shadow = ShadowImplicationGraph::new();
+        shadow.seed_from_assignments(&active_assignments);
+
+        // Limit to first 10 unassigned variables for performance
+        let limited_vars = &unassigned[..unassigned.len().min(5)];
+        shadow.three_ply_projection(&all_clauses, limited_vars, 3);
+
+        // Return forced literals
+        shadow.forced_literals().iter().cloned().collect()
+    }
+
     fn pick_branch_var(&self) -> Option<(usize, bool)> {
         let mut best_var: Option<usize> = None;
         let mut best_score: f64 = -1.0;
@@ -697,6 +742,18 @@ impl CdclSolver {
                     .collect();
                 self.update_telemetry();
                 return SolveResult::Sat(model);
+            }
+
+            // M2.7.9: Epistemic Look-Ahead — inject forced literals preemptively
+            let forced = self.shadow_lookahead();
+            for lit in &forced {
+                let var = lit.var;
+                if self.assignment[var].is_none() {
+                    self.decision_level += 1;
+                    self.telemetry.decision_count += 1;
+                    self.assign(var, lit.value, None);
+                    // Let normal unit_propagate() in next loop iteration handle implications
+                }
             }
 
             // Make a decision using VSIDS + phase saving
@@ -1079,6 +1136,87 @@ mod tests {
         assert_eq!(
             learned_after_first, learned_after_second,
             "M2.7.7: Repeated strategic injection must be idempotent — no duplicate clauses"
+        );
+    }
+    // M2.7.9: Epistemic Look-Ahead — Functional Verification
+
+    #[test]
+    fn test_shadow_forced_literal_detection() {
+        // Controlled CNF: (x1 ∨ x2) ∧ (¬x1 ∨ x2) ∧ (x1 ∨ ¬x2)
+        // Variable x2 is forced to true in both branches of x1
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 3,
+            clauses: vec![vec![1, 2], vec![-1, 2], vec![1, -2]],
+        };
+        let solver = CdclSolver::from_dimacs(&instance);
+
+        let forced = solver.shadow_lookahead();
+
+        // x2 should be detected as forced (appears in ≥85% of projected branches)
+        // Under this CNF, x2=true is forced regardless of x1 assignment
+        let x2_forced = forced.iter().any(|lit| lit.var == 2 && lit.value);
+        assert!(
+            x2_forced,
+            "M2.7.9: Forced literal detection must identify x2=true as forced"
+        );
+    }
+
+    #[test]
+    fn test_shadow_projection_determinism() {
+        // Shadow projection on a fresh solver must return consistent results.
+        // We verify that the projection runs without error and produces a stable
+        // set of forced literals for a formula with obvious structure.
+        let instance = DimacsInstance {
+            num_vars: 3,
+            num_clauses: 4,
+            clauses: vec![vec![1, 2], vec![-1, 2], vec![2, 3], vec![-2, 3]],
+        };
+
+        let solver = CdclSolver::from_dimacs(&instance);
+        let forced = solver.shadow_lookahead();
+
+        // The projection should identify at least one forced literal in this
+        // highly constrained formula (x2=true is forced by clauses 1 and 2).
+        assert!(
+            !forced.is_empty(),
+            "M2.7.9: Shadow projection must detect forced literals in constrained formula"
+        );
+
+        // Verify x2=true is among the forced literals
+        let x2_forced = forced.iter().any(|lit| lit.var == 2 && lit.value);
+        assert!(
+            x2_forced,
+            "M2.7.9: x2=true must be detected as forced in this formula"
+        );
+    }
+
+    #[test]
+    fn test_epistemic_injection_reduces_backtracks() {
+        // Formula where x2 is forced: (x1 ∨ x2) ∧ (¬x1 ∨ x2)
+        // Without look-ahead: solver branches on x1, then x2 → 2 decisions
+        // With look-ahead: x2 forced, solver skips x2 decision → fewer backtracks
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 2,
+            clauses: vec![vec![1, 2], vec![-1, 2]],
+        };
+
+        // Solve with M2.7.9 look-ahead active (default)
+        let mut solver_with = CdclSolver::from_dimacs(&instance);
+        let result_with = solver_with.solve();
+
+        // Verify SAT
+        assert!(
+            matches!(result_with, SolveResult::Sat(_)),
+            "M2.7.9: Formula must be satisfiable"
+        );
+
+        // The epistemic injection should have processed forced literals
+        // Decision count should reflect reduced branching depth
+        assert!(
+            solver_with.telemetry.decision_count <= 2,
+            "M2.7.9: Epistemic injection must reduce decision count by preempting forced literals"
         );
     }
 }

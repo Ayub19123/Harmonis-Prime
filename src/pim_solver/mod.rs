@@ -33,5 +33,6 @@ pub mod solver; // M2.5.1: Minimal CDCL engine for SAT Competition 2027
 pub use cdcl::{CdclSolver, SolveResult, SolverTelemetry};
 pub use dimacs::{DimacsError, DimacsInstance};
 pub use solver::{Clause, CrossbarConfig, EnergyState, PimSolver, VariableAssignment};
+pub mod shadow;
 #[cfg(test)]
 mod tests;
