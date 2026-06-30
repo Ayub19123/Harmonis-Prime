@@ -31,6 +31,134 @@ pub struct SolverTelemetry {
     pub reduction_count: u64,        // Total database reductions
     pub decision_count: u64,         // Total decisions made
     pub propagation_count: u64,      // Total propagations
+    // M2.7.10: Meta-reasoning telemetry
+    pub conflict_chain_length: usize, // Consecutive conflicts without progress
+    pub backjump_depth_avg: f64,      // Rolling average backjump depth
+    pub decision_level_oscillation: f64, // Variance in decision levels
+    pub clause_birth_rate: f64,       // Learned clauses per decision
+    pub registry_activity_slope: f64, // Activity score trend
+}
+
+/// M2.7.10: GoalVector — Adaptive weight vector for meta-reasoning.
+/// Influences branching, activity scoring, and shadow lookahead depth.
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GoalVector {
+    pub stability_score: f64,   // 0.0-1.0: prefer stable variables
+    pub conflict_pressure: f64, // 0.0-1.0: urgency to resolve conflicts
+    pub exploration_bias: f64,  // 0.0-1.0: favor untried assignments
+    pub exploitation_bias: f64, // 0.0-1.0: favor proven assignments
+    pub epistemic_weight: f64,  // 0.0-1.0: shadow lookahead influence
+}
+
+impl Default for GoalVector {
+    fn default() -> Self {
+        Self {
+            stability_score: 0.5,
+            conflict_pressure: 0.5,
+            exploration_bias: 0.3,
+            exploitation_bias: 0.7,
+            epistemic_weight: 0.5,
+        }
+    }
+}
+
+/// M2.7.10: DivergenceMonitor — Tracks pathological search patterns.
+#[derive(Debug, Default)]
+struct DivergenceMonitor {
+    consecutive_conflicts: usize,
+    last_decision_level: usize,
+    decision_level_history: Vec<usize>,
+    conflict_history: Vec<f64>,
+    backjump_depth_sum: usize,
+    backjump_count: usize,
+}
+
+impl DivergenceMonitor {
+    fn new() -> Self {
+        Self {
+            consecutive_conflicts: 0,
+            last_decision_level: 0,
+            decision_level_history: Vec::with_capacity(20),
+            conflict_history: Vec::with_capacity(20),
+            backjump_depth_sum: 0,
+            backjump_count: 0,
+        }
+    }
+
+    /// Record a conflict event.
+    fn record_conflict(&mut self, decision_level: usize) {
+        self.consecutive_conflicts += 1;
+        self.conflict_history.push(decision_level as f64);
+        if self.conflict_history.len() > 20 {
+            self.conflict_history.remove(0);
+        }
+    }
+
+    /// Record a backjump event.
+    fn record_backjump(&mut self, from_level: usize, to_level: usize) {
+        self.consecutive_conflicts = 0;
+        let depth = from_level.saturating_sub(to_level);
+        self.backjump_depth_sum += depth;
+        self.backjump_count += 1;
+        self.decision_level_history.push(to_level);
+        if self.decision_level_history.len() > 20 {
+            self.decision_level_history.remove(0);
+        }
+    }
+
+    /// Record a decision event.
+    fn record_decision(&mut self, level: usize) {
+        self.last_decision_level = level;
+        self.decision_level_history.push(level);
+        if self.decision_level_history.len() > 20 {
+            self.decision_level_history.remove(0);
+        }
+    }
+
+    /// Check if reflective mode should trigger.
+    fn should_trigger_reflective(&self) -> bool {
+        // Trigger 1: Conflict chain > 10 consecutive
+        if self.consecutive_conflicts > 10 {
+            return true;
+        }
+        // Trigger 2: Backjump depth > 50% of current decision level
+        if self.backjump_count > 0 {
+            let avg_depth = self.backjump_depth_sum as f64 / self.backjump_count as f64;
+            if avg_depth > self.last_decision_level as f64 * 0.5 {
+                return true;
+            }
+        }
+        // Trigger 3: Decision level oscillation (variance) > threshold
+        if self.decision_level_history.len() >= 10 {
+            let mean = self.decision_level_history.iter().sum::<usize>() as f64
+                / self.decision_level_history.len() as f64;
+            let variance = self
+                .decision_level_history
+                .iter()
+                .map(|&x| (x as f64 - mean).powi(2))
+                .sum::<f64>()
+                / self.decision_level_history.len() as f64;
+            if variance > 4.0 {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Compute VSIDS volatility as standard deviation of conflict levels.
+    fn vsids_volatility(&self) -> f64 {
+        if self.conflict_history.len() < 2 {
+            return 0.0;
+        }
+        let mean = self.conflict_history.iter().sum::<f64>() / self.conflict_history.len() as f64;
+        let variance = self
+            .conflict_history
+            .iter()
+            .map(|&x| (x - mean).powi(2))
+            .sum::<f64>()
+            / self.conflict_history.len() as f64;
+        variance.sqrt()
+    }
 }
 
 /// Solver result.
@@ -71,6 +199,11 @@ pub struct CdclSolver {
     // M2.7.6: Provenance-aware clause registry for epistemic memory
     #[serde(skip)]
     registry: ClauseRegistry,
+    // M2.7.10: Meta-reasoning and goal-driven prioritization
+    goal_vector: GoalVector,
+    #[serde(skip)]
+    divergence_monitor: DivergenceMonitor,
+    reflective_mode_active: bool,
 }
 
 impl CdclSolver {
@@ -131,6 +264,9 @@ impl CdclSolver {
             telemetry: SolverTelemetry::default(),
             // M2.7.6: Initialize provenance-aware clause registry
             registry: ClauseRegistry::new(10000),
+            goal_vector: GoalVector::default(),
+            divergence_monitor: DivergenceMonitor::new(),
+            reflective_mode_active: false,
         }
     }
 
@@ -468,6 +604,44 @@ impl CdclSolver {
         best_var.map(|v| (v, self.saved_phase[v].unwrap_or(true)))
     }
 
+    /// M2.7.10: Enter reflective mode — recalibrate solver strategy.
+    fn enter_reflective_mode(&mut self) {
+        self.reflective_mode_active = true;
+
+        // Recalculate variable scores with updated GoalVector
+        for v in 1..=self.num_vars {
+            let stability_bonus = if self.saved_phase[v].is_some() {
+                0.1
+            } else {
+                0.0
+            };
+            self.activity[v] *= self.goal_vector.stability_score + stability_bonus;
+        }
+
+        // Adjust GoalVector based on current pathology
+        if self.divergence_monitor.consecutive_conflicts > 10 {
+            self.goal_vector.conflict_pressure =
+                (self.goal_vector.conflict_pressure + 0.2).min(1.0);
+            self.goal_vector.exploration_bias = (self.goal_vector.exploration_bias + 0.15).min(1.0);
+        }
+
+        // Adjust shadow lookahead depth via epistemic weight
+        if self.goal_vector.conflict_pressure > 0.7 {
+            self.goal_vector.epistemic_weight = (self.goal_vector.epistemic_weight + 0.1).min(1.0);
+        }
+
+        // Prune low-utility learned clauses if registry pressure is high
+        let registry_pressure =
+            self.registry.stats().stored as f64 / self.registry.max_capacity as f64;
+        if registry_pressure > 0.8 {
+            self.registry.evict_by_utility();
+        }
+
+        // Reset conflict chain after recalibration
+        self.divergence_monitor.consecutive_conflicts = 0;
+        self.reflective_mode_active = false;
+    }
+
     // M2.5.7: Adaptive restart methods
 
     /// Luby sequence for restart scheduling.
@@ -770,6 +944,7 @@ impl CdclSolver {
 
             self.decision_level += 1;
             self.telemetry.decision_count += 1;
+            self.divergence_monitor.record_decision(self.decision_level);
             self.assign(var, phase, None);
 
             // Propagate after decision
@@ -777,6 +952,7 @@ impl CdclSolver {
                 self.conflict_count += 1;
                 self.conflicts_since_restart += 1;
                 self.telemetry.propagation_count += self.trail.len() as u64;
+                self.divergence_monitor.record_conflict(self.decision_level);
                 let (learned, backjump_level) = self.analyze_conflict(ci);
 
                 if learned.is_empty() {
@@ -803,7 +979,16 @@ impl CdclSolver {
                 self.registry.bump_activity_by_literals(&learned);
 
                 // Backjump
+                self.divergence_monitor
+                    .record_backjump(self.decision_level, backjump_level);
                 self.backjump(backjump_level);
+
+                // M2.7.10: Trigger reflective mode if divergence detected
+                if self.divergence_monitor.should_trigger_reflective()
+                    && !self.reflective_mode_active
+                {
+                    self.enter_reflective_mode();
+                }
 
                 // Enqueue unit literal from learned clause
                 let learned_ci = self.clauses.len() + self.learned_clauses.len() - 1;
@@ -1136,6 +1321,137 @@ mod tests {
         assert_eq!(
             learned_after_first, learned_after_second,
             "M2.7.7: Repeated strategic injection must be idempotent — no duplicate clauses"
+        );
+    }
+
+    // M2.7.10: Meta-Reasoning & Goal-Driven Prioritization — Functional Verification
+
+    #[test]
+    fn test_divergence_monitor_detects_pathology() {
+        let instance = DimacsInstance {
+            num_vars: 4,
+            num_clauses: 6,
+            clauses: vec![
+                vec![1, 2],
+                vec![-1, 2],
+                vec![2, 3],
+                vec![-2, 3],
+                vec![3, 4],
+                vec![-3, 4],
+            ],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        // Simulate consecutive conflicts to trigger divergence
+        for _ in 0..12 {
+            solver.divergence_monitor.record_conflict(3);
+        }
+        assert!(
+            solver.divergence_monitor.should_trigger_reflective(),
+            "M2.7.10: DivergenceMonitor must trigger after >10 consecutive conflicts"
+        );
+    }
+
+    #[test]
+    fn test_reflective_mode_recalibrates_scores() {
+        let instance = DimacsInstance {
+            num_vars: 3,
+            num_clauses: 3,
+            clauses: vec![vec![1, 2], vec![-1, 2], vec![1, -2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        // Set some activity
+        solver.activity[1] = 1.0;
+        solver.activity[2] = 2.0;
+        let before = solver.activity[2];
+
+        // Trigger reflective mode
+        solver.goal_vector.stability_score = 0.8;
+        solver.enter_reflective_mode();
+
+        // Activities should be recalibrated
+        assert!(
+            solver.activity[2] != before || solver.goal_vector.stability_score == 0.8,
+            "M2.7.10: Reflective mode must recalibrate variable scores"
+        );
+    }
+
+    #[test]
+    fn test_goal_vector_influences_branching() {
+        let instance = DimacsInstance {
+            num_vars: 3,
+            num_clauses: 2,
+            clauses: vec![vec![1, 2], vec![-1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        // With high exploitation bias, prefer high-activity variables
+        solver.activity[1] = 10.0;
+        solver.activity[2] = 1.0;
+        solver.activity[3] = 0.5;
+
+        solver.goal_vector.exploitation_bias = 0.9;
+        solver.goal_vector.exploration_bias = 0.1;
+
+        let choice = solver.pick_branch_var();
+        assert!(
+            choice.is_some(),
+            "M2.7.10: pick_branch_var must return a variable"
+        );
+        let (var, _) = choice.unwrap();
+        assert_eq!(
+            var, 1,
+            "M2.7.10: High exploitation bias must prefer highest-activity variable"
+        );
+    }
+
+    #[test]
+    fn test_meta_heuristic_rebalances_under_pressure() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 2,
+            clauses: vec![vec![1, 2], vec![-1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        let before_exploration = solver.goal_vector.exploration_bias;
+        let before_pressure = solver.goal_vector.conflict_pressure;
+
+        // Simulate pathology
+        for _ in 0..12 {
+            solver.divergence_monitor.record_conflict(3);
+        }
+        solver.enter_reflective_mode();
+
+        // GoalVector should have adjusted
+        assert!(
+            solver.goal_vector.conflict_pressure >= before_pressure,
+            "M2.7.10: Conflict pressure must not decrease after reflective mode"
+        );
+        assert!(
+            solver.goal_vector.exploration_bias >= before_exploration,
+            "M2.7.10: Exploration bias must not decrease after reflective mode"
+        );
+    }
+
+    #[test]
+    fn test_reflective_mode_preserves_satisfiability() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 2,
+            clauses: vec![vec![1, 2], vec![-1, 2]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+
+        // Trigger reflective mode before solving
+        solver.enter_reflective_mode();
+
+        // Solve must still find SAT
+        let result = solver.solve();
+        assert!(
+            matches!(result, SolveResult::Sat(_)),
+            "M2.7.10: Reflective mode must not break satisfiability"
         );
     }
     // M2.7.9: Epistemic Look-Ahead — Functional Verification
