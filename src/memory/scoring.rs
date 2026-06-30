@@ -69,6 +69,19 @@ impl ClauseScore {
         ClauseScore(score.max(0.0)) // Never negative
     }
 
+    /// M2.7.8: Utility formula — governs eviction decisions.
+    /// 𝒰(c) = 𝒜(c) / (LBD(c) × log₂(Age(c) + 1))
+    /// Higher utility = more valuable clause. Used for bottom-decile pruning.
+    pub fn utility(provenance: &ClauseProvenance, activity: f64) -> f64 {
+        let lbd = provenance.lbd.max(1) as f64;
+        let age = provenance.age_seconds().max(0) as f64;
+        let denominator = lbd * (age + 1.0).log2();
+        if denominator <= 0.0 {
+            return activity; // Degenerate case: fall back to raw activity
+        }
+        activity / denominator
+    }
+
     /// Check if score is above dynamic threshold.
     pub fn is_above_threshold(&self, mean_score: f64, params: &ScoringParams) -> bool {
         self.0 >= params.mu * mean_score

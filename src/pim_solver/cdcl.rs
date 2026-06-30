@@ -807,6 +807,13 @@ impl CdclSolver {
                     self.reduce_database();
                 }
 
+                // M2.7.8: Trigger utility-based eviction when registry exceeds 90% capacity
+                let registry_pressure =
+                    self.registry.stats().stored as f64 / self.registry.max_capacity as f64;
+                if registry_pressure > 0.9 {
+                    self.registry.evict_by_utility();
+                }
+
                 // M2.5.7: Check if restart is needed
                 if self.conflicts_since_restart >= self.restart_threshold() {
                     self.restart();
