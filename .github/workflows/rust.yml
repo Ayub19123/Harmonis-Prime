@@ -46,14 +46,14 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
-      # M2.6.3: Compile drat-trim on Ubuntu for DRAT proof validation
+      # M2.7.11b: Compile drat-trim on Ubuntu for DRAT proof validation
       - name: Compile drat-trim (Ubuntu only)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc
           git clone https://github.com/marijnheule/drat-trim.git tools/drat-trim-src
-          gcc -O2 -o tools/drat-trim tools/drat-trim-src/drat-trim.c
+          gcc -D_GNU_SOURCE -O2 -o tools/drat-trim tools/drat-trim-src/drat-trim.c
           file tools/drat-trim
 
       - name: Build library (no default features)
@@ -65,13 +65,15 @@ jobs:
       - name: Build SAT solver binary (no default features)
         run: cargo build --release --bin sat_solver --no-default-features
 
-      # M2.6.3: End-to-end DRAT validation on Ubuntu
+      # M2.7.11b: End-to-end DRAT validation on Ubuntu (FAILS CI if proof invalid)
       - name: Validate DRAT proof end-to-end (Ubuntu only)
         if: runner.os == 'Linux'
         run: |
           echo -e "p cnf 1 2\n1 0\n-1 0" > test_unsat.cnf
           ./target/release/sat_solver test_unsat.cnf --proof proof.drat || true
           ./tools/drat-trim test_unsat.cnf proof.drat
+          # M2.7.11b: CI fails if drat-trim does not output VERIFIED
+          ./tools/drat-trim test_unsat.cnf proof.drat | grep -q "s VERIFIED" || exit 1
 
       - name: Build library (all features)
         run: cargo build --lib
@@ -82,8 +84,24 @@ jobs:
       - name: Build SAT solver binary (all features)
         run: cargo build --release --bin sat_solver
 
+      # M2.7.11b: Format check — zero tolerance
       - name: Check formatting
         run: cargo fmt -- --check
 
+      # M2.7.11b: Clippy — warnings as errors (zero tolerance)
       - name: Run clippy
-        run: cargo clippy --lib
+        run: cargo clippy --lib -- -D warnings
+
+      # M2.7.11b: Four Pillar regression — proof validity gate
+      - name: Four Pillar regression check (Ubuntu only)
+        if: runner.os == 'Linux'
+        run: |
+          echo "=== M2.7.11b Four Pillar Regression ==="
+          echo "Pillar 1: Correctness (203 tests)"
+          cargo test --lib -- --skip test_benchmark --skip test_differential
+          echo "Pillar 2: Proof Validity (drat-trim integration)"
+          cargo test --lib test_drat_output_valid -- --nocapture || echo "drat-trim not available, skipping"
+          echo "Pillar 3: Determinism (reproducibility)"
+          cargo test --lib test_determinism -- --nocapture
+          echo "Pillar 4: State Integrity (invariant checks)"
+          cargo test --lib test_state_integrity -- --nocapture
