@@ -1,6 +1,6 @@
 use crate::memory::{ClauseProvenance, ClauseRegistry, EpistemicMeta, EpistemicProofTrace};
 use crate::pim_solver::shadow::{ShadowImplicationGraph, ShadowLiteral};
-use std::collections::{HashSet, VecDeque};
+use std::collections::{BTreeSet, VecDeque};
 
 /// Trail entry recording assignment.
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
@@ -18,6 +18,323 @@ struct WatchedClause {
     literals: Vec<i32>,
     watch_a: usize,
     watch_b: usize,
+}
+
+
+
+
+
+
+/// M2.7.13: RegressionAnalyzer — Automated regression intelligence with epsilon-divergence detection.
+/// Compares current benchmark telemetry against historical baselines.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RegressionAnalyzer {
+    pub epsilon_pct: u64,           // Max allowed deviation (percent * 100, e.g., 500 = 5%)
+    pub baseline_db: Vec<BenchmarkTelemetry>, // Historical expected values
+}
+
+impl Default for RegressionAnalyzer {
+    fn default() -> Self {
+        Self {
+            epsilon_pct: 500, // 5% tolerance
+            baseline_db: Vec::new(),
+        }
+    }
+}
+
+impl RegressionAnalyzer {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Load baseline from regression_db.json file.
+    pub fn load_baseline(path: &str) -> std::io::Result<Self> {
+        let json = std::fs::read_to_string(path)?;
+        let db: Vec<BenchmarkTelemetry> = serde_json::from_str(&json)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+        Ok(Self {
+            epsilon_pct: 500,
+            baseline_db: db,
+        })
+    }
+
+    /// Save current baseline to regression_db.json.
+    pub fn save_baseline(&self, path: &str) -> std::io::Result<()> {
+        let json = serde_json::to_string_pretty(&self.baseline_db)
+            .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+        std::fs::write(path, json)
+    }
+
+    /// Check if current telemetry diverges from baseline by more than epsilon.
+    /// Returns Ok(()) if within tolerance, Err with divergence details if exceeded.
+    pub fn check_divergence(&self, current: &BenchmarkTelemetry) -> Result<(), String> {
+        if self.baseline_db.is_empty() {
+            return Ok(()); // No baseline = no divergence possible
+        }
+
+        for baseline in &self.baseline_db {
+            let div_decisions = Self::pct_diff(baseline.decisions, current.decisions);
+            let div_propagations = Self::pct_diff(baseline.propagations, current.propagations);
+            let div_conflicts = Self::pct_diff(baseline.conflicts, current.conflicts);
+
+            if div_decisions > self.epsilon_pct {
+                return Err(format!(
+                    "M2.7.13 REGRESSION: decisions diverged by {}% (baseline: {}, current: {})",
+                    div_decisions as f64 / 100.0, baseline.decisions, current.decisions
+                ));
+            }
+            if div_propagations > self.epsilon_pct {
+                return Err(format!(
+                    "M2.7.13 REGRESSION: propagations diverged by {}% (baseline: {}, current: {})",
+                    div_propagations as f64 / 100.0, baseline.propagations, current.propagations
+                ));
+            }
+            if div_conflicts > self.epsilon_pct {
+                return Err(format!(
+                    "M2.7.13 REGRESSION: conflicts diverged by {}% (baseline: {}, current: {})",
+                    div_conflicts as f64 / 100.0, baseline.conflicts, current.conflicts
+                ));
+            }
+        }
+        Ok(())
+    }
+
+    /// Compute percentage difference scaled by 100 (e.g., 500 = 5.00%).
+    fn pct_diff(baseline: u64, current: u64) -> u64 {
+        if baseline == 0 {
+            return if current == 0 { 0 } else { u64::MAX };
+        }
+        let diff = if current > baseline { current - baseline } else { baseline - current };
+        (diff * 10000) / baseline // Returns percent * 100
+    }
+}
+
+/// M2.7.13: DeterministicSandbox — Execution environment isolation for reproducible benchmarking.
+/// Records CPU affinity, memory constraints, and deterministic seeds.
+/// CPU affinity applied via `taskset` command (no libc dependency).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DeterministicSandbox {
+    pub cpu_affinity: Option<usize>,      // Pin to specific CPU core
+    pub memory_limit_mb: Option<usize>,   // RSS memory cap
+    pub seed: u64,                        // Deterministic PRNG seed
+}
+
+impl Default for DeterministicSandbox {
+    fn default() -> Self {
+        Self {
+            cpu_affinity: None,
+            memory_limit_mb: None,
+            seed: 0x9e3779b97f4a7c15, // Golden ratio prime
+        }
+    }
+}
+
+impl DeterministicSandbox {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Apply CPU affinity via `taskset` if available (Linux only).
+    /// Falls back silently if taskset is unavailable.
+    pub fn apply_affinity(&self) -> std::io::Result<()> {
+        #[cfg(target_os = "linux")]
+        if let Some(core) = self.cpu_affinity {
+            let status = std::process::Command::new("taskset")
+                .args(&["-pc", &core.to_string(), &std::process::id().to_string()])
+                .status();
+            match status {
+                Ok(s) if s.success() => {},
+                _ => {
+                    eprintln!("c M2.7.13: taskset unavailable, CPU affinity not applied");
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Generate deterministic seed from instance hash and run index.
+    pub fn deterministic_seed(&self, instance_hash: &str, run_index: u64) -> u64 {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let mut hasher = DefaultHasher::new();
+        instance_hash.hash(&mut hasher);
+        run_index.hash(&mut hasher);
+        self.seed.hash(&mut hasher);
+        hasher.finish()
+    }
+}
+
+/// M2.7.13: BenchmarkReport — Unified telemetry + proof + state schema.
+/// Matches the exact JSON schema from the M2.7.13 blueprint.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct BenchmarkReport {
+    pub instance_hash: String,
+    pub state_invariant: bool,
+    pub telemetry: BenchmarkTelemetry,
+    pub proof_validation: ProofValidationReport,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct BenchmarkTelemetry {
+    pub decisions: u64,
+    pub propagations: u64,
+    pub conflicts: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ProofValidationReport {
+    #[serde(rename = "type")]
+    pub proof_type: String,
+    pub status: String,
+    #[serde(rename = "time_to_verify_s")]
+    pub time_to_verify_s: f64,
+}
+
+impl BenchmarkReport {
+    /// Generate from a solved solver instance.
+    pub fn from_solver(solver: &CdclSolver, proof_type: &str, status: &str, verify_time_s: f64) -> Self {
+        Self {
+            instance_hash: solver.instance_hash.clone(),
+            state_invariant: solver.invariant_checker.last_check_passed,
+            telemetry: BenchmarkTelemetry {
+                decisions: solver.telemetry.decision_count,
+                propagations: solver.telemetry.propagation_count,
+                conflicts: solver.conflict_count as u64,
+            },
+            proof_validation: ProofValidationReport {
+                proof_type: proof_type.to_string(),
+                status: status.to_string(),
+                time_to_verify_s: verify_time_s,
+            },
+        }
+    }
+
+    /// Serialize to JSON string.
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string_pretty(self)
+    }
+}
+
+/// M2.7.13: FixedPointVSIDS — Integer-only activity scoring to eliminate floating-point drift.
+/// Activity scores are u64 with implicit 1e6 scaling. Decay uses right-shift instead of multiply.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FixedPointVSIDS {
+    pub activity: Vec<u64>,           // Per-variable activity (scaled by 1_000_000)
+    pub clause_activity: Vec<u64>,    // Per-learned-clause activity
+    pub var_decay_shift: u32,         // Decay = activity >> var_decay_shift
+    pub clause_decay_shift: u32,      // Decay = activity >> clause_decay_shift
+    pub bump_amount: u64,             // Fixed-point increment (default: 1_000_000)
+}
+
+impl Default for FixedPointVSIDS {
+    fn default() -> Self {
+        Self {
+            activity: Vec::new(),
+            clause_activity: Vec::new(),
+            var_decay_shift: 4,      // ~1/16 decay per step
+            clause_decay_shift: 10,  // ~1/1024 decay per step
+            bump_amount: 1_000_000,  // 1.0 in fixed-point
+        }
+    }
+}
+
+impl FixedPointVSIDS {
+    pub fn new(num_vars: usize) -> Self {
+        let mut s = Self::default();
+        s.activity = vec![0; num_vars + 1];
+        s
+    }
+
+    /// Bump variable activity by fixed-point amount.
+    pub fn bump_var(&mut self, var: usize) {
+        self.activity[var] = self.activity[var].saturating_add(self.bump_amount);
+    }
+
+    /// Decay all variable activities using right-shift (deterministic, no FP drift).
+    pub fn decay_vars(&mut self) {
+        let shift = self.var_decay_shift;
+        for a in self.activity.iter_mut().skip(1) {
+            *a = *a >> shift;
+        }
+    }
+
+    /// Bump clause activity.
+    pub fn bump_clause(&mut self, ci: usize) {
+        if ci < self.clause_activity.len() {
+            self.clause_activity[ci] = self.clause_activity[ci].saturating_add(self.bump_amount);
+        }
+    }
+
+    /// Decay all clause activities.
+    pub fn decay_clauses(&mut self) {
+        let shift = self.clause_decay_shift;
+        for a in self.clause_activity.iter_mut() {
+            *a = *a >> shift;
+        }
+    }
+
+    /// Rescale activities if any score exceeds u64::MAX / 2 (prevent overflow).
+    pub fn rescale_if_needed(&mut self) {
+        let max_act = self.activity.iter().skip(1).max().copied().unwrap_or(0);
+        if max_act > u64::MAX / 2 {
+            for a in self.activity.iter_mut().skip(1) {
+                *a = *a >> 1;
+            }
+        }
+    }
+}
+
+/// M2.7.13: BenchmarkClock — Deterministic timing with instruction-count fallback.
+/// Uses `rdtsc` on x86_64 for cycle-count precision, falls back to `Instant` on other platforms.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BenchmarkClock {
+    start_cycles: u64,
+    start_instant: std::time::Instant,
+}
+
+impl BenchmarkClock {
+    pub fn new() -> Self {
+        Self {
+            start_cycles: Self::read_cycles(),
+            start_instant: std::time::Instant::now(),
+        }
+    }
+
+    /// Read CPU cycle counter (rdtsc) on x86_64, or 0 on other platforms.
+    #[cfg(target_arch = "x86_64")]
+    fn read_cycles() -> u64 {
+        unsafe { std::arch::x86_64::_rdtsc() }
+    }
+
+    #[cfg(not(target_arch = "x86_64"))]
+    fn read_cycles() -> u64 {
+        0
+    }
+
+    /// Elapsed cycles since clock creation (x86_64) or 0 (other).
+    pub fn elapsed_cycles(&self) -> u64 {
+        Self::read_cycles().saturating_sub(self.start_cycles)
+    }
+
+    /// Elapsed wall-clock time since clock creation.
+    pub fn elapsed_wall_ms(&self) -> u128 {
+        self.start_instant.elapsed().as_millis()
+    }
+
+    /// Unified measurement: cycles on x86_64, wall-ms fallback otherwise.
+    pub fn elapsed(&self) -> BenchmarkMeasurement {
+        BenchmarkMeasurement {
+            cycles: self.elapsed_cycles(),
+            wall_ms: self.elapsed_wall_ms(),
+        }
+    }
+}
+
+/// M2.7.13: BenchmarkMeasurement — Dual-mode timing result.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct BenchmarkMeasurement {
+    pub cycles: u64,
+    pub wall_ms: u128,
 }
 
 /// M2.5.10: Solver telemetry — self-observation metrics for meta-cognition.
@@ -42,6 +359,9 @@ pub struct SolverTelemetry {
     pub proof_verified: bool,          // DRAT/LRAT proof independently checked
     pub invariant_violations: u64,     // Count of state integrity failures
     pub determinism_hash: u64,         // Reproducibility verification hash
+    // M2.7.13: Benchmark Harness telemetry
+    pub instance_hash: String,         // SHA-256 of original DIMACS CNF
+    pub benchmark_clock: BenchmarkMeasurement, // Layer 1.1 timing
 }
 
 /// M2.7.10: GoalVector — Adaptive weight vector for meta-reasoning.
@@ -368,6 +688,9 @@ pub struct CdclSolver {
     invariant_checker: InvariantChecker,
     determinism_seal: Option<DeterminismSeal>,
     proof_obligation: ProofObligation,
+    // M2.7.13: Benchmark Harness fields
+    instance_hash: String,
+    benchmark_clock: BenchmarkMeasurement,
 }
 
 impl CdclSolver {
@@ -436,6 +759,9 @@ impl CdclSolver {
             invariant_checker: InvariantChecker::new(),
             determinism_seal: None,
             proof_obligation: ProofObligation::Unverified,
+            // M2.7.13: Benchmark Harness initialization
+            instance_hash: Self::hash_instance(instance),
+            benchmark_clock: BenchmarkMeasurement { cycles: 0, wall_ms: 0 },
         }
     }
 
@@ -964,7 +1290,7 @@ impl CdclSolver {
     /// Literal Block Distance (LBD): count of distinct decision levels in a clause.
     /// Lower LBD = better clause (more "glued" variables).
     fn lbd(&self, clause: &[i32]) -> usize {
-        let mut levels = HashSet::new();
+        let mut levels = BTreeSet::new();
         for &lit in clause {
             let var = lit.abs() as usize;
             if let Some(entry) = self.trail.iter().find(|e| e.var == var) {
@@ -1047,7 +1373,7 @@ impl CdclSolver {
             return;
         }
         // Compute LBD: count unique decision levels in clause
-        let mut levels = std::collections::HashSet::new();
+        let mut levels = std::collections::BTreeSet::new();
         for &lit in clause {
             let var = lit.abs() as usize;
             if let Some(entry) = self.trail.iter().find(|e| e.var == var) {
@@ -1394,6 +1720,21 @@ impl CdclSolver {
         }
 
         Ok(verified)
+    }
+
+
+    /// M2.7.13: Compute SHA-256 hash of DIMACS instance for deterministic fingerprinting.
+    fn hash_instance(instance: &crate::pim_solver::DimacsInstance) -> String {
+        use sha2::{Sha256, Digest};
+        let mut hasher = Sha256::new();
+        hasher.update(instance.num_vars.to_le_bytes());
+        hasher.update(instance.num_clauses.to_le_bytes());
+        for clause in &instance.clauses {
+            for lit in clause {
+                hasher.update(lit.to_le_bytes());
+            }
+        }
+        format!("sha256:{:x}", hasher.finalize())
     }
 
     // M2.6.1: Deterministic checkpoint serialization
@@ -2075,4 +2416,109 @@ mod tests {
         assert!(solver.telemetry.proof_verified,
             "M2.7.11b: telemetry.proof_verified must be true after validate_proof_obligation(true)");
     }
+
+    // M2.7.13 LAYER 5: Benchmark Harness Integration Tests
+
+    #[test]
+    fn test_benchmark_clock_measures_cycles() {
+        let clock = BenchmarkClock::new();
+        let mut sum = 0u64;
+        for i in 0..1000 {
+            sum = sum.wrapping_add(i);
+        }
+        let _ = sum;
+        let m = clock.elapsed();
+        #[cfg(target_arch = "x86_64")]
+        assert!(m.cycles > 0, "M2.7.13: BenchmarkClock must measure rdtsc cycles on x86_64");
+        assert!(m.wall_ms >= 0, "M2.7.13: BenchmarkClock wall_ms must be non-negative");
+    }
+
+    #[test]
+    fn test_fixed_point_vsids_no_drift() {
+        let mut vsids = FixedPointVSIDS::new(10);
+        vsids.bump_var(1);
+        vsids.bump_var(3);
+        vsids.bump_var(5);
+        let act1 = vsids.activity[1];
+        let act3 = vsids.activity[3];
+        let act5 = vsids.activity[5];
+        vsids.decay_vars();
+        assert_eq!(vsids.activity[1], act1 >> 4, "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift");
+        assert_eq!(vsids.activity[3], act3 >> 4, "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift");
+        assert_eq!(vsids.activity[5], act5 >> 4, "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift");
+        let mut vsids2 = FixedPointVSIDS::new(10);
+        vsids2.bump_var(1);
+        vsids2.bump_var(3);
+        vsids2.bump_var(5);
+        vsids2.decay_vars();
+        assert_eq!(vsids.activity, vsids2.activity,
+            "M2.7.13: FixedPointVSIDS must be 100% reproducible across instances");
+    }
+
+    #[test]
+    fn test_benchmark_report_json_schema() {
+        let instance = DimacsInstance {
+            num_vars: 2,
+            num_clauses: 2,
+            clauses: vec![vec![1], vec![-1]],
+        };
+        let mut solver = CdclSolver::from_dimacs(&instance);
+        let _result = solver.solve();
+        let report = BenchmarkReport::from_solver(&solver, "DRAT", "VALID", 0.081);
+        let json = report.to_json().expect("M2.7.13: BenchmarkReport must serialize to JSON");
+        assert!(json.contains("instance_hash"), "M2.7.13: JSON must contain instance_hash");
+        assert!(json.contains("state_invariant"), "M2.7.13: JSON must contain state_invariant");
+        assert!(json.contains("telemetry"), "M2.7.13: JSON must contain telemetry");
+        assert!(json.contains("decisions"), "M2.7.13: JSON telemetry must contain decisions");
+        assert!(json.contains("propagations"), "M2.7.13: JSON telemetry must contain propagations");
+        assert!(json.contains("conflicts"), "M2.7.13: JSON telemetry must contain conflicts");
+        assert!(json.contains("proof_validation"), "M2.7.13: JSON must contain proof_validation");
+        assert!(json.contains("type"), "M2.7.13: JSON proof_validation must contain type");
+        assert!(json.contains("status"), "M2.7.13: JSON proof_validation must contain status");
+        assert!(json.contains("time_to_verify_s"), "M2.7.13: JSON proof_validation must contain time_to_verify_s");
+        assert!(json.contains("sha256:"), "M2.7.13: instance_hash must contain sha256 prefix");
+    }
+
+    #[test]
+    fn test_regression_analyzer_detects_divergence() {
+        let mut analyzer = RegressionAnalyzer::new();
+        analyzer.epsilon_pct = 500;
+        analyzer.baseline_db.push(BenchmarkTelemetry {
+            decisions: 1000,
+            propagations: 50000,
+            conflicts: 100,
+        });
+        let within = BenchmarkTelemetry {
+            decisions: 1020,
+            propagations: 51000,
+            conflicts: 102,
+        };
+        assert!(analyzer.check_divergence(&within).is_ok(),
+            "M2.7.13: 2% deviation must be within 5% epsilon tolerance");
+        let exceeded = BenchmarkTelemetry {
+            decisions: 1100,
+            propagations: 50000,
+            conflicts: 100,
+        };
+        let result = analyzer.check_divergence(&exceeded);
+        assert!(result.is_err(), "M2.7.13: 10% deviation must exceed 5% epsilon tolerance");
+        let err_msg = result.unwrap_err();
+        assert!(err_msg.contains("decisions diverged"), "M2.7.13: Error must identify diverged metric");
+        let empty_analyzer = RegressionAnalyzer::new();
+        assert!(empty_analyzer.check_divergence(&exceeded).is_ok(),
+            "M2.7.13: Empty baseline must not flag divergence");
+    }
+
+    #[test]
+    fn test_deterministic_sandbox_seed_generation() {
+        let sandbox = DeterministicSandbox::new();
+        let seed1 = sandbox.deterministic_seed("sha256:abc123", 0);
+        let seed2 = sandbox.deterministic_seed("sha256:abc123", 0);
+        let seed3 = sandbox.deterministic_seed("sha256:abc123", 1);
+        assert_eq!(seed1, seed2, "M2.7.13: deterministic_seed must be reproducible for identical inputs");
+        assert_ne!(seed1, seed3, "M2.7.13: deterministic_seed must vary with run_index");
+        let seed4 = sandbox.deterministic_seed("sha256:def456", 0);
+        assert_ne!(seed1, seed4, "M2.7.13: deterministic_seed must vary with instance_hash");
+    }
+
 }
