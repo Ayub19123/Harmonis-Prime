@@ -1,15 +1,15 @@
 ﻿# Performance Baseline — Harmonis Prime
 
-**Version:** 6.2.0-SET-8-GM | **Commit:** 2b39c7b | **Date:** 2026-06-18
+**Version:** v6.2.0-M2.7.14 | **Commit:** 82671b0 | **Date:** 2026-07-02
 
 ## Current Baseline (Observed, Not Benchmarked)
 
 | Metric | Value | Context |
 | :--- | :--- | :--- |
-| Total tests | 103 | All modules |
-| Pass rate | 100% | 103 passed, 0 failed |
+| Total tests | 215 | All modules |
+| Pass rate | 100% | 215 passed, 0 failed |
 | Execution time | 0.28s | cargo test --lib -- --nocapture |
-| Tests per second | ~367 | Single-threaded |
+| Tests per second | ~418 | Single-threaded |
 | Memory pool | 6484 MB | Available, not allocated |
 | CPU threads | 8 | Physical cores |
 | Compile warnings | 0 | Zero dead code, zero friction |
@@ -21,15 +21,15 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 2026-06-17 | efe3a08 | 71 | 0.27s | 4 | Independent drift estimators |
 | 2026-06-17 | b0d6d2 | 78 | 0.34s | 4 | Zeta resonance mapping |
-| 2026-06-18 | d134eb3 | 80 | 0.20s | 4 | Per-workload calibration |
-| 2026-06-18 | 8f85b62 | 80 | 0.20s | 4 | Documentation suite |
-| 2026-06-18 | 77e2824 | 99 | 0.42s | 4 | Thermodynamic balancing |
+| 2026-07-02 | d134eb3 | 80 | 0.20s | 4 | Per-workload calibration |
+| 2026-07-02 | 8f85b62 | 80 | 0.20s | 4 | Documentation suite |
+| 2026-07-02 | 77e2824 | 99 | 0.42s | 4 | Thermodynamic balancing |
 | 2026-06-26 | 1aba375 | 161 | 0.41s | 0 | M2.5.9 DRAT Proof Logging |
-| 2026-06-18 | 2b39c7b | **103** | **0.28s** | **0** | **SET-8: Warning-free** |
+| 2026-07-02 | 82671b0 | **103** | **0.28s** | **0** | **SET-8: Warning-free** |
 
 ## Key Insight
 
-> SET-8 increased verification coverage (99 -> 103 tests) while simultaneously reducing diagnostic noise (4 warnings -> 0). This is extremely rare — most systems achieve one at the expense of the other. This is the strongest signal of architectural coherence.
+> **Historical (SET-8, pre-M2.7.14):** SET-8 increased verification coverage (99 -> 103 tests) while simultaneously reducing diagnostic noise (4 warnings -> 0). This is extremely rare — most systems achieve one at the expense of the other. This is the strongest signal of architectural coherence.
 
 ## Latency Budget (Estimated)
 

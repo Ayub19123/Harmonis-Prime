@@ -12,10 +12,10 @@
 | M2.7.11 | Formal Harmonis Protocol Completion | ✅ SEALED | v6.2.0-M2.7.11 | 203 |
 | M2.7.11b | DRAT/LRAT Verification Integration | ✅ SEALED | v6.2.0-M2.7.11b | 206 |
 | M2.7.13 | Benchmark Harness — Deterministic Invariants, Unified Telemetry, Regression Intelligence | ✅ SEALED | v6.2.0-M2.7.13 | 209 |
-| M2.7.14 | *(Next brick — TBD)* | 🔜 QUEUED | — | — |
+| M2.7.14 | Benchmark Execution Layer — Batch Runner, Baseline Comparator, Metrics Exporter, Version History, CLI | ✅ SEALED | v6.2.0-M2.7.14 | 215 |
 
-**Current Brick:** M2.7.13 — COMPLETE
-**Next Brick:** M2.7.14 — Awaiting roadmap alignment
+**Current Brick:** M2.7.14 — SEALED
+**Next Brick:** M2.7.1 — Documentation Brick (in progress)
 
 ---
 
@@ -26,7 +26,7 @@
 | Compiler Errors | 0 | ✅ |
 | Compiler Warnings | 0 | ✅ |
 | Last Build | GREEN | ✅ |
-| Last Verified | 2026-07-02 | ✅ |
+| Last Verified | 2026-07-02 (M2.7.14 sealed) | ✅ |
 
 ---
 

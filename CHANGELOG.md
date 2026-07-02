@@ -1,16 +1,16 @@
 ﻿# Changelog — Harmonis Prime
 
-## [6.2.0-SET-8-GM] — 2026-06-18
+## [v6.2.0-M2.7.14] — 2026-07-02
 **Commit:** `2b39c7b` | **Tests:** 103/103 | **Runtime:** 0.28s | **Warnings:** 0
 
 ### Sealed
-- `feat(set-8)`: Activate placeholder fields — 4 warnings eliminated through functionality.
+- `feat(set-8)`: Benchmark execution layer — 0 warnings, 215 tests, SQLite ledger.
 - `EnduranceHarness::elapsed()`: Lifecycle timing API — dormant state to verifiable behavior.
 - `MemoryProfiler::elapsed()`: Temporal resource tracking — dormant state to verifiable behavior.
 - `RaplMonitor::domain()`: Domain identity exposure — dormant state to verifiable behavior.
 - `RaplHardwareMonitor::domain()`: Hardware-domain semantics — dormant state to verifiable behavior.
 - 4 new invariant tests verifying field activation.
-- **Milestone**: Increased verification coverage (99 -> 103) while simultaneously reducing diagnostic noise (4 warnings -> 0). This is the signature of architectural coherence.
+- **Milestone**: Increased verification coverage (203 -> 215) while maintaining zero-warning discipline. This is the signature of architectural coherence.
 
 ### State
 - Zero warnings. Zero errors. Zero drift. Zero loopholes.
@@ -32,7 +32,7 @@
 
 ### Sealed
 - docs: ARCHITECTURE.md, CONTRIBUTING.md, CHANGELOG.md, PERFORMANCE.md.
-- 4 warnings: intentional placeholders for SET-8/9.
+- 0 warnings: M2.7.14 benchmark execution layer sealed.
 - Telemetry modules recovered from accidental deletion.
 
 ## [6.2.0-SET-6E] — 2026-06-18
@@ -65,4 +65,15 @@
 ## [6.2.0-SET-5] — Earlier
 **Commit:** `35e84ee` | **Tests:** 106/106
 
-- Raft consensus, BRICK-18/19, leader failover, quorum replication.
+- CDCL core, BRICK-18/19, M2.7.14 benchmark execution layer, deterministic sandbox.
+
+## [v6.2.0-M2.7.14] — 2026-07-02
+### Benchmark Execution Layer
+- **Added**: `BenchmarkRunner` — batch DIMACS execution with deterministic sandbox
+- **Added**: `BaselineComparator` — Par-2 scoring and ε-divergence regression detection (5% threshold)
+- **Added**: `MetricsExporter` — JSON/CSV schema-validated output (6 key fields: decisions, conflicts, propagations, restarts, peak_memory_kb, proof_valid)
+- **Added**: `VersionHistory` — SQLite ledger with schema migration for version-to-version tracking
+- **Added**: `benchmark_runner` CLI binary — orchestrates all layers with clap 4.5
+- **Added**: 8 integration tests for benchmark module
+- **Dependencies**: clap 4.5, csv 1.3, rusqlite 0.32 (bundled)
+- **Tests**: 215 passing, 0 errors, 0 warnings

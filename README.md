@@ -1,13 +1,13 @@
 .# Harmonis Prime
 
 ## Current Status
-- **199 tests passing** | 0 failed | 8 ignored (Odlyzko cache)
-- **Latest sealed brick:** M2.7.10 — Meta-Reasoning & Goal-Driven Prioritization
-- **Commit:** `696d86a`
+- **215 tests passing** | 0 failed | 8 ignored (Odlyzko cache)
+- **Latest sealed brick:** M2.7.14 — Benchmark Execution Layer
+- **Commit:** `82671b0`
 - **Target:** SAT Competition 2027 (March 2027 submission window)
 
 
-[![Tests](https://img.shields.io/badge/tests-170%2F170%20passing-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
+[![Tests](https://img.shields.io/badge/tests-215%2F215%20passing-brightgreen)](https://github.com/Ayub19123/Harmonis-Prime/actions)
 [![CI](https://img.shields.io/badge/CI-Ubuntu%20%7C%20Windows%20%7C%20macOS-blue)](https://github.com/Ayub19123/Harmonis-Prime/actions)
 [![DRAT](https://img.shields.io/badge/DRAT-verified%20s%20VERIFIED-success)](https://github.com/Ayub19123/Harmonis-Prime)
 [![Rust](https://img.shields.io/badge/rust-1.96%2B-orange?logo=rust)](https://www.rust-lang.org)
@@ -18,7 +18,7 @@ Overview
 Harmonis Prime is a SAT Competition 2027 candidate solver built on four inviolable pillars:
 Table
 Pillar	Principle	Enforcement
-Correctness	Every algorithmic path is verified by deterministic tests	cargo test --lib — 170 tests, zero tolerance
+Correctness	Every algorithmic path is verified by deterministic tests	cargo test --lib — 215 tests, zero tolerance
 Auditability	Every proof carries epistemic provenance	DRAT + c epistemic origin_id lbd timestamp metadata
 Reproducibility	Identical inputs produce identical outputs across platforms	CI matrix: Ubuntu / Windows / macOS
 Competitiveness	Performance gains are measured, never assumed	Benchmark baselines per brick, no regression without evidence
@@ -71,11 +71,11 @@ M2.8	Neural Heuristic Engine	Summit
 M2.10	GPU Offloading	Summit
 Core Verification Command
 bash
-# Full regression suite (170 tests)
+# Full regression suite (215 tests)
 cargo test --lib -- --nocapture
 
 # Expected output:
-# test result: ok. 170 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out
+# test result: ok. 215 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out
 SAT Solver Binary
 bash
 # Build competition binary (no default features — SAT Competition path)
@@ -212,7 +212,7 @@ Hardware acceleration (FPGA/SIMD — future work)
 "First-of-its-kind" status (we stand on MiniSAT, CaDiCaL, Maple)
 Aerospace-grade certification (no DO-178C/ECSS)
 Validation Methodology
-Deterministic unit testing (170 tests)
+Deterministic unit testing (215 tests)
 DRAT proof validation via drat-trim (external checker)
 CI matrix reproducibility (3 platforms)
 Benchmark baselines per brick (no regression without evidence)

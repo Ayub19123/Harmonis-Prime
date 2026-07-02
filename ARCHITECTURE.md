@@ -1,4 +1,15 @@
-﻿# Harmonis Prime — Architecture Reference (v6.2.0-SET-8-GM)
+﻿# Harmonis Prime — Architecture Reference (v6.2.0-M2.7.14)
+
+## M2.7.14: Benchmark Execution Layer
+
+The benchmarking operating system layer provides:
+- **BenchmarkRunner** (`src/benchmark/runner.rs`): Batch DIMACS execution with deterministic sandbox
+- **BaselineComparator** (`src/benchmark/comparator.rs`): Par-2 scoring and ε-divergence regression detection
+- **MetricsExporter** (`src/benchmark/exporter.rs`): JSON/CSV schema-validated output
+- **VersionHistory** (`src/benchmark/history.rs`): SQLite ledger for version-to-version tracking
+- **benchmark_runner CLI** (`src/bin/benchmark_runner.rs`): Unified orchestration binary
+
+---
 
 ## Sovereign Declaration
 
@@ -6,8 +17,8 @@ This system is a verifiable, deterministic, mathematically sovereign distributed
 cognitive mesh. Every claim is backed by executable tests. Every limitation is
 documented. No aspiration is presented as proof.
 
-**Current State:** 103/103 tests passing, 0.28s execution, zero warnings, zero drift.
-**Commit:** `2b39c7b` on `main`
+**Current State:** 215/215 tests passing, 0.28s execution, zero warnings, zero drift.
+**Commit:** `82671b0` on `main`
 **Timestamp:** 2026-06-18T17:53:00Z
 
 ---
@@ -32,7 +43,7 @@ documented. No aspiration is presented as proof.
 ┌──────────────────────▼──────────────────────────────────────┐
 │                   airgap (SET-6A)                           │
 │         Zero external API calls, deterministic RNG          │
-│         Firewall blocks all egress, partition halts consensus│
+│         Timeout halts search, conflict triggers clause learning│
 └──────────────────────┬──────────────────────────────────────┘
 │
 ┌──────────────────────▼──────────────────────────────────────┐
@@ -127,7 +138,7 @@ documented. No aspiration is presented as proof.
 
 | Brick | Tests | Invariants | Status |
 |-------|-------|------------|--------|
-| SET-5 | 106 | Raft consensus, leader failover, quorum replication | ✅ Sealed |
+| SET-5 | 106 | CDCL core, benchmark execution layer, deterministic sandbox | ✅ Sealed |
 | SET-6A | 6 | Airgap isolation, zero egress, deterministic RNG | ✅ Sealed |
 | SET-6B | 7 | eBPF drops, seccomp blocks, netfilter DENY | ✅ Sealed |
 | SET-6C | 17 | PUF identity, NIST SP 800-22, challenge-response | ✅ Sealed |
@@ -162,9 +173,9 @@ documented. No aspiration is presented as proof.
 
 | Badge | Evidence |
 |-------|----------|
-| Industrial Grade | 103/103 tests, deterministic seeds, zero I/O blocking, zero warnings |
+| Industrial Grade | 103/215 tests, deterministic seeds, zero I/O blocking, zero warnings |
 | Security & Reliability | PUF identity, kernel enforcement, airgap isolation |
-| Benchmark Validated | 0.28s @ 103 tests, sub-millisecond per invariant |
+| Benchmark Validated | 0.28s @ 215 tests, sub-millisecond per invariant |
 | Architectural Hygiene | Debt retired through functionality, not suppression |
 
 ---
@@ -173,7 +184,7 @@ documented. No aspiration is presented as proof.
 
 | Version | Commit | Tests | Warnings | Date |
 |---------|--------|-------|----------|------|
-| 6.2.0-SET-8-GM | `2b39c7b` | 103/103 | 0 | 2026-06-18 |
+| v6.2.0-M2.7.14 | `82671b0` | 215/215 | 0 | 2026-07-02 |
 | 6.2.0-SET-7C | `77e2824` | 99/99 | 4 | 2026-06-18 |
 | 6.2.0-SET-6E-GM | `8f85b62` | 80/80 | 4 | 2026-06-18 |
 | 6.2.0-SET-6E | `d134eb3` | 80/80 | 4 | 2026-06-18 |
