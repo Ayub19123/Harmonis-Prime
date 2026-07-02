@@ -694,6 +694,28 @@ pub struct CdclSolver {
 }
 
 impl CdclSolver {
+    // M2.7.14: Benchmark access API — pub getters for external benchmark runner
+    /// Get the number of decisions made during solving.
+    pub fn get_decision_count(&self) -> u64 {
+        self.telemetry.decision_count
+    }
+
+    /// Get the number of unit propagations performed.
+    pub fn get_propagation_count(&self) -> u64 {
+        self.telemetry.propagation_count
+    }
+
+    /// Get the total conflict count.
+    pub fn get_conflict_count(&self) -> u64 {
+        self.conflict_count
+    }
+
+    /// Get the SHA-256 instance hash for deterministic fingerprinting.
+    pub fn get_instance_hash(&self) -> String {
+        self.instance_hash.clone()
+    }
+
+
     /// Build solver from DIMACS instance.
     pub fn from_dimacs(instance: &crate::pim_solver::dimacs::DimacsInstance) -> Self {
         let mut watched_clauses = Vec::new();

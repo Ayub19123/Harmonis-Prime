@@ -43,6 +43,10 @@ md5 = "0.7"
 petgraph = "0.6"
 thiserror = "1.0"
 rand_chacha = "0.3"
+# M2.7.14: Benchmark Execution Layer dependencies
+clap = { version = "4.5", features = ["derive"] }
+csv = "1.3"
+rusqlite = { version = "0.32", features = ["bundled"] }
 rand_core = "0.6"
 hmac = "0.12"
 fastrand = "2.4.1"
@@ -75,3 +79,8 @@ harness = false
 [[bin]]
 name = "sat_solver"
 path = "src/bin/sat_solver.rs"
+
+# M2.7.14: Benchmark Execution Layer
+[[bin]]
+name = "benchmark_runner"
+path = "src/bin/benchmark_runner.rs"
