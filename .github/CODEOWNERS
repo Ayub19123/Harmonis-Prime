@@ -1,0 +1,11 @@
+# Harmonis Prime — Code Ownership
+# Every line of code is sovereignly owned by the founder.
+
+* @Ayub19123
+
+# Core modules
+src/pim_solver/       @Ayub19123
+src/benchmark/        @Ayub19123
+src/bin/              @Ayub19123
+docs/                 @Ayub19123
+*.md                  @Ayub19123
