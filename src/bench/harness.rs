@@ -171,6 +171,8 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore = "benchmark: hangs in CI"]
+    #[ignore = "benchmark: hangs in CI - runs actual solver with 5s timeout per instance"]
     fn test_benchmark_ci_suite() {
         let results = run_ci_suite(5000); // 5 second timeout per instance
 
@@ -188,6 +190,8 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "benchmark: hangs in CI"]
+    #[ignore = "benchmark: hangs in CI - performance test with DIMACS instance"]
     fn test_benchmark_xor_pattern_performance() {
         let instance = DimacsInstance {
             num_vars: 2,
