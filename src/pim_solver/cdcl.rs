@@ -20,16 +20,11 @@ struct WatchedClause {
     watch_b: usize,
 }
 
-
-
-
-
-
 /// M2.7.13: RegressionAnalyzer — Automated regression intelligence with epsilon-divergence detection.
 /// Compares current benchmark telemetry against historical baselines.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegressionAnalyzer {
-    pub epsilon_pct: u64,           // Max allowed deviation (percent * 100, e.g., 500 = 5%)
+    pub epsilon_pct: u64, // Max allowed deviation (percent * 100, e.g., 500 = 5%)
     pub baseline_db: Vec<BenchmarkTelemetry>, // Historical expected values
 }
 
@@ -80,19 +75,25 @@ impl RegressionAnalyzer {
             if div_decisions > self.epsilon_pct {
                 return Err(format!(
                     "M2.7.13 REGRESSION: decisions diverged by {}% (baseline: {}, current: {})",
-                    div_decisions as f64 / 100.0, baseline.decisions, current.decisions
+                    div_decisions as f64 / 100.0,
+                    baseline.decisions,
+                    current.decisions
                 ));
             }
             if div_propagations > self.epsilon_pct {
                 return Err(format!(
                     "M2.7.13 REGRESSION: propagations diverged by {}% (baseline: {}, current: {})",
-                    div_propagations as f64 / 100.0, baseline.propagations, current.propagations
+                    div_propagations as f64 / 100.0,
+                    baseline.propagations,
+                    current.propagations
                 ));
             }
             if div_conflicts > self.epsilon_pct {
                 return Err(format!(
                     "M2.7.13 REGRESSION: conflicts diverged by {}% (baseline: {}, current: {})",
-                    div_conflicts as f64 / 100.0, baseline.conflicts, current.conflicts
+                    div_conflicts as f64 / 100.0,
+                    baseline.conflicts,
+                    current.conflicts
                 ));
             }
         }
@@ -104,7 +105,11 @@ impl RegressionAnalyzer {
         if baseline == 0 {
             return if current == 0 { 0 } else { u64::MAX };
         }
-        let diff = if current > baseline { current - baseline } else { baseline - current };
+        let diff = if current > baseline {
+            current - baseline
+        } else {
+            baseline - current
+        };
         (diff * 10000) / baseline // Returns percent * 100
     }
 }
@@ -114,9 +119,9 @@ impl RegressionAnalyzer {
 /// CPU affinity applied via `taskset` command (no libc dependency).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DeterministicSandbox {
-    pub cpu_affinity: Option<usize>,      // Pin to specific CPU core
-    pub memory_limit_mb: Option<usize>,   // RSS memory cap
-    pub seed: u64,                        // Deterministic PRNG seed
+    pub cpu_affinity: Option<usize>,    // Pin to specific CPU core
+    pub memory_limit_mb: Option<usize>, // RSS memory cap
+    pub seed: u64,                      // Deterministic PRNG seed
 }
 
 impl Default for DeterministicSandbox {
@@ -143,7 +148,7 @@ impl DeterministicSandbox {
                 .args(&["-pc", &core.to_string(), &std::process::id().to_string()])
                 .status();
             match status {
-                Ok(s) if s.success() => {},
+                Ok(s) if s.success() => {}
                 _ => {
                     eprintln!("c M2.7.13: taskset unavailable, CPU affinity not applied");
                 }
@@ -192,7 +197,12 @@ pub struct ProofValidationReport {
 
 impl BenchmarkReport {
     /// Generate from a solved solver instance.
-    pub fn from_solver(solver: &CdclSolver, proof_type: &str, status: &str, verify_time_s: f64) -> Self {
+    pub fn from_solver(
+        solver: &CdclSolver,
+        proof_type: &str,
+        status: &str,
+        verify_time_s: f64,
+    ) -> Self {
         Self {
             instance_hash: solver.instance_hash.clone(),
             state_invariant: solver.invariant_checker.last_check_passed,
@@ -219,11 +229,11 @@ impl BenchmarkReport {
 /// Activity scores are u64 with implicit 1e6 scaling. Decay uses right-shift instead of multiply.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FixedPointVSIDS {
-    pub activity: Vec<u64>,           // Per-variable activity (scaled by 1_000_000)
-    pub clause_activity: Vec<u64>,    // Per-learned-clause activity
-    pub var_decay_shift: u32,         // Decay = activity >> var_decay_shift
-    pub clause_decay_shift: u32,      // Decay = activity >> clause_decay_shift
-    pub bump_amount: u64,             // Fixed-point increment (default: 1_000_000)
+    pub activity: Vec<u64>,        // Per-variable activity (scaled by 1_000_000)
+    pub clause_activity: Vec<u64>, // Per-learned-clause activity
+    pub var_decay_shift: u32,      // Decay = activity >> var_decay_shift
+    pub clause_decay_shift: u32,   // Decay = activity >> clause_decay_shift
+    pub bump_amount: u64,          // Fixed-point increment (default: 1_000_000)
 }
 
 impl Default for FixedPointVSIDS {
@@ -231,9 +241,9 @@ impl Default for FixedPointVSIDS {
         Self {
             activity: Vec::new(),
             clause_activity: Vec::new(),
-            var_decay_shift: 4,      // ~1/16 decay per step
-            clause_decay_shift: 10,  // ~1/1024 decay per step
-            bump_amount: 1_000_000,  // 1.0 in fixed-point
+            var_decay_shift: 4,     // ~1/16 decay per step
+            clause_decay_shift: 10, // ~1/1024 decay per step
+            bump_amount: 1_000_000, // 1.0 in fixed-point
         }
     }
 }
@@ -355,12 +365,12 @@ pub struct SolverTelemetry {
     pub clause_birth_rate: f64,       // Learned clauses per decision
     pub registry_activity_slope: f64, // Activity score trend
     // M2.7.11: Formal protocol telemetry
-    pub solver_state: SolverState,     // Current state machine state
-    pub proof_verified: bool,          // DRAT/LRAT proof independently checked
-    pub invariant_violations: u64,     // Count of state integrity failures
-    pub determinism_hash: u64,         // Reproducibility verification hash
+    pub solver_state: SolverState, // Current state machine state
+    pub proof_verified: bool,      // DRAT/LRAT proof independently checked
+    pub invariant_violations: u64, // Count of state integrity failures
+    pub determinism_hash: u64,     // Reproducibility verification hash
     // M2.7.13: Benchmark Harness telemetry
-    pub instance_hash: String,         // SHA-256 of original DIMACS CNF
+    pub instance_hash: String, // SHA-256 of original DIMACS CNF
     pub benchmark_clock: BenchmarkMeasurement, // Layer 1.1 timing
 }
 
@@ -487,7 +497,6 @@ impl DivergenceMonitor {
     }
 }
 
-
 /// M2.7.11: SolverState — Explicit state machine for formal protocol enforcement.
 /// Every solver execution follows strict state transitions with invariant validation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -506,9 +515,10 @@ pub enum SolverState {
 }
 
 impl Default for SolverState {
-    fn default() -> Self { SolverState::Init }
+    fn default() -> Self {
+        SolverState::Init
+    }
 }
-
 
 // M2.7.11: Four Pillar Assertion Macros — Formal invariant enforcement
 // These macros compile to debug_assert! in debug builds, no-op in release.
@@ -543,9 +553,9 @@ macro_rules! assert_soundness {
 macro_rules! assert_state_integrity {
     ($solver:expr) => {
         debug_assert!(
-            $solver.check_watchlist_consistency() &&
-            $solver.check_trail_validity() &&
-            $solver.check_assignment_coherence(),
+            $solver.check_watchlist_consistency()
+                && $solver.check_trail_validity()
+                && $solver.check_assignment_coherence(),
             "HARMONIS PILLAR 3: State integrity violation — internal invariant broken"
         );
     };
@@ -624,7 +634,9 @@ impl DeterminismSeal {
 
     fn compute_expected_hash(&self) -> u64 {
         // Deterministic hash: input_hash ^ seed
-        self.input_hash.wrapping_mul(0x9e3779b97f4a7c15).wrapping_add(self.seed)
+        self.input_hash
+            .wrapping_mul(0x9e3779b97f4a7c15)
+            .wrapping_add(self.seed)
     }
 
     pub fn seal(&mut self, output_hash: u64) {
@@ -643,7 +655,9 @@ pub enum ProofObligation {
 }
 
 impl Default for ProofObligation {
-    fn default() -> Self { ProofObligation::Unverified }
+    fn default() -> Self {
+        ProofObligation::Unverified
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -715,7 +729,6 @@ impl CdclSolver {
         self.instance_hash.clone()
     }
 
-
     /// Build solver from DIMACS instance.
     pub fn from_dimacs(instance: &crate::pim_solver::dimacs::DimacsInstance) -> Self {
         let mut watched_clauses = Vec::new();
@@ -783,7 +796,10 @@ impl CdclSolver {
             proof_obligation: ProofObligation::Unverified,
             // M2.7.13: Benchmark Harness initialization
             instance_hash: Self::hash_instance(instance),
-            benchmark_clock: BenchmarkMeasurement { cycles: 0, wall_ms: 0 },
+            benchmark_clock: BenchmarkMeasurement {
+                cycles: 0,
+                wall_ms: 0,
+            },
         }
     }
 
@@ -1120,7 +1136,6 @@ impl CdclSolver {
 
         best_var.map(|v| (v, self.saved_phase[v].unwrap_or(true)))
     }
-
 
     // M2.7.11: Invariant validation methods for formal protocol enforcement
 
@@ -1480,7 +1495,7 @@ impl CdclSolver {
         // M2.7.11: Initialize formal protocol state
         self.solver_state = SolverState::Init;
         self.proof_obligation = ProofObligation::Unverified;
-        
+
         // M2.7.11: Initialize determinism seal with input hash
         let input_hash = self.clauses.len() as u64 ^ self.num_vars as u64;
         self.determinism_seal = Some(DeterminismSeal::new(input_hash, 0));
@@ -1511,7 +1526,9 @@ impl CdclSolver {
                 assert_correctness!(&model, &self.clauses);
                 // M2.7.11: Pillar 4 — seal determinism hash
                 if let Some(ref mut seal) = self.determinism_seal {
-                    let output_hash = model.iter().fold(0u64, |h, &b| h.wrapping_mul(31).wrapping_add(b as u64));
+                    let output_hash = model
+                        .iter()
+                        .fold(0u64, |h, &b| h.wrapping_mul(31).wrapping_add(b as u64));
                     seal.seal(output_hash);
                 }
                 return SolveResult::Sat(model);
@@ -1686,7 +1703,6 @@ impl CdclSolver {
         }
     }
 
-
     /// M2.7.11: Verify determinism seal integrity. Called in debug builds after solve().
     #[allow(dead_code)]
     #[cfg(debug_assertions)]
@@ -1698,8 +1714,6 @@ impl CdclSolver {
             true
         }
     }
-
-
 
     /// M2.7.11b: validate_proof_obligation — Check proof status and transition state
     /// Called by tests and CI to enforce proof validity gate.
@@ -1728,7 +1742,10 @@ impl CdclSolver {
         {
             Ok(out) => out,
             Err(e) => {
-                eprintln!("c drat-trim not available: {}, skipping external proof validation", e);
+                eprintln!(
+                    "c drat-trim not available: {}, skipping external proof validation",
+                    e
+                );
                 return Ok(false);
             }
         };
@@ -1744,10 +1761,9 @@ impl CdclSolver {
         Ok(verified)
     }
 
-
     /// M2.7.13: Compute SHA-256 hash of DIMACS instance for deterministic fingerprinting.
     fn hash_instance(instance: &crate::pim_solver::DimacsInstance) -> String {
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(instance.num_vars.to_le_bytes());
         hasher.update(instance.num_clauses.to_le_bytes());
@@ -2224,7 +2240,6 @@ mod tests {
         );
     }
 
-
     // M2.7.11: Formal Harmonis Protocol — Functional Verification
 
     #[test]
@@ -2232,16 +2247,16 @@ mod tests {
         let instance = DimacsInstance {
             num_vars: 2,
             num_clauses: 2,
-            clauses: vec![
-                vec![1, 2],
-                vec![-1, 2],
-            ],
+            clauses: vec![vec![1, 2], vec![-1, 2]],
         };
         let mut solver = CdclSolver::from_dimacs(&instance);
 
         // Verify initial state
-        assert_eq!(solver.solver_state, SolverState::Init,
-            "M2.7.11: Solver must start in Init state");
+        assert_eq!(
+            solver.solver_state,
+            SolverState::Init,
+            "M2.7.11: Solver must start in Init state"
+        );
 
         // Solve transitions through states
         let _result = solver.solve();
@@ -2259,10 +2274,7 @@ mod tests {
         let instance = DimacsInstance {
             num_vars: 2,
             num_clauses: 2,
-            clauses: vec![
-                vec![1, 2],
-                vec![-1, 2],
-            ],
+            clauses: vec![vec![1, 2], vec![-1, 2]],
         };
         let mut solver = CdclSolver::from_dimacs(&instance);
         let result = solver.solve();
@@ -2275,9 +2287,11 @@ mod tests {
                     let val = model[var - 1];
                     (lit > 0 && val) || (lit < 0 && !val)
                 });
-                assert!(satisfied,
+                assert!(
+                    satisfied,
                     "M2.7.11 PILLAR 1: Correctness violation — model does not satisfy clause {:?}",
-                    clause);
+                    clause
+                );
             }
         }
     }
@@ -2287,26 +2301,30 @@ mod tests {
         let instance = DimacsInstance {
             num_vars: 3,
             num_clauses: 3,
-            clauses: vec![
-                vec![1, 2],
-                vec![-1, 2],
-                vec![1, -2],
-            ],
+            clauses: vec![vec![1, 2], vec![-1, 2], vec![1, -2]],
         };
         let mut solver = CdclSolver::from_dimacs(&instance);
 
         // Run invariant checks before solving
-        assert!(solver.check_watchlist_consistency(),
-            "M2.7.11 PILLAR 3: Watchlist must be consistent after initialization");
-        assert!(solver.check_trail_validity(),
-            "M2.7.11 PILLAR 3: Trail must be valid after initialization");
-        assert!(solver.check_assignment_coherence(),
-            "M2.7.11 PILLAR 3: Assignment must be coherent after initialization");
+        assert!(
+            solver.check_watchlist_consistency(),
+            "M2.7.11 PILLAR 3: Watchlist must be consistent after initialization"
+        );
+        assert!(
+            solver.check_trail_validity(),
+            "M2.7.11 PILLAR 3: Trail must be valid after initialization"
+        );
+        assert!(
+            solver.check_assignment_coherence(),
+            "M2.7.11 PILLAR 3: Assignment must be coherent after initialization"
+        );
 
         // Solve and verify no invariant violations occurred
         let _result = solver.solve();
-        assert_eq!(solver.invariant_checker.violation_count, 0,
-            "M2.7.11 PILLAR 3: No invariant violations allowed during solve");
+        assert_eq!(
+            solver.invariant_checker.violation_count, 0,
+            "M2.7.11 PILLAR 3: No invariant violations allowed during solve"
+        );
     }
 
     #[test]
@@ -2314,11 +2332,7 @@ mod tests {
         let instance = DimacsInstance {
             num_vars: 3,
             num_clauses: 3,
-            clauses: vec![
-                vec![1, 2],
-                vec![-1, 2],
-                vec![1, -2],
-            ],
+            clauses: vec![vec![1, 2], vec![-1, 2], vec![1, -2]],
         };
 
         // Run solver twice with same input
@@ -2332,10 +2346,11 @@ mod tests {
         };
 
         // Pillar 4: Same input → same output
-        assert_eq!(result1, result2,
-            "M2.7.11 PILLAR 4: Determinism violation — same input produced different output");
+        assert_eq!(
+            result1, result2,
+            "M2.7.11 PILLAR 4: Determinism violation — same input produced different output"
+        );
     }
-
 
     // M2.7.11b: DRAT/LRAT Verification Integration — Functional Tests
 
@@ -2349,29 +2364,48 @@ mod tests {
         let mut solver = CdclSolver::from_dimacs(&instance);
 
         // Initial state: Unverified
-        assert_eq!(solver.proof_obligation, ProofObligation::Unverified,
-            "M2.7.11b: Proof obligation must start Unverified");
+        assert_eq!(
+            solver.proof_obligation,
+            ProofObligation::Unverified,
+            "M2.7.11b: Proof obligation must start Unverified"
+        );
 
         // Solve produces UNSAT with DratGenerated
         let _result = solver.solve();
-        assert_eq!(solver.solver_state, SolverState::Unsat,
-            "M2.7.11b: Trivial contradiction must be UNSAT");
-        assert_eq!(solver.proof_obligation, ProofObligation::DratGenerated,
-            "M2.7.11b: UNSAT must generate DratGenerated proof obligation");
+        assert_eq!(
+            solver.solver_state,
+            SolverState::Unsat,
+            "M2.7.11b: Trivial contradiction must be UNSAT"
+        );
+        assert_eq!(
+            solver.proof_obligation,
+            ProofObligation::DratGenerated,
+            "M2.7.11b: UNSAT must generate DratGenerated proof obligation"
+        );
 
         // Validate transitions to Verified
         solver.validate_proof_obligation(true);
-        assert_eq!(solver.proof_obligation, ProofObligation::Verified,
-            "M2.7.11b: validate_proof_obligation(true) must transition to Verified");
-        assert!(solver.telemetry.proof_verified,
-            "M2.7.11b: telemetry.proof_verified must be true after validation");
+        assert_eq!(
+            solver.proof_obligation,
+            ProofObligation::Verified,
+            "M2.7.11b: validate_proof_obligation(true) must transition to Verified"
+        );
+        assert!(
+            solver.telemetry.proof_verified,
+            "M2.7.11b: telemetry.proof_verified must be true after validation"
+        );
 
         // Validate transitions to Failed
         solver.validate_proof_obligation(false);
-        assert_eq!(solver.proof_obligation, ProofObligation::Failed,
-            "M2.7.11b: validate_proof_obligation(false) must transition to Failed");
-        assert!(!solver.telemetry.proof_verified,
-            "M2.7.11b: telemetry.proof_verified must be false after failed validation");
+        assert_eq!(
+            solver.proof_obligation,
+            ProofObligation::Failed,
+            "M2.7.11b: validate_proof_obligation(false) must transition to Failed"
+        );
+        assert!(
+            !solver.telemetry.proof_verified,
+            "M2.7.11b: telemetry.proof_verified must be false after failed validation"
+        );
     }
 
     #[test]
@@ -2384,8 +2418,11 @@ mod tests {
         let mut solver = CdclSolver::from_dimacs(&instance);
 
         let result = solver.solve();
-        assert_eq!(result, SolveResult::Unsat,
-            "M2.7.11b: Smoke test must produce UNSAT");
+        assert_eq!(
+            result,
+            SolveResult::Unsat,
+            "M2.7.11b: Smoke test must produce UNSAT"
+        );
 
         // Write proof to temp file
         let proof_path = "smoke_test_proof.drat";
@@ -2401,12 +2438,18 @@ mod tests {
 
         if verified {
             solver.validate_proof_obligation(true);
-            assert_eq!(solver.proof_obligation, ProofObligation::Verified,
-                "M2.7.11b: Smoke test proof must be Verified when drat-trim available");
+            assert_eq!(
+                solver.proof_obligation,
+                ProofObligation::Verified,
+                "M2.7.11b: Smoke test proof must be Verified when drat-trim available"
+            );
         } else {
             // drat-trim not available — proof obligation stays DratGenerated
-            assert_eq!(solver.proof_obligation, ProofObligation::DratGenerated,
-                "M2.7.11b: Proof obligation stays DratGenerated when drat-trim unavailable");
+            assert_eq!(
+                solver.proof_obligation,
+                ProofObligation::DratGenerated,
+                "M2.7.11b: Proof obligation stays DratGenerated when drat-trim unavailable"
+            );
         }
 
         // Cleanup
@@ -2424,19 +2467,26 @@ mod tests {
         let mut solver = CdclSolver::from_dimacs(&instance);
 
         // Pre-solve: proof not verified
-        assert!(!solver.telemetry.proof_verified,
-            "M2.7.11b: telemetry.proof_verified must be false before solve");
+        assert!(
+            !solver.telemetry.proof_verified,
+            "M2.7.11b: telemetry.proof_verified must be false before solve"
+        );
 
         let _result = solver.solve();
 
         // Post-solve UNSAT: proof generated but not yet verified
-        assert_eq!(solver.proof_obligation, ProofObligation::DratGenerated,
-            "M2.7.11b: Post-solve obligation must be DratGenerated");
+        assert_eq!(
+            solver.proof_obligation,
+            ProofObligation::DratGenerated,
+            "M2.7.11b: Post-solve obligation must be DratGenerated"
+        );
 
         // After validation
         solver.validate_proof_obligation(true);
-        assert!(solver.telemetry.proof_verified,
-            "M2.7.11b: telemetry.proof_verified must be true after validate_proof_obligation(true)");
+        assert!(
+            solver.telemetry.proof_verified,
+            "M2.7.11b: telemetry.proof_verified must be true after validate_proof_obligation(true)"
+        );
     }
 
     // M2.7.13 LAYER 5: Benchmark Harness Integration Tests
@@ -2451,8 +2501,10 @@ mod tests {
         let _ = sum;
         let m = clock.elapsed();
         #[cfg(target_arch = "x86_64")]
-        assert!(m.cycles > 0, "M2.7.13: BenchmarkClock must measure rdtsc cycles on x86_64");
-        assert!(m.wall_ms >= 0, "M2.7.13: BenchmarkClock wall_ms must be non-negative");
+        assert!(
+            m.cycles > 0,
+            "M2.7.13: BenchmarkClock must measure rdtsc cycles on x86_64"
+        );
     }
 
     #[test]
@@ -2465,16 +2517,30 @@ mod tests {
         let act3 = vsids.activity[3];
         let act5 = vsids.activity[5];
         vsids.decay_vars();
-        assert_eq!(vsids.activity[1], act1 >> 4, "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift");
-        assert_eq!(vsids.activity[3], act3 >> 4, "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift");
-        assert_eq!(vsids.activity[5], act5 >> 4, "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift");
+        assert_eq!(
+            vsids.activity[1],
+            act1 >> 4,
+            "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift"
+        );
+        assert_eq!(
+            vsids.activity[3],
+            act3 >> 4,
+            "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift"
+        );
+        assert_eq!(
+            vsids.activity[5],
+            act5 >> 4,
+            "M2.7.13: FixedPointVSIDS decay must be deterministic right-shift"
+        );
         let mut vsids2 = FixedPointVSIDS::new(10);
         vsids2.bump_var(1);
         vsids2.bump_var(3);
         vsids2.bump_var(5);
         vsids2.decay_vars();
-        assert_eq!(vsids.activity, vsids2.activity,
-            "M2.7.13: FixedPointVSIDS must be 100% reproducible across instances");
+        assert_eq!(
+            vsids.activity, vsids2.activity,
+            "M2.7.13: FixedPointVSIDS must be 100% reproducible across instances"
+        );
     }
 
     #[test]
@@ -2487,18 +2553,53 @@ mod tests {
         let mut solver = CdclSolver::from_dimacs(&instance);
         let _result = solver.solve();
         let report = BenchmarkReport::from_solver(&solver, "DRAT", "VALID", 0.081);
-        let json = report.to_json().expect("M2.7.13: BenchmarkReport must serialize to JSON");
-        assert!(json.contains("instance_hash"), "M2.7.13: JSON must contain instance_hash");
-        assert!(json.contains("state_invariant"), "M2.7.13: JSON must contain state_invariant");
-        assert!(json.contains("telemetry"), "M2.7.13: JSON must contain telemetry");
-        assert!(json.contains("decisions"), "M2.7.13: JSON telemetry must contain decisions");
-        assert!(json.contains("propagations"), "M2.7.13: JSON telemetry must contain propagations");
-        assert!(json.contains("conflicts"), "M2.7.13: JSON telemetry must contain conflicts");
-        assert!(json.contains("proof_validation"), "M2.7.13: JSON must contain proof_validation");
-        assert!(json.contains("type"), "M2.7.13: JSON proof_validation must contain type");
-        assert!(json.contains("status"), "M2.7.13: JSON proof_validation must contain status");
-        assert!(json.contains("time_to_verify_s"), "M2.7.13: JSON proof_validation must contain time_to_verify_s");
-        assert!(json.contains("sha256:"), "M2.7.13: instance_hash must contain sha256 prefix");
+        let json = report
+            .to_json()
+            .expect("M2.7.13: BenchmarkReport must serialize to JSON");
+        assert!(
+            json.contains("instance_hash"),
+            "M2.7.13: JSON must contain instance_hash"
+        );
+        assert!(
+            json.contains("state_invariant"),
+            "M2.7.13: JSON must contain state_invariant"
+        );
+        assert!(
+            json.contains("telemetry"),
+            "M2.7.13: JSON must contain telemetry"
+        );
+        assert!(
+            json.contains("decisions"),
+            "M2.7.13: JSON telemetry must contain decisions"
+        );
+        assert!(
+            json.contains("propagations"),
+            "M2.7.13: JSON telemetry must contain propagations"
+        );
+        assert!(
+            json.contains("conflicts"),
+            "M2.7.13: JSON telemetry must contain conflicts"
+        );
+        assert!(
+            json.contains("proof_validation"),
+            "M2.7.13: JSON must contain proof_validation"
+        );
+        assert!(
+            json.contains("type"),
+            "M2.7.13: JSON proof_validation must contain type"
+        );
+        assert!(
+            json.contains("status"),
+            "M2.7.13: JSON proof_validation must contain status"
+        );
+        assert!(
+            json.contains("time_to_verify_s"),
+            "M2.7.13: JSON proof_validation must contain time_to_verify_s"
+        );
+        assert!(
+            json.contains("sha256:"),
+            "M2.7.13: instance_hash must contain sha256 prefix"
+        );
     }
 
     #[test]
@@ -2515,20 +2616,30 @@ mod tests {
             propagations: 51000,
             conflicts: 102,
         };
-        assert!(analyzer.check_divergence(&within).is_ok(),
-            "M2.7.13: 2% deviation must be within 5% epsilon tolerance");
+        assert!(
+            analyzer.check_divergence(&within).is_ok(),
+            "M2.7.13: 2% deviation must be within 5% epsilon tolerance"
+        );
         let exceeded = BenchmarkTelemetry {
             decisions: 1100,
             propagations: 50000,
             conflicts: 100,
         };
         let result = analyzer.check_divergence(&exceeded);
-        assert!(result.is_err(), "M2.7.13: 10% deviation must exceed 5% epsilon tolerance");
+        assert!(
+            result.is_err(),
+            "M2.7.13: 10% deviation must exceed 5% epsilon tolerance"
+        );
         let err_msg = result.unwrap_err();
-        assert!(err_msg.contains("decisions diverged"), "M2.7.13: Error must identify diverged metric");
+        assert!(
+            err_msg.contains("decisions diverged"),
+            "M2.7.13: Error must identify diverged metric"
+        );
         let empty_analyzer = RegressionAnalyzer::new();
-        assert!(empty_analyzer.check_divergence(&exceeded).is_ok(),
-            "M2.7.13: Empty baseline must not flag divergence");
+        assert!(
+            empty_analyzer.check_divergence(&exceeded).is_ok(),
+            "M2.7.13: Empty baseline must not flag divergence"
+        );
     }
 
     #[test]
@@ -2537,10 +2648,18 @@ mod tests {
         let seed1 = sandbox.deterministic_seed("sha256:abc123", 0);
         let seed2 = sandbox.deterministic_seed("sha256:abc123", 0);
         let seed3 = sandbox.deterministic_seed("sha256:abc123", 1);
-        assert_eq!(seed1, seed2, "M2.7.13: deterministic_seed must be reproducible for identical inputs");
-        assert_ne!(seed1, seed3, "M2.7.13: deterministic_seed must vary with run_index");
+        assert_eq!(
+            seed1, seed2,
+            "M2.7.13: deterministic_seed must be reproducible for identical inputs"
+        );
+        assert_ne!(
+            seed1, seed3,
+            "M2.7.13: deterministic_seed must vary with run_index"
+        );
         let seed4 = sandbox.deterministic_seed("sha256:def456", 0);
-        assert_ne!(seed1, seed4, "M2.7.13: deterministic_seed must vary with instance_hash");
+        assert_ne!(
+            seed1, seed4,
+            "M2.7.13: deterministic_seed must vary with instance_hash"
+        );
     }
-
 }

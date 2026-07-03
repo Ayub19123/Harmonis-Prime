@@ -1,4 +1,3 @@
-
 //! M2.7.14 Layer 2: BaselineComparator — Tag-to-tag performance comparison
 
 use std::collections::HashMap;
@@ -43,7 +42,7 @@ impl BaselineComparator {
         current: &HashMap<String, u64>,
     ) -> Vec<PerformanceDelta> {
         let mut deltas = Vec::new();
-        
+
         for (instance, &current_time) in current {
             if let Some(&baseline_time) = baseline.get(instance) {
                 let delta_pct = if baseline_time == 0 {
@@ -51,7 +50,7 @@ impl BaselineComparator {
                 } else {
                     ((current_time as f64 - baseline_time as f64) / baseline_time as f64) * 100.0
                 };
-                
+
                 deltas.push(PerformanceDelta {
                     instance: instance.clone(),
                     baseline_time_ms: baseline_time,
@@ -60,13 +59,14 @@ impl BaselineComparator {
                 });
             }
         }
-        
+
         deltas
     }
 
     /// Flag regressions exceeding epsilon threshold
     pub fn flag_regressions(&self, deltas: &[PerformanceDelta]) -> Vec<PerformanceDelta> {
-        deltas.iter()
+        deltas
+            .iter()
             .filter(|d| d.delta_pct > self.epsilon_pct)
             .cloned()
             .collect()

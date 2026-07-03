@@ -1,20 +1,19 @@
 //! M2.7.14: Benchmark Execution Layer
-//! 
+//!
 //! The missing SAT execution standard layer.
 //! Provides batch execution, baseline comparison, metrics export, and regression intelligence.
 
-pub mod runner;
 pub mod comparator;
 pub mod exporter;
 pub mod history;
-
+pub mod runner;
 
 #[cfg(test)]
 mod tests {
-    use super::runner::{BenchmarkConfig, BenchmarkRunner};
-    use super::comparator::{BaselineComparator, par2_score};
-    use super::exporter::{export_json, export_csv};
+    use super::comparator::{par2_score, BaselineComparator};
+    use super::exporter::{export_csv, export_json};
     use super::history::VersionHistory;
+    use super::runner::{BenchmarkConfig, BenchmarkRunner};
     use std::collections::HashMap;
 
     #[test]
@@ -92,23 +91,25 @@ mod tests {
     fn test_version_history_open_and_record() {
         let temp = std::env::temp_dir().join("test_m2714.db");
         let _ = std::fs::remove_file(&temp);
-        
+
         let history = VersionHistory::open(&temp).unwrap();
-        history.record_run(
-            "v6.2.0-M2.7.14",
-            "/path/to/test.cnf",
-            "abc123",
-            "SAT",
-            100,
-            200,
-            50,
-            5,
-            1024,
-            1500,
-            Some(true),
-            false,
-            false,
-        ).unwrap();
+        history
+            .record_run(
+                "v6.2.0-M2.7.14",
+                "/path/to/test.cnf",
+                "abc123",
+                "SAT",
+                100,
+                200,
+                50,
+                5,
+                1024,
+                1500,
+                Some(true),
+                false,
+                false,
+            )
+            .unwrap();
 
         let runs = history.query_tag("v6.2.0-M2.7.14").unwrap();
         assert_eq!(runs.len(), 1);

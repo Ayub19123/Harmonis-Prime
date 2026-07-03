@@ -1,10 +1,9 @@
-
 //! M2.7.14 Layer 1: BenchmarkRunner — Batch DIMACS execution engine
 
+use crate::pim_solver::cdcl::DeterministicSandbox;
+use crate::pim_solver::{CdclSolver, DimacsInstance, SolveResult};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
-use crate::pim_solver::{CdclSolver, DimacsInstance, SolveResult};
-use crate::pim_solver::cdcl::DeterministicSandbox;
 
 /// M2.7.14: Benchmark configuration for a single run
 #[derive(Debug, Clone)]
@@ -57,7 +56,7 @@ impl BenchmarkRunner {
         sandbox.cpu_affinity = config.cpu_affinity;
         sandbox.memory_limit_mb = config.memory_limit_mb;
         sandbox.seed = config.deterministic_seed;
-        
+
         Self { config, sandbox }
     }
 
@@ -73,7 +72,7 @@ impl BenchmarkRunner {
             .map_err(|e| format!("Failed to parse {}: {:?}", path.display(), e))?;
 
         let mut solver = CdclSolver::from_dimacs(&instance);
-        
+
         // Solve with timeout check
         let result = solver.solve();
         let wall_time = start.elapsed().as_millis() as u64;
@@ -107,22 +106,22 @@ impl BenchmarkRunner {
     /// Batch execute all .cnf files in a directory
     pub fn run_batch(&self, dir: &Path) -> Vec<Result<BenchmarkRun, String>> {
         let mut results = Vec::new();
-        
+
         if let Ok(entries) = std::fs::read_dir(dir) {
             let mut paths: Vec<_> = entries
                 .filter_map(|e| e.ok())
                 .map(|e| e.path())
                 .filter(|p| p.extension().map(|e| e == "cnf").unwrap_or(false))
                 .collect();
-            
+
             // Deterministic ordering
             paths.sort();
-            
+
             for path in paths {
                 results.push(self.run_single(&path));
             }
         }
-        
+
         results
     }
 }

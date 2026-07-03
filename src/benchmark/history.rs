@@ -1,4 +1,3 @@
-
 //! M2.7.14 Layer 4: VersionHistory — SQLite ledger for performance tracking
 
 use rusqlite::{Connection, Result as SqlResult};
@@ -13,7 +12,7 @@ impl VersionHistory {
     /// Initialize or open the performance database
     pub fn open(path: &Path) -> SqlResult<Self> {
         let conn = Connection::open(path)?;
-        
+
         conn.execute(
             "CREATE TABLE IF NOT EXISTS benchmark_runs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,8 +35,16 @@ impl VersionHistory {
         )?;
 
         // M2.7.14: Schema migration for tables created before this brick
-        conn.execute("ALTER TABLE benchmark_runs ADD COLUMN restarts INTEGER DEFAULT 0", []).ok();
-        conn.execute("ALTER TABLE benchmark_runs ADD COLUMN peak_memory_kb INTEGER DEFAULT 0", []).ok();
+        conn.execute(
+            "ALTER TABLE benchmark_runs ADD COLUMN restarts INTEGER DEFAULT 0",
+            [],
+        )
+        .ok();
+        conn.execute(
+            "ALTER TABLE benchmark_runs ADD COLUMN peak_memory_kb INTEGER DEFAULT 0",
+            [],
+        )
+        .ok();
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS version_metadata (
@@ -106,18 +113,26 @@ impl VersionHistory {
             "INSERT OR REPLACE INTO version_metadata 
              (git_tag, commit_hash, test_count, compiler_warnings)
              VALUES (?1, ?2, ?3, ?4)",
-            [git_tag, commit_hash, &test_count.to_string(), &compiler_warnings.to_string()],
+            [
+                git_tag,
+                commit_hash,
+                &test_count.to_string(),
+                &compiler_warnings.to_string(),
+            ],
         )?;
         Ok(())
     }
 
     /// Query all runs for a specific git tag
-    pub fn query_tag(&self, git_tag: &str) -> SqlResult<Vec<(String, u64, u64, u64, u64, u64, u64)>> {
+    pub fn query_tag(
+        &self,
+        git_tag: &str,
+    ) -> SqlResult<Vec<(String, u64, u64, u64, u64, u64, u64)>> {
         let mut stmt = self.conn.prepare(
             "SELECT instance_path, decisions, propagations, conflicts, restarts, peak_memory_kb, wall_time_ms
              FROM benchmark_runs WHERE git_tag = ?1"
         )?;
-        
+
         let rows = stmt.query_map([git_tag], |row| {
             Ok((
                 row.get::<_, String>(0)?,
@@ -129,7 +144,7 @@ impl VersionHistory {
                 row.get::<_, u64>(6)?,
             ))
         })?;
-        
+
         let mut results = Vec::new();
         for row in rows {
             results.push(row?);
