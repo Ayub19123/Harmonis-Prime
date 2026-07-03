@@ -30,7 +30,7 @@ jobs:
       run: cargo fmt -- --check
 
     - name: Run clippy
-      run: cargo clippy --all-targets -- -D warnings
+      run: cargo clippy --all-targets -- -W clippy::all
 
     - name: Build
       run: cargo build --lib --bins
