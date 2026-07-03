@@ -37,8 +37,8 @@ jobs:
 
     - name: Run tests per module
       run: |
-        echo "=== Running tests per module to avoid cross-module hang ==="
-        for module in $(cargo test --lib -- --list 2>&1 | grep ": test" | cut -d: -f1 | sort -u); do
+        modules="airgap audit bench benchmark endurance energy energy_telemetry euler hal identity kernel_enforcement memory mpfr_oracle mpfr_zeta network_calculus pim_solver ramanujan reference_data set10_fusion set9_telemetry thermodynamic_balance truncation_budget zeta_resonance"
+        for module in $modules; do
           echo "=== Testing module: $module ==="
           cargo test --lib $module -- --test-threads=1 --nocapture
         done
