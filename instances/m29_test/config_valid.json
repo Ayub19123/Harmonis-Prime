@@ -1,0 +1,8 @@
+{
+  "timeout": 300,
+  "memory_limit": 8192,
+  "thread_count": 4,
+  "project_root": ".",
+  "solver": "harmonis-prime",
+  "version": "6.2.0-M2.9.1"
+}
