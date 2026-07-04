@@ -2,45 +2,12 @@
 # M2.7.15: Docker/cgroups Containerization
 # Harmonis Prime Sovereign Core v6.2.0-M2.7.15
 # =============================================================================
-# Multi-stage build for minimal, reproducible, competition-grade artifact.
-# Rust 1.96.0 locked to glibc 2.36 (debian:bookworm).
-# Non-root execution. cgroups-aware resource governance.
+# Runtime-only container. Binary is built by CI test job and copied in.
+# Eliminates Docker build compilation failures due to environment differences.
 # =============================================================================
 
-ARG RUST_VERSION=1.96.0
 ARG DEBIAN_VERSION=bookworm
 
-# -----------------------------------------------------------------------------
-# Stage 1: Builder
-# -----------------------------------------------------------------------------
-FROM rust:${RUST_VERSION}-slim-${DEBIAN_VERSION} AS builder
-
-LABEL maintainer="Ayub19123 <ayub@harmonisprime.io>"
-LABEL version="6.2.0-M2.7.15"
-LABEL description="Harmonis Prime Sovereign Core - SAT Solver"
-LABEL org.opencontainers.image.source="https://github.com/Ayub19123/Harmonis-Prime"
-
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config \
-    libssl-dev \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /usr/src/sovereign_core
-
-# Copy dependency manifests first for deterministic layer caching
-COPY Cargo.toml Cargo.lock ./
-COPY src ./src
-
-# Build only the benchmark_runner binary (not all bins/benches)
-# --bins builds all [[bin]] and [[bench]] targets which may reference
-# files excluded by .dockerignore or non-existent paths
-RUN cargo build --release --bin benchmark_runner
-
-# -----------------------------------------------------------------------------
-# Stage 2: Runtime
-# -----------------------------------------------------------------------------
 FROM debian:${DEBIAN_VERSION}-slim AS runtime
 
 LABEL maintainer="Ayub19123 <ayub@harmonisprime.io>"
@@ -61,12 +28,13 @@ RUN groupadd -r sovereign && \
 RUN mkdir -p /opt/sovereign/bin /opt/sovereign/lib /opt/sovereign/data /opt/sovereign/benchmarks && \
     chown -R sovereign:sovereign /opt/sovereign
 
-# Copy binaries from builder
-COPY --from=builder /usr/src/sovereign_core/target/release/benchmark_runner /opt/sovereign/bin/
+# Binary is built by CI test job and copied here
+# Placeholder — actual binary injected via CI artifact or multi-stage workaround
+COPY target/release/benchmark_runner /opt/sovereign/bin/
 
 # Copy library artifacts if present
-COPY --from=builder /usr/src/sovereign_core/target/release/libsovereign_core.so /opt/sovereign/lib/ 2>/dev/null || true
-COPY --from=builder /usr/src/sovereign_core/target/release/libsovereign_core.a /opt/sovereign/lib/ 2>/dev/null || true
+COPY target/release/libsovereign_core.so /opt/sovereign/lib/ 2>/dev/null || true
+COPY target/release/libsovereign_core.a /opt/sovereign/lib/ 2>/dev/null || true
 
 # cgroups-aware resource governance environment
 ENV SOVEREIGN_CGROUPS_ENABLED=true

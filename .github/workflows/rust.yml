@@ -54,14 +54,26 @@ jobs:
     - name: Build release
       run: cargo build --release --lib --bins
 
-  # =============================================================================
-  # M2.7.15: Docker/cgroups Containerization
-  # =============================================================================
+    - name: Upload release binary as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-runner
+        path: target/release/benchmark_runner
+
   docker:
     runs-on: ubuntu-latest
     needs: test
     steps:
     - uses: actions/checkout@v4
+
+    - name: Download release binary
+      uses: actions/download-artifact@v4
+      with:
+        name: benchmark-runner
+        path: target/release/
+
+    - name: Make binary executable
+      run: chmod +x target/release/benchmark_runner
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -69,7 +81,6 @@ jobs:
     - name: Build Docker image
       run: |
         docker build \
-          --build-arg RUST_VERSION=1.96.0 \
           --build-arg DEBIAN_VERSION=bookworm \
           -t harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
           -t harmonis-prime/sovereign-core:latest \
