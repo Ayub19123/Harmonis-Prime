@@ -2,13 +2,11 @@
 # M2.7.15: Docker/cgroups Containerization
 # Harmonis Prime Sovereign Core v6.2.0-M2.7.15
 # =============================================================================
-# Runtime-only container. Binary is built by CI test job and copied in.
-# Eliminates Docker build compilation failures due to environment differences.
+# Runtime-only container. Binary built by CI test job (Ubuntu 24.04, glibc 2.39).
+# Runtime uses ubuntu:24.04 to match build environment glibc version.
 # =============================================================================
 
-ARG DEBIAN_VERSION=bookworm
-
-FROM debian:${DEBIAN_VERSION}-slim AS runtime
+FROM ubuntu:24.04 AS runtime
 
 LABEL maintainer="Ayub19123 <ayub@harmonisprime.io>"
 LABEL version="6.2.0-M2.7.15"
@@ -29,10 +27,9 @@ RUN mkdir -p /opt/sovereign/bin /opt/sovereign/lib /opt/sovereign/data /opt/sove
     chown -R sovereign:sovereign /opt/sovereign
 
 # Binary is built by CI test job and downloaded as artifact
-# Must exist at target/release/benchmark_runner in build context
 COPY target/release/benchmark_runner /opt/sovereign/bin/
 
-# Library artifacts are optional — use RUN with test instead of COPY with shell syntax
+# Library artifacts are optional
 RUN if [ -f target/release/libsovereign_core.so ]; then \
         cp target/release/libsovereign_core.so /opt/sovereign/lib/; \
     fi && \
