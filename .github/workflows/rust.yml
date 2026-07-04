@@ -65,13 +65,22 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Build Docker image
       run: |
-        docker build           -t harmonis-prime/sovereign-core:6.2.0-M2.7.15           -t harmonis-prime/sovereign-core:latest           .
+        docker build \
+          -t harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
+          -t harmonis-prime/sovereign-core:latest \
+          .
     - name: Verify container binary integrity
       run: |
         docker run --rm harmonis-prime/sovereign-core:6.2.0-M2.7.15 --help | grep -q "benchmark_runner" && echo "BINARY OK"
     - name: Test container with cgroups limits
       run: |
-        docker run --rm           --cpus=2           --memory=4g           --memory-swap=4g           -e SOVEREIGN_CGROUPS_ENABLED=true           harmonis-prime/sovereign-core:6.2.0-M2.7.15           --help | grep -q "benchmark_runner" && echo "cgroups test passed"
+        docker run --rm \
+          --cpus=2 \
+          --memory=4g \
+          --memory-swap=4g \
+          -e SOVEREIGN_CGROUPS_ENABLED=true \
+          harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
+          --help | grep -q "benchmark_runner" && echo "cgroups test passed"
     - name: Export image digest for auditability
       run: |
         docker images harmonis-prime/sovereign-core:6.2.0-M2.7.15 --format "{{.ID}}" > docker-image-digest.txt
@@ -106,3 +115,31 @@ jobs:
         echo "=== M2.7.16 PAR-2 SCORE ==="
         cat benchmark_output/par2_score.json
         echo "============================="
+
+  # =============================================================================
+  # M2.7.17: Regression Intelligence — 12% EMA Anomaly Detection
+  # =============================================================================
+  regression:
+    runs-on: ubuntu-latest
+    needs: benchmark
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download benchmark artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: benchmark-results-M2.7.16
+        path: benchmark_output/
+    - name: Run regression intelligence
+      run: ./scripts/regression_ci.sh ./benchmark_output/benchmark_results.json ./benchmark_output/par2_score.json ./benchmark_output
+    - name: Upload regression artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: regression-intelligence-M2.7.17
+        path: |
+          benchmark_output/per_class_report.json
+          baselines/par2_history.json
+    - name: Display regression report
+      run: |
+        echo "=== M2.7.17 REGRESSION REPORT ==="
+        cat benchmark_output/per_class_report.json
+        echo "==================================="

@@ -1,0 +1,86 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "harmonis-prime-m2717",
+    "title": "Harmonis Prime M2.7.17 — Regression Intelligence",
+    "tags": ["sat", "benchmark", "regression"],
+    "timezone": "utc",
+    "schemaVersion": 36,
+    "refresh": "5m",
+    "panels": [
+      {
+        "id": 1,
+        "title": "PAR-2 Score Trend",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "harmonis_par2_score",
+            "legendFormat": "PAR-2 Score"
+          }
+        ],
+        "alert": {
+          "name": "PAR-2 Regression Alert",
+          "condition": "B",
+          "evaluator": {
+            "type": "gt",
+            "params": [0]
+          },
+          "expression": "A",
+          "reducer": {
+            "type": "last",
+            "params": []
+          },
+          "query": {
+            "params": ["A", "5m", "now"]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "EMA Baseline vs Current",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "harmonis_ema_baseline",
+            "legendFormat": "EMA Baseline"
+          },
+          {
+            "expr": "harmonis_par2_score",
+            "legendFormat": "Current PAR-2"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Deviation % (12% Threshold)",
+        "type": "graph",
+        "thresholds": [
+          {
+            "colorMode": "critical",
+            "op": "gt",
+            "value": 12,
+            "fill": true,
+            "line": true
+          }
+        ],
+        "targets": [
+          {
+            "expr": "harmonis_deviation_percent",
+            "legendFormat": "Deviation %"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Per-Class Solve Rate",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "harmonis_solve_rate",
+            "legendFormat": "{{class}}"
+          }
+        ]
+      }
+    ]
+  }
+}
