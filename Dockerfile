@@ -33,11 +33,10 @@ WORKDIR /usr/src/sovereign_core
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 
-# Update lock file to ensure compatibility with container environment
-# then build release binary. --locked removed due to cross-environment
-# lock file drift (test job verifies lock integrity).
-RUN cargo update --workspace && \
-    cargo build --release --lib --bins
+# Build only the benchmark_runner binary (not all bins/benches)
+# --bins builds all [[bin]] and [[bench]] targets which may reference
+# files excluded by .dockerignore or non-existent paths
+RUN cargo build --release --bin benchmark_runner
 
 # -----------------------------------------------------------------------------
 # Stage 2: Runtime
