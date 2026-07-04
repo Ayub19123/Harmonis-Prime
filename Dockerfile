@@ -32,9 +32,13 @@ RUN mkdir -p /opt/sovereign/bin /opt/sovereign/lib /opt/sovereign/data /opt/sove
 # Must exist at target/release/benchmark_runner in build context
 COPY target/release/benchmark_runner /opt/sovereign/bin/
 
-# Copy library artifacts if present
-COPY target/release/libsovereign_core.so /opt/sovereign/lib/ 2>/dev/null || true
-COPY target/release/libsovereign_core.a /opt/sovereign/lib/ 2>/dev/null || true
+# Library artifacts are optional — use RUN with test instead of COPY with shell syntax
+RUN if [ -f target/release/libsovereign_core.so ]; then \
+        cp target/release/libsovereign_core.so /opt/sovereign/lib/; \
+    fi && \
+    if [ -f target/release/libsovereign_core.a ]; then \
+        cp target/release/libsovereign_core.a /opt/sovereign/lib/; \
+    fi
 
 # cgroups-aware resource governance environment
 ENV SOVEREIGN_CGROUPS_ENABLED=true
