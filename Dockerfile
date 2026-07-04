@@ -28,8 +28,8 @@ RUN groupadd -r sovereign && \
 RUN mkdir -p /opt/sovereign/bin /opt/sovereign/lib /opt/sovereign/data /opt/sovereign/benchmarks && \
     chown -R sovereign:sovereign /opt/sovereign
 
-# Binary is built by CI test job and copied here
-# Placeholder — actual binary injected via CI artifact or multi-stage workaround
+# Binary is built by CI test job and downloaded as artifact
+# Must exist at target/release/benchmark_runner in build context
 COPY target/release/benchmark_runner /opt/sovereign/bin/
 
 # Copy library artifacts if present

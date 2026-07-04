@@ -9,8 +9,11 @@
 # GitHub Actions
 .github/
 
-# Rust build artifacts
-target/
+# Rust build artifacts (EXCEPT release binary for Docker COPY)
+target/debug/
+target/.rustc_info.json
+target/.fingerprint/
+target/CACHEDIR.TAG
 **/*.rs.bk
 **/*.swp
 **/*.swo
