@@ -52,6 +52,7 @@ def detect_regression(current_par2, baseline_file, threshold=0.12):
             "current_par2": current_par2,
             "ema_baseline": None,
             "deviation": None,
+            "deviation_percent": None,
             "threshold": threshold,
             "recommendation": "Need 3+ data points for EMA. Current score recorded as baseline."
         }
@@ -66,6 +67,7 @@ def detect_regression(current_par2, baseline_file, threshold=0.12):
             "current_par2": current_par2,
             "ema_baseline": ema,
             "deviation": None,
+            "deviation_percent": None,
             "threshold": threshold,
             "recommendation": "EMA is zero or undefined. Check baseline data."
         }
