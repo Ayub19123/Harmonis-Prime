@@ -149,6 +149,8 @@ jobs:
     needs: test
     steps:
     - uses: actions/checkout@v4
+    - name: Create benchmark output directory
+      run: mkdir -p benchmark_output
     - name: Run M2.9.1 Horn-SAT Config Validation
       run: |
         python3 scripts/m29_preflight/horn_sat_validator.py \
