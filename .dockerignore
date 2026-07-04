@@ -1,11 +1,55 @@
-target/
+# M2.7.15: Docker build context exclusions
+# Minimize image size, maximize build cache hit rate, prevent secret leakage.
+
+# Git
 .git/
+.gitignore
+.gitattributes
+
+# GitHub Actions
 .github/
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+**/*.swp
+**/*.swo
+*~
+
+# Documentation (not required for compilation)
 *.md
-*.txt
-*.py
-*.sh
-*.ps1
-*.bak
+!README.md
+!REPRODUCIBILITY.md
+
+# IDE / Editor
+.vscode/
+.idea/
+*.iml
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Secrets and environment
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Temporary and log files
+tmp/
+temp/
+*.tmp
+*.log
+
+# Benchmark outputs (generated at runtime)
+*.cnf.sol
 *.drat
-*.cnf
+benchmark_results/
+results/
+
+# Docker itself
+Dockerfile
+.dockerignore
+docker-compose.yml

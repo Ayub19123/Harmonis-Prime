@@ -1,0 +1,98 @@
+# =============================================================================
+# M2.7.15: Docker Compose for Harmonis Prime Sovereign Core
+# Reproducible local development and benchmark execution environment.
+# With cgroups-aware resource governance and network isolation.
+# =============================================================================
+
+version: "3.8"
+
+services:
+  sovereign-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUST_VERSION: "1.96.0"
+        DEBIAN_VERSION: "bookworm"
+    image: harmonis-prime/sovereign-core:6.2.0-M2.7.15
+    container_name: sovereign_core
+    restart: "no"
+    
+    # cgroups resource governance (Pillar: Competitiveness)
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    
+    # Persistence for SQLite ledger and benchmark telemetry
+    volumes:
+      - sovereign_data:/opt/sovereign/data
+      - ./benchmarks:/opt/sovereign/benchmarks:ro
+      - ./instances:/opt/sovereign/instances:ro
+    
+    environment:
+      - RUST_LOG=info
+      - SOVEREIGN_DATA_DIR=/opt/sovereign/data
+      - SOVEREIGN_BENCHMARK_DIR=/opt/sovereign/benchmarks
+      - SOVEREIGN_CGROUPS_ENABLED=true
+    
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    user: "sovereign"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "test -x /opt/sovereign/bin/benchmark_runner || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    
+    networks:
+      - sovereign_net
+
+  benchmark-runner:
+    image: harmonis-prime/sovereign-core:6.2.0-M2.7.15
+    container_name: benchmark_runner
+    restart: "no"
+    
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+    
+    volumes:
+      - sovereign_data:/opt/sovereign/data
+      - ./benchmarks:/opt/sovereign/benchmarks:ro
+      - ./instances:/opt/sovereign/instances:ro
+    
+    environment:
+      - RUST_LOG=debug
+      - SOVEREIGN_DATA_DIR=/opt/sovereign/data
+      - SOVEREIGN_BENCHMARK_DIR=/opt/sovereign/benchmarks
+    
+    entrypoint: ["/opt/sovereign/bin/benchmark_runner"]
+    command: ["--suite", "sat2027", "--output", "/opt/sovereign/data/results.json"]
+    
+    depends_on:
+      sovereign-core:
+        condition: service_healthy
+    
+    networks:
+      - sovereign_net
+
+volumes:
+  sovereign_data:
+    driver: local
+
+networks:
+  sovereign_net:
+    driver: bridge
+    internal: true

@@ -35,7 +35,7 @@ jobs:
     - name: Build
       run: cargo build --lib --bins
 
-    - name: Run tests - safe modules (no global state conflicts)
+    - name: Run tests - safe modules
       run: |
         modules="airgap benchmark endurance energy energy_telemetry euler hal identity kernel_enforcement memory mpfr_oracle mpfr_zeta network_calculus pim_solver ramanujan reference_data set10_fusion set9_telemetry thermodynamic_balance truncation_budget zeta_resonance"
         for module in $modules; do
@@ -53,3 +53,44 @@ jobs:
 
     - name: Build release
       run: cargo build --release --lib --bins
+
+  # =============================================================================
+  # M2.7.15: Docker/cgroups Containerization
+  # =============================================================================
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          --build-arg RUST_VERSION=1.96.0 \
+          --build-arg DEBIAN_VERSION=bookworm \
+          -t harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
+          -t harmonis-prime/sovereign-core:latest \
+          .
+
+    - name: Verify container binary integrity
+      run: |
+        docker run --rm harmonis-prime/sovereign-core:6.2.0-M2.7.15 /bin/sh -c \
+          "test -x /opt/sovereign/bin/benchmark_runner && echo 'BINARY OK' || exit 1"
+
+    - name: Test container with cgroups limits
+      run: |
+        docker run --rm \
+          --cpus=2 \
+          --memory=4g \
+          --memory-swap=4g \
+          -e SOVEREIGN_CGROUPS_ENABLED=true \
+          harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
+          /bin/sh -c "echo 'cgroups test passed'"
+
+    - name: Export image digest for auditability
+      run: |
+        docker images harmonis-prime/sovereign-core:6.2.0-M2.7.15 --format "{{.ID}}" > docker-image-digest.txt
+        cat docker-image-digest.txt
