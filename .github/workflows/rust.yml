@@ -81,15 +81,13 @@ jobs:
     - name: Build Docker image
       run: |
         docker build \
-          --build-arg DEBIAN_VERSION=bookworm \
           -t harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
           -t harmonis-prime/sovereign-core:latest \
           .
 
     - name: Verify container binary integrity
       run: |
-        docker run --rm harmonis-prime/sovereign-core:6.2.0-M2.7.15 /bin/sh -c \
-          "test -x /opt/sovereign/bin/benchmark_runner && echo 'BINARY OK' || exit 1"
+        docker run --rm harmonis-prime/sovereign-core:6.2.0-M2.7.15 --help | grep -q "benchmark_runner" && echo "BINARY OK"
 
     - name: Test container with cgroups limits
       run: |
@@ -99,7 +97,7 @@ jobs:
           --memory-swap=4g \
           -e SOVEREIGN_CGROUPS_ENABLED=true \
           harmonis-prime/sovereign-core:6.2.0-M2.7.15 \
-          /bin/sh -c "echo 'cgroups test passed'"
+          --help | grep -q "benchmark_runner" && echo "cgroups test passed"
 
     - name: Export image digest for auditability
       run: |
