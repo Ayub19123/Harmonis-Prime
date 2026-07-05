@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-07-05T12:23:01Z",
+  "brick": "M3.2",
+  "phase": "BFT_CONSENSUS_SIMULATION",
+  "honest_constraint": "Single WSL instance \u2014 network layer mocked. Software simulation only.",
+  "topology": {
+    "nodes": 5,
+    "faulty_max": 1,
+    "fault_tolerance": "N >= 3f + 1"
+  },
+  "simulation": {
+    "rounds": 100,
+    "success": 100,
+    "failed": 0,
+    "success_rate": 1.0,
+    "avg_consensus_ms": 0.004,
+    "min_consensus_ms": 0.003,
+    "max_consensus_ms": 0.07,
+    "phi_master_violations": 0,
+    "faulty_detected": 0
+  },
+  "evidence_gates": {
+    "consensus_under_1s": {
+      "target": "< 1 s",
+      "actual_ms": 0.004,
+      "status": "PASS"
+    },
+    "success_rate_95pct": {
+      "target": ">= 95%",
+      "actual_pct": 100.0,
+      "status": "PASS"
+    },
+    "phi_master_zero_violations": {
+      "target": "0",
+      "actual": 0,
+      "status": "PASS"
+    }
+  },
+  "status": "PASS",
+  "pillars": {
+    "correctness": true,
+    "auditability": true,
+    "reproducibility": true,
+    "competitiveness": true
+  },
+  "checksum_sha256": "a72e34cbb44be05dfe9e01cbd870c77c7d118eb515466c10d3a1ed6e87dd74a3"
+}
