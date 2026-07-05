@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-07-05T08:49:43Z",
+  "brick": "M2.9.1",
+  "variables": 4,
+  "clauses": 4,
+  "cnf_generation_ms": 0.4,
+  "solve_time_ms": 0.03,
+  "total_time_ms": 0.917,
+  "satisfiable": true,
+  "proof_size_bytes": 101,
+  "cnf_file": "/tmp/preflight.cnf",
+  "cnf_size_bytes": 74,
+  "gates": {
+    "cnf_generation_under_10ms": true,
+    "solve_under_100ms": true,
+    "proof_under_10kb": true,
+    "memory_under_16mb": true
+  },
+  "status": "PASS",
+  "pillars": {
+    "correctness": true,
+    "auditability": true,
+    "reproducibility": true,
+    "competitiveness": true
+  }
+}

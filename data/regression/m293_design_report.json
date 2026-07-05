@@ -1,0 +1,30 @@
+{
+  "brick": "M2.9.3",
+  "name": "5-Node BFT Testnet",
+  "objective": "Minimal BFT CNF, measure solve time and bandwidth",
+  "mathematical_foundation": "N >= 3f + 1 where N=5, f=1",
+  "cnf_encoding": {
+    "variables": "15 boolean vars (5 nodes x 3 states)",
+    "clauses": "50-100 Horn clauses",
+    "target_size": "< 1 MB",
+    "kill_condition": "> 1 MB -> abandon"
+  },
+  "performance_gates": {
+    "solve_time_s": {"target": "< 1", "kill": "> 1"},
+    "bandwidth_mbps": {"target": "< 1", "kill": "> 1"},
+    "proof_size_kb": {"target": "< 10", "kill": "> 10"}
+  },
+  "network_topology": {
+    "nodes": 5,
+    "fault_tolerance": 1,
+    "topology": "Fully connected mesh"
+  },
+  "four_pillars": {
+    "correctness": "BFT consensus proven by SAT before commitment",
+    "auditability": "Every message SHA-256 logged, proofs drat-trim verified",
+    "reproducibility": "Same config -> same CNF -> same consensus",
+    "competitiveness": "If solve <1s, distributed formal verification is practical"
+  },
+  "contingency": "If ANY gate fails -> abandon distributed consensus",
+  "status": "DESIGN_COMPLETE_PENDING_EVIDENCE"
+}

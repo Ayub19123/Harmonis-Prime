@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-07-05T06:20:10.450316+00:00Z",
+  "commit_hash": "a1b2c3d4",
+  "benchmark_family": "sat2024-main",
+  "par2_current": 2450.5,
+  "par2_baseline_ema": 2421.5247,
+  "drift_ratio": 0.012,
+  "drift_percent": 1.2,
+  "anomaly_threshold_percent": 12.0,
+  "is_anomaly": false,
+  "severity": "NORMAL",
+  "recommendation": "Within bounds",
+  "history_length": 5,
+  "ema_window": 5
+}

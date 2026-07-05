@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-07-05T09:10:00Z",
+  "total_instances": 1,
+  "families": {
+    "sat2024-main": {
+      "count": 1,
+      "par2_min": 2450.5,
+      "par2_max": 2450.5,
+      "par2_mean": 2450.5,
+      "par2_median": 2450.5,
+      "time_mean": 45.2
+    }
+  }
+}

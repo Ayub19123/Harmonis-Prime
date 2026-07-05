@@ -1,0 +1,38 @@
+[
+  {
+    "timestamp": "2026-07-01T00:00:00Z",
+    "commit_hash": "00000001",
+    "benchmark_family": "sat2024-main",
+    "par2_score": 2400.0
+  },
+  {
+    "timestamp": "2026-07-02T00:00:00Z",
+    "commit_hash": "00000002",
+    "benchmark_family": "sat2024-main",
+    "par2_score": 2410.0
+  },
+  {
+    "timestamp": "2026-07-03T00:00:00Z",
+    "commit_hash": "00000003",
+    "benchmark_family": "sat2024-main",
+    "par2_score": 2395.0
+  },
+  {
+    "timestamp": "2026-07-04T00:00:00Z",
+    "commit_hash": "00000004",
+    "benchmark_family": "sat2024-main",
+    "par2_score": 2420.0
+  },
+  {
+    "timestamp": "2026-07-05T06:14:24.066673Z",
+    "commit_hash": "a1b2c3d4",
+    "benchmark_family": "sat2024-main",
+    "par2_score": 2450.5
+  },
+  {
+    "timestamp": "2026-07-05T06:20:10.450316+00:00Z",
+    "commit_hash": "a1b2c3d4",
+    "benchmark_family": "sat2024-main",
+    "par2_score": 2450.5
+  }
+]

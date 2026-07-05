@@ -1,80 +1,88 @@
 ---- MODULE BenchmarkRunner ----
 EXTENDS Naturals, Sequences, FiniteSets
 
-CONSTANTS
-    Instances,           \* Set of benchmark instance names
-    MaxTime,             \* Maximum timeout per instance
-    Workers              \* Number of parallel workers
+CONSTANTS Instances, Solvers, MaxTime
 
-VARIABLES
-    state,               \* Current workflow state
-    completed,           \* Set of completed instances
-    failed,              \* Set of failed instances
-    current_time         \* Elapsed time tracker
+VARIABLES state, completed, failed, scores, timestamp
+
+States == {"INIT", "VALIDATE", "RUN", "SCORE", "REGRESS", "DONE"}
 
 TypeInvariant ==
-    /\ state \in {"INIT", "VALIDATE", "RUN", "SCORE", "REGRESS", "DONE", "ABORT"}
+    /\ state \in States
     /\ completed \subseteq Instances
     /\ failed \subseteq Instances
-    /\ current_time \in Nat
+    /\ scores \in [Instances -> Nat]
+    /\ timestamp \in Nat
 
 Init ==
     /\ state = "INIT"
     /\ completed = {}
     /\ failed = {}
-    /\ current_time = 0
+    /\ scores = [i \in Instances |-> 0]
+    /\ timestamp = 0
 
 Validate ==
     /\ state = "INIT"
     /\ state' = "VALIDATE"
-    /\ UNCHANGED <<completed, failed, current_time>>
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<completed, failed, scores>>
 
 RunBenchmarks ==
     /\ state = "VALIDATE"
     /\ state' = "RUN"
-    /\ UNCHANGED <<completed, failed, current_time>>
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<completed, failed, scores>>
 
 CompleteInstance(i) ==
     /\ state = "RUN"
-    /\ i \in Instances \ (completed \union failed)
+    /\ i \in Instances \ completed \ failed
+    /\ scores' = [scores EXCEPT ![i] = @ + 1]
     /\ completed' = completed \union {i}
-    /\ IF completed' = Instances
-       THEN state' = "SCORE"
-       ELSE state' = state
-    /\ UNCHANGED <<failed, current_time>>
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<state, failed>>
 
 FailInstance(i) ==
     /\ state = "RUN"
-    /\ i \in Instances \ (completed \union failed)
+    /\ i \in Instances \ completed \ failed
     /\ failed' = failed \union {i}
-    /\ state' = "ABORT"
-    /\ UNCHANGED <<completed, current_time>>
+    /\ scores' = [scores EXCEPT ![i] = MaxTime * 2]
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<state, completed>>
 
 Score ==
-    /\ state = "SCORE"
-    /\ state' = "REGRESS"
-    /\ UNCHANGED <<completed, failed, current_time>>
+    /\ state = "RUN"
+    /\ completed \union failed = Instances
+    /\ state' = "SCORE"
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<completed, failed, scores>>
 
 Regress ==
+    /\ state = "SCORE"
+    /\ state' = "REGRESS"
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<completed, failed, scores>>
+
+Done ==
     /\ state = "REGRESS"
     /\ state' = "DONE"
-    /\ UNCHANGED <<completed, failed, current_time>>
-
-\* Liveness: Every started benchmark eventually completes or fails
-Liveness == \A i \in Instances : 
-    [](i \in completed \/ i \in failed)
-
-\* Safety: Cannot abort and complete simultaneously
-Safety == ~(state = "ABORT" /\ completed # {})
+    /\ timestamp' = timestamp + 1
+    /\ UNCHANGED <<completed, failed, scores>>
 
 Next ==
-    \/ Validate
-    \/ RunBenchmarks
+    \/ Validate \/ RunBenchmarks
     \/ \E i \in Instances : CompleteInstance(i)
     \/ \E i \in Instances : FailInstance(i)
-    \/ Score
-    \/ Regress
+    \/ Score \/ Regress \/ Done
 
-Spec == Init /\ [][Next]_<<state, completed, failed, current_time>> /\ Liveness
+Safety ==
+    /\ completed \intersect failed = {}
+    /\ timestamp <= Cardinality(Instances) + 6
 
+Liveness == state = "INIT" ~> state = "DONE"
+
+Par2Bounded == \A i \in Instances : scores[i] <= MaxTime * 2
+
+Spec == Init /\ [][Next]_vars /\ WF_vars(Next)
+
+vars == <<state, completed, failed, scores, timestamp>>
 ====

@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "description": "Baseline schema for PAR-2 regression tracking",
+  "metrics": ["par2_score", "solved_count", "timeout_count", "mean_time", "median_time"],
+  "required_fields": ["timestamp", "commit_hash", "benchmark_family", "instance_count"],
+  "ema_window": 5,
+  "anomaly_threshold": 0.12
+}
