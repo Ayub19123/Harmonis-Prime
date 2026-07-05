@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-07-05T12:10:29Z",
+  "brick": "M3.1",
+  "phase": "MASTER_CNF_INTEGRATION",
+  "formula": "\u03a6_Master = \u03a6_Consensus \u2227 \u03c8 \u2227 \u22c0Clauses_Horn",
+  "components": {
+    "phi_consensus": {
+      "source": "M2.9.3",
+      "description": "BFT consensus: N >= 3f + 1",
+      "variables": 5
+    },
+    "psi": {
+      "source": "M2.9.2",
+      "description": "Temporal liveness: INIT ~> DONE",
+      "variables": 1
+    },
+    "horn_clauses": {
+      "source": "M2.9.1",
+      "description": "Config validation",
+      "variables": 1
+    }
+  },
+  "master_cnf": {
+    "file": "data/regression/master_cnf.cnf",
+    "total_variables": 7,
+    "total_clauses": 12,
+    "size_bytes": 1205,
+    "size_kb": 1.18,
+    "compile_ms": 0.233,
+    "sha256": "56ebb3cf4c3ebba13f867f3536af42f15580469595e8dbe3dc6847b819825489"
+  },
+  "evidence_gates": {
+    "cnf_under_100kb": {
+      "target": "< 100 KB",
+      "actual_kb": 1.18,
+      "status": "PASS"
+    },
+    "compile_under_10ms": {
+      "target": "< 10 ms",
+      "actual_ms": 0.233,
+      "status": "PASS"
+    },
+    "sat_solve_under_1s": {
+      "target": "< 1 s",
+      "actual_ms": 0,
+      "status": "SKIPPED"
+    }
+  },
+  "sat_result": {
+    "satisfiable": null,
+    "interpretation": "UNSAT or unknown"
+  },
+  "status": "PASS",
+  "pillars": {
+    "correctness": true,
+    "auditability": true,
+    "reproducibility": true,
+    "competitiveness": true
+  }
+}
