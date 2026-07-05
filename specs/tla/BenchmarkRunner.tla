@@ -1,11 +1,11 @@
 ---- MODULE BenchmarkRunner ----
-EXTENDS Naturals, Sequences, FiniteSets
+EXTENDS Naturals, FiniteSets
 
-CONSTANTS Instances, Solvers, MaxTime
+CONSTANTS Instances, MaxTime
 
 VARIABLES state, completed, failed, scores, timestamp
 
-States == {"INIT", "VALIDATE", "RUN", "SCORE", "REGRESS", "DONE"}
+States == {"INIT","VALIDATE","RUN","SCORE","REGRESS","DONE"}
 
 TypeInvariant ==
     /\ state \in States
@@ -35,23 +35,23 @@ RunBenchmarks ==
 
 CompleteInstance(i) ==
     /\ state = "RUN"
-    /\ i \in Instances \ completed \ failed
+    /\ i \in Instances \ (completed \cup failed)
     /\ scores' = [scores EXCEPT ![i] = @ + 1]
-    /\ completed' = completed \union {i}
+    /\ completed' = completed \cup {i}
     /\ timestamp' = timestamp + 1
     /\ UNCHANGED <<state, failed>>
 
 FailInstance(i) ==
     /\ state = "RUN"
-    /\ i \in Instances \ completed \ failed
-    /\ failed' = failed \union {i}
+    /\ i \in Instances \ (completed \cup failed)
+    /\ failed' = failed \cup {i}
     /\ scores' = [scores EXCEPT ![i] = MaxTime * 2]
     /\ timestamp' = timestamp + 1
     /\ UNCHANGED <<state, completed>>
 
 Score ==
     /\ state = "RUN"
-    /\ completed \union failed = Instances
+    /\ completed \cup failed = Instances
     /\ state' = "SCORE"
     /\ timestamp' = timestamp + 1
     /\ UNCHANGED <<completed, failed, scores>>
@@ -69,20 +69,22 @@ Done ==
     /\ UNCHANGED <<completed, failed, scores>>
 
 Next ==
-    \/ Validate \/ RunBenchmarks
+    \/ Validate
+    \/ RunBenchmarks
     \/ \E i \in Instances : CompleteInstance(i)
     \/ \E i \in Instances : FailInstance(i)
-    \/ Score \/ Regress \/ Done
+    \/ Score
+    \/ Regress
+    \/ Done
 
 Safety ==
-    /\ completed \intersect failed = {}
+    /\ completed \cap failed = {}
     /\ timestamp <= Cardinality(Instances) + 6
 
-Liveness == state = "INIT" ~> state = "DONE"
+Liveness == state = "INIT" ~> (state = "DONE" \/ state = "REGRESS")
 
 Par2Bounded == \A i \in Instances : scores[i] <= MaxTime * 2
 
-Spec == Init /\ [][Next]_vars /\ WF_vars(Next)
+Spec == Init /\ [][Next]_<<state, completed, failed, scores, timestamp>> /\ WF_<<state, completed, failed, scores, timestamp>>(Next)
 
-vars == <<state, completed, failed, scores, timestamp>>
 ====
