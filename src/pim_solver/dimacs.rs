@@ -113,6 +113,10 @@ impl DimacsInstance {
 
             // Parse clause literals
             for token in trimmed.split_whitespace() {
+                // Skip DIMACS terminator '%'
+                if token == "%" {
+                    break;
+                }
                 let literal = token.parse::<i32>().map_err(|e| {
                     DimacsError::MalformedClause(format!(
                         "Non-integer token '{}' at line {}: {}",
