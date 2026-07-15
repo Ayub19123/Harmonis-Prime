@@ -1,0 +1,50 @@
+{
+  "dashboard": {
+    "title": "Harmonis Prime — Sovereign Dashboard v6.2.0",
+    "panels": [
+      {
+        "id": 1,
+        "title": "PAR-2 Score Trend",
+        "type": "timeseries",
+        "targets": [{"expr": "par2_score", "legendFormat": "PAR-2"}]
+      },
+      {
+        "id": 2,
+        "title": "EMA Baseline vs Current",
+        "type": "timeseries",
+        "targets": [
+          {"expr": "ema_baseline", "legendFormat": "EMA Baseline"},
+          {"expr": "par2_current", "legendFormat": "Current"}
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Anomaly Alerts",
+        "type": "stat",
+        "targets": [{"expr": "anomaly_status", "legendFormat": "Status"}],
+        "mappings": {"0": {"text": "NORMAL", "color": "green"}, "1": {"text": "WARNING", "color": "yellow"}, "2": {"text": "CRITICAL", "color": "red"}}
+      },
+      {
+        "id": 4,
+        "title": "Per-Family PAR-2 Mean",
+        "type": "bargauge",
+        "targets": [{"expr": "par2_by_family", "legendFormat": "{{family}}"}]
+      },
+      {
+        "id": 5,
+        "title": "Brick Completion Tracker",
+        "type": "table",
+        "rows": [
+          {"brick": "M2.7.15", "name": "Docker/cgroups", "status": "SEALED", "correctness": "PASS", "auditability": "PASS", "reproducibility": "PASS", "competitiveness": "PASS"},
+          {"brick": "M2.7.16", "name": "CI/CD Lockstep", "status": "SEALED", "correctness": "PASS", "auditability": "PASS", "reproducibility": "PASS", "competitiveness": "PASS"},
+          {"brick": "M2.7.17", "name": "Regression Intel", "status": "SEALED", "correctness": "PASS", "auditability": "PASS", "reproducibility": "PASS", "competitiveness": "PASS"},
+          {"brick": "M2.7.1++", "name": "Documentation", "status": "SEALED", "correctness": "PASS", "auditability": "PASS", "reproducibility": "PASS", "competitiveness": "PASS"},
+          {"brick": "M2.9.1", "name": "SAT Preflight", "status": "ACTIVE", "correctness": "PENDING", "auditability": "PENDING", "reproducibility": "PENDING", "competitiveness": "PENDING"},
+          {"brick": "M2.9.2", "name": "TLA+ Spec", "status": "DESIGN", "correctness": "DESIGN", "auditability": "DESIGN", "reproducibility": "DESIGN", "competitiveness": "DESIGN"},
+          {"brick": "M2.9.3", "name": "5-Node Testnet", "status": "DESIGN", "correctness": "DESIGN", "auditability": "DESIGN", "reproducibility": "DESIGN", "competitiveness": "DESIGN"},
+          {"brick": "M3.0", "name": "Decision Gate", "status": "FUTURE", "correctness": "—", "auditability": "—", "reproducibility": "—", "competitiveness": "—"}
+        ]
+      }
+    ]
+  }
+}

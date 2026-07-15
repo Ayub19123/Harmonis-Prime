@@ -1,0 +1,3 @@
+# M2.7.16: Python dependencies for PAR-2 scoring and cactus plots
+matplotlib>=3.7.0
+numpy>=1.24.0

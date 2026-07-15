@@ -2,7 +2,7 @@
 
 ## Build Requirements
 
-- Rust 1.78+ (stable)
+- Rust 1.96.0 (pinned) (stable)
 - `cargo` (comes with Rustup)
 - No external dependencies for core library
 - Optional: `pyo3` feature for Python bridge
@@ -14,8 +14,8 @@
 cargo test --lib -- --nocapture
 
 # Expected output:
-# warning: `sovereign_core` (lib test) generated 4 warnings
-# test result: ok. 80 passed; 0 failed; 0 ignored; finished in 0.20s
+# warning: `sovereign_core` (lib test) generated 0 warnings
+# test result: ok. 215 passed; 0 failed; 0 ignored; finished in 0.20s
 Test Discipline
 Table
 Rule	Enforcement
@@ -47,3 +47,9 @@ Calm, clear, grounded, zero emotion
 Every failure is data, not defeat
 Every boundary condition is a brick
 The precision is eternal
+## M2.7.14+ Contribution Discipline
+- Zero warnings: cargo check --lib --bins must return 0 warnings
+- Test coverage: All new modules require integration tests in mod.rs
+- Documentation sync: Every code change requires matching .md update
+- Benchmark validation: New features must include benchmark_runner regression test
+- Git tagging: Sealed bricks receive annotated tags (git tag -a vX.Y.Z-Mx.y.z)

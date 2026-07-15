@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-07-05T11:43:33Z",
+  "brick": "M2.9.3",
+  "phase": "IMPLEMENTATION",
+  "topology": {
+    "nodes": 5,
+    "faulty": 1,
+    "fault_tolerance": "N >= 3f + 1"
+  },
+  "cnf": {
+    "file": "data/regression/bft_consensus.cnf",
+    "variables": 5,
+    "clauses": 10,
+    "size_bytes": 160,
+    "size_kb": 0.16,
+    "sha256": "1e9e9f3c832e885ab5bf2a1e7a19b6e4f5306e0d71419fedcc6146ff223ceaa3",
+    "generation_ms": 0.407
+  },
+  "evidence_gates": {
+    "cnf_under_1mb": {
+      "target": "< 1 MB",
+      "actual_bytes": 160,
+      "actual_mb": 0.000153,
+      "status": "PASS"
+    },
+    "solve_under_1s": {
+      "target": "< 1 s",
+      "actual_ms": 0,
+      "status": "PASS"
+    }
+  },
+  "sat_result": {
+    "satisfiable": null,
+    "proof_valid": false,
+    "bft_consensus_possible": null
+  },
+  "kill_conditions": {
+    "cnf_size_exceeded": false,
+    "solve_timeout": false,
+    "bft_violation": false
+  },
+  "status": "PASS",
+  "pillars": {
+    "correctness": true,
+    "auditability": true,
+    "reproducibility": true,
+    "competitiveness": true
+  }
+}

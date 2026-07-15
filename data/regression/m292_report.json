@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-07-05T09:49:26Z",
+  "brick": "M2.9.2",
+  "spec_file": "specs/tla/BenchmarkRunner.tla",
+  "spec_lines": 90,
+  "states_generated": 81,
+  "distinct_states": 53,
+  "parse_errors": 0,
+  "spec_errors": 0,
+  "invariant_violations": 0,
+  "deadlocks": 0,
+  "total_errors": 0,
+  "status": "PASS",
+  "gates": {
+    "spec_under_500_lines": true,
+    "zero_parse_errors": true,
+    "zero_spec_errors": true,
+    "zero_invariant_violations": true,
+    "zero_deadlocks": true,
+    "temporal_finished": true,
+    "queue_empty": true
+  },
+  "pillars": {
+    "correctness": true,
+    "auditability": true,
+    "reproducibility": true,
+    "competitiveness": true
+  }
+}

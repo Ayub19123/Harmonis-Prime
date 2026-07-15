@@ -16,7 +16,7 @@ fn main() {
     // Initialize energy monitor (RAPL hardware on Linux, software fallback on Windows)
     #[cfg(target_os = "linux")]
     let mut energy_monitor: Box<dyn EnergyMonitor> = {
-        let mut rapl = RaplHardwareMonitor::new(RaplDomain::Package);
+        let rapl = RaplHardwareMonitor::new(RaplDomain::Package);
         if rapl.is_available() {
             println!("Platform: Linux (RAPL hardware)");
             Box::new(rapl)
