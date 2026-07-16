@@ -705,6 +705,11 @@ pub struct CdclSolver {
     // M2.7.13: Benchmark Harness fields
     instance_hash: String,
     benchmark_clock: BenchmarkMeasurement,
+    /// M2.7.17: Output verbosity control.
+    /// When false, all diagnostic output is suppressed.
+    /// Only `s SATISFIABLE` / `s UNSATISFIABLE` and `v ... 0` model lines
+    /// are emitted to stdout. All diagnostics use `eprintln!` (stderr).
+    verbose: bool,
 }
 
 impl CdclSolver {
@@ -800,6 +805,7 @@ impl CdclSolver {
                 cycles: 0,
                 wall_ms: 0,
             },
+            verbose: true,
         }
     }
 
