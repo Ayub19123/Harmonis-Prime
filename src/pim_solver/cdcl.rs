@@ -1534,17 +1534,20 @@ impl CdclSolver {
                 return SolveResult::Sat(model);
             }
 
-            // M2.7.9: Epistemic Look-Ahead — inject forced literals preemptively
-            let forced = self.shadow_lookahead();
-            for lit in &forced {
-                let var = lit.var;
-                if self.assignment[var].is_none() {
-                    self.decision_level += 1;
-                    self.telemetry.decision_count += 1;
-                    self.assign(var, lit.value, None);
-                    // Let normal unit_propagate() in next loop iteration handle implications
-                }
-            }
+            // M2.7.9: Epistemic Look-Ahead — DISABLED. Not a sound inference:
+            // "≥85% of projected branches" is a heuristic threshold, not logical
+            // entailment. Injecting these as no-reason decisions with deferred
+            // propagation corrupts decision-level structure used by analyze_conflict's
+            // backjump computation, causing false SAT on UNSAT instances.
+            // let forced = self.shadow_lookahead();
+            // for lit in &forced {
+            //     let var = lit.var;
+            //     if self.assignment[var].is_none() {
+            //         self.decision_level += 1;
+            //         self.telemetry.decision_count += 1;
+            //         self.assign(var, lit.value, None);
+            //     }
+            // }
 
             // M2.7.11: State transition to Decide
             self.solver_state = SolverState::Decide;
