@@ -122,6 +122,8 @@ pub struct DeterministicSandbox {
     pub cpu_affinity: Option<usize>,    // Pin to specific CPU core
     pub memory_limit_mb: Option<usize>, // RSS memory cap
     pub seed: u64,                      // Deterministic PRNG seed
+    /// M2.7.17: Output verbosity control for sandbox diagnostics
+    pub verbose: bool,
 }
 
 impl Default for DeterministicSandbox {
@@ -130,6 +132,7 @@ impl Default for DeterministicSandbox {
             cpu_affinity: None,
             memory_limit_mb: None,
             seed: 0x9e3779b97f4a7c15, // Golden ratio prime
+            verbose: true,
         }
     }
 }
@@ -150,7 +153,9 @@ impl DeterministicSandbox {
             match status {
                 Ok(s) if s.success() => {}
                 _ => {
-                    eprintln!("c M2.7.13: taskset unavailable, CPU affinity not applied");
+                    if self.verbose {
+                        eprintln!("c M2.7.13: taskset unavailable, CPU affinity not applied");
+                    }
                 }
             }
         }
